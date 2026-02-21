@@ -38,6 +38,18 @@ typedef struct CelluleResultat{
 typedef struct CelluleResultat CelluleResultat;
 
 
+typedef struct {
+	ListeProcessus tete;
+	ListeProcessus queue;
+} *ListePTQ;
+
+
+typedef struct {
+	ListeResultat tete;
+	ListeResultat queue;
+} *ListeRTQ;
+
+
 /*
 * Type générique - c'est un pointeur universel (void *)
 * Permet à une fonction de manipuler n'importe quel type de données
@@ -94,7 +106,7 @@ ListeResultat creatNouvelleCelluleResultat(int donnee);
 *******************************************/
 TGenerique suivant_processus(TGenerique cellule);
 TGenerique suivant_resultat(TGenerique cellule);
-TGenerique dernierListe(TGenerique l, FonctionSuivant suivant);
+TGenerique queueListe(TGenerique l, FonctionSuivant suivant);
 
 
 bool est_videListe(TGenerique l);
@@ -126,21 +138,18 @@ int donnee(ListeResultat l);
 *******************************************/
 void inserProcessusTete(TGenerique *l, FonctionAlloc alloc, const char *name, int timeArrival, int nbQuantum);
 void inserResultatTete(TGenerique *l, FonctionAlloc alloc, int donnee);
-/*
 
-void inserProcessusQueue(ListeProcessus *l, int elt);
-void inserResultatQueue(ListeResultat *l, int elt);*/
+
+void inserProcessusQueue(TGenerique *l, FonctionAlloc alloc, const char *name, int timeArrival, int nbQuantum);
+void inserResultatQueue(TGenerique *l, FonctionAlloc alloc, int donnee);
 
 
 
 /******************************************
 	Fonction de suppression
-*******************************************//*
-void suppProcessusTete(ListeProcessus *l);
-void suppProcessusQueue(ListeProcessus *l);
-
-void suppResultatTete(ListeResultat *l);
-void suppResultatQueue(ListeResultat *l);*/
-
+*******************************************/
+void suppTete(TGenerique *l, FonctionSuivant suivant);
+void suppProcessusQueue(TGenerique *l, FonctionSuivant suivant);
+void suppResultatQueue(TGenerique *l, FonctionSuivant suivant);
 
 #endif
