@@ -13,10 +13,11 @@
 	Strucutre de données
 ***************************************/
 
-/*
-Structure d'une Liste chainée
-avec dans chaque cellule les informations d'un processus
-*/
+
+/**
+ * Structure d'une Liste chainée
+ * avec dans chaque cellule les informations d'un processus
+ * */
 typedef struct CelluleProcessus{
 	char processus_name[NBMAXCHAR];		// chaine non modifiable
 	int time_arrival;
@@ -26,10 +27,10 @@ typedef struct CelluleProcessus{
 
 typedef struct CelluleProcessus CelluleProcessus;
 
-/*
-Structure qui permet de stocker les informations
-sortante des algorithmes
-*/
+
+/**
+ * Structure qui permet de stocker les informations sortante des algorithmes
+ * */
 typedef struct CelluleResultat{
 	int donnee;
 	struct CelluleResultat *suivant;
@@ -38,36 +39,44 @@ typedef struct CelluleResultat{
 typedef struct CelluleResultat CelluleResultat;
 
 
+/**
+ * Structure qui permet de manipuler une liste de processus
+ * avec un accès direct à la tête et à la queue.
+ */
 typedef struct {
-	ListeProcessus tete;
-	ListeProcessus queue;
+    ListeProcessus tete;
+    ListeProcessus queue;
 } *ListePTQ;
 
 
+/**
+ * Structure qui permet de manipuler une liste de résultats
+ * avec un accès direct à la tête et à la queue.
+ */
 typedef struct {
-	ListeResultat tete;
-	ListeResultat queue;
+    ListeResultat tete;
+    ListeResultat queue;
 } *ListeRTQ;
 
 
-/*
-* Type générique - c'est un pointeur universel (void *)
-* Permet à une fonction de manipuler n'importe quel type de données
-* sans en connaître la structure. Le cast vers un type réel
-* est à la charge des fonctions concrètes appelantes.
-*/
+/**
+ * Type générique - c'est un pointeur universel (void *)
+ * Permet à une fonction de manipuler n'importe quel type de données
+ * sans en connaître la structure. Le cast vers un type réel
+ * est à la charge des fonctions concrètes appelantes.
+ * */
 typedef void *TGenerique;
 
 
-/*
-* Déclaration d'un type "FonctionSuivant"
-* Ce type représente un pointeur vers une fonction
-* qui prend en parametre une cellule quelconque (TGenerique cellule)
-* et retourn la cellule suivante (TGenerique)
-*/
+/**
+ * Déclaration d'un type "FonctionSuivant"
+ * Ce type représente un pointeur vers une fonction
+ * qui prend en parametre une cellule quelconque (TGenerique cellule)
+ * et retourn la cellule suivante (TGenerique)
+ * */
 typedef TGenerique (*FonctionSuivant)(TGenerique cellule);
 typedef TGenerique (*FonctionAlloc)();
-
+typedef void (*FonctionTraiter)(TGenerique *cellule);
 
 
 /*******************************************
@@ -75,7 +84,6 @@ typedef TGenerique (*FonctionAlloc)();
 ********************************************/
 TGenerique allocMem_processus();
 TGenerique allocMem_resultat();
-TGenerique allocMem(FonctionAlloc alloc);
 
 
 
@@ -151,5 +159,11 @@ void inserResultatQueue(TGenerique *l, FonctionAlloc alloc, int donnee);
 void suppTete(TGenerique *l, FonctionSuivant suivant);
 void suppProcessusQueue(TGenerique *l, FonctionSuivant suivant);
 void suppResultatQueue(TGenerique *l, FonctionSuivant suivant);
+
+
+/******************************************
+	Fonction de parcours
+*******************************************/
+void parcoursGD(TGenerique *l, FonctionSuivant suivant, FonctionTraiter traiter);
 
 #endif
