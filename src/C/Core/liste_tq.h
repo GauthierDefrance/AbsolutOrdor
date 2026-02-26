@@ -1,5 +1,5 @@
 #pragma once
-#include "liste_generique.h"
+#include "liste.h"
 
 
 /**
@@ -7,8 +7,8 @@
  * les listes de Resultat et les listes de Processus
  */
 typedef struct {
-    ListeGenerique tete;
-    ListeGenerique queue;
+    Liste tete;
+    Liste queue;
 } *ListeTQ;
 
 
@@ -44,13 +44,13 @@ void initLTQ(ListeTQ listeTQ);
 /******************************************
     Fonction primitive
 *******************************************/
-ListeGenerique teteLTQ(ListeTQ listeTQ);
-ListeGenerique queueLTQ(ListeTQ listeTQ);			// ADVICE : Choisissez celui-là si vous devez aller à la fin de la liste
+Liste teteLTQ(ListeTQ listeTQ);
+Liste queueLTQ(ListeTQ listeTQ);			// ADVICE : Choisissez celui-là si vous devez aller à la fin de la liste
 
 
 
 /******************************************
     Fonction d'insertion
 *******************************************/
-void inserTeteLTQ(ListeTQ listeTQ, Data *data);
-void inserQueueLTQ(ListeTQ listeTQ, Data *data);
+void inserTeteLTQ(ListeTQ listeTQ, int elem);
+void inserQueueLTQ(ListeTQ listeTQ, int elem);

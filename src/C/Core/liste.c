@@ -1,9 +1,9 @@
 /**
- * @file liste_generique.c
+ * @file liste.c
  * @brief Implémentation des fonctions de gestion de la liste générique chaînée.
  */
 
-#include "liste_generique.h"
+#include "liste.h"
 
 
 /*******************************************
@@ -11,10 +11,10 @@
 ********************************************/
 /**
  * @brief Alloue la mémoire pour une cellule de ListeGenerique.
- * @return ListeGenerique - Pointeur vers la cellule allouée, NULL en cas d'échec.
+ * @return ListeGenerique - Pointeur vers la cellule allouée, NULL en cas d’échec.
  */
-ListeGenerique allocListeGenerique() {
-    ListeGenerique cellule = (ListeGenerique) malloc(sizeof(struct Cellule));
+Liste allocListe() {
+    Liste cellule = (Liste) malloc(sizeof(struct Cellule));
     if (cellule == NULL) {
         fprintf(stderr, "Erreur : echec de l'allocation memoire d'une cellule\n");
         return NULL;
@@ -26,28 +26,19 @@ ListeGenerique allocListeGenerique() {
 /*******************************************
     Fonction libération mémoire
 ********************************************/
-/**
- * @brief Libère la mémoire de la cellule courante et de sa donnée interne.
- * @note  Libère d'abord la donnée via libMemData, puis la cellule elle-même.
- * @param cellule - Pointeur vers la cellule à libérer.
- */
-void libereCelluleCourante(ListeGenerique cellule) {
-    if (cellule == NULL) return;
-    libMemData(&(cellule->data));
-    free(cellule);
-}
+
 
 
 /******************************************
     Fonction de destruction
 ******************************************/
 /**
- * @brief Détruit complètement une ListeGenerique en libérant toutes ses cellules.
- * @note  Utilise suppTete pour libérer chaque cellule en cascade.
- *        Pas de free final, car suppTete libère déjà chaque cellule.
+ * @brief Détruit complètement une ListeGenerique.
+ * @note  Libère toutes les cellules de la liste en cascade à l’aide de suppTete().
+ *        Aucun free final n’est nécessaire car chaque cellule est libérée.
  * @param liste - Pointeur vers la tête de la liste à détruire.
  */
-void destroyListeGenerique(ListeGenerique liste) {
+void destroyListe(Liste liste) {
     if (liste == NULL) return;
     while (liste != NULL) {
         suppTete(&liste);
@@ -59,10 +50,12 @@ void destroyListeGenerique(ListeGenerique liste) {
     Fonction d'initialisation
 ******************************************/
 /**
- * @brief Initialise le pointeur suivant d'une cellule à NULL.
+ * @brief Initialise une cellule de ListeGenerique.
+ * @note  Met le pointeur suivant à NULL.
  * @param cellule - Pointeur vers la cellule à initialiser.
+ * @pre cellule != NULL
  */
-void initListeGenerique(ListeGenerique cellule) {
+void initListe(Liste cellule) {
     if (cellule == NULL) return;
     cellule->suivant = NULL;
 }
@@ -72,43 +65,28 @@ void initListeGenerique(ListeGenerique cellule) {
     Fonction de création
 ******************************************/
 /**
- * @brief Crée une nouvelle cellule et y copie la donnée fournie.
- * @param data - Pointeur vers la donnée à copier dans la cellule.
- * @return ListeGenerique - Pointeur vers la cellule créée, NULL en cas d'échec.
+ * @brief Crée une nouvelle cellule et y stocke la donnée fournie.
+ * @param elem - Élément à stocker dans la cellule.
+ * @return ListeGenerique - Pointeur vers la cellule créée, NULL en cas d’échec.
  */
-ListeGenerique createListe(const Data *data) {
-    ListeGenerique cellule = allocListeGenerique();
+Liste createListe(int elem){
+    Liste cellule = allocListe();
     if (!cellule) return NULL;
-
-    initListeGenerique(cellule);
-
-    if (data != NULL) {
-        Data *copie = deepCopyData(data);
-        if ( !copie ) {
-            free(cellule);
-            return NULL;
-        }
-        cellule->data = *copie;   // copie structurelle
-        free(copie);              // on peut libérer la structure temporaire
-    }
-
+    initListe(cellule);
+    cellule->data = elem;
     return cellule;
 }
 
 
 /**
- * @brief Écrase et libère l'ancienne donnée d'une cellule, puis y copie la nouvelle.
+ * @brief Modifie la donnée stockée dans une cellule.
+ * @note  Écrase la valeur précédente.
  * @param cellule - Pointeur vers la cellule à modifier.
- * @param newData - Pointeur vers la nouvelle donnée à copier.
+ * @param elem - Élément à stocker.
  */
-void setCelluleData(ListeGenerique cellule, const Data *newData) {
-    if (cellule == NULL || newData == NULL) return;
-    libMemData(&(cellule->data));
-
-    Data* copie = deepCopyData(newData);
-    if ( copie == NULL ) return;
-    cellule->data = *copie;
-    free(copie);
+void setCelluleData(Liste cellule, int elem) {
+    if (cellule == NULL) return;
+    cellule->data = elem;
 }
 
 
@@ -120,18 +98,18 @@ void setCelluleData(ListeGenerique cellule, const Data *newData) {
  * @param cellule - Pointeur vers la cellule courante.
  * @return ListeGenerique - Pointeur vers la cellule suivante, NULL si fin de liste.
  */
-ListeGenerique suivantListe(ListeGenerique cellule) {
+Liste suivantListe(Liste cellule) {
     if (cellule == NULL) return NULL;
     return cellule->suivant;
 }
 
 /**
  * @brief Retourne la dernière cellule de la liste.
- * @warning Complexité O(N) — préférer queueLTQ() qui est O(1).
+ * @warning Complexité O(N) — préférer une structure avec pointeur queue si possible.
  * @param l - Pointeur vers la tête de la liste.
  * @return ListeGenerique - Pointeur vers la dernière cellule.
  */
-ListeGenerique queueListe(ListeGenerique l) {
+Liste queueListe(Liste l) {
     while (!estVideListe(suivantListe(l))) {
         l = suivantListe(l);
     }
@@ -143,7 +121,15 @@ ListeGenerique queueListe(ListeGenerique l) {
  * @param l - Pointeur vers la tête de la liste.
  * @return bool - true si la liste est vide, false sinon.
  */
-bool estVideListe(ListeGenerique l) { return l == NULL; }
+bool estVideListe(Liste l) { return l == NULL; }
+
+/**
+ * @brief Retourne la donnée stockée dans une cellule.
+ * @param l - Pointeur vers la cellule.
+ * @return int - Donnée contenue dans la cellule.
+ * @pre l != NULL
+ */
+int donneeListe(Liste l) { return l->data; }
 
 
 /******************************************
@@ -152,11 +138,11 @@ bool estVideListe(ListeGenerique l) { return l == NULL; }
 /**
  * @brief Insère une donnée en tête de la liste.
  * @param l    - Adresse du pointeur vers la tête de la liste.
- * @param data - Pointeur vers la donnée à insérer.
+ * @param elem - Élément à insérer.
  */
-void inserTete(ListeGenerique *l, const Data *data) {
-    if (data == NULL || l == NULL) return;
-    ListeGenerique liste = createListe(data);
+void inserTete(Liste *l,  int elem) {
+    if (l == NULL) return;
+    Liste liste = createListe(elem);
     if (liste == NULL) return;
 
     liste->suivant = *l;
@@ -167,11 +153,11 @@ void inserTete(ListeGenerique *l, const Data *data) {
  * @brief Insère une donnée en queue de la liste.
  * @warning Complexité O(N) — préférer inserQueueLTQ() qui est O(1).
  * @param l    - Adresse du pointeur vers la tête de la liste.
- * @param data - Pointeur vers la donnée à insérer.
+ * @param elem - Élément à insérer.
  */
-void inserQueue(ListeGenerique *l, const Data *data) {
-    if (data == NULL || l == NULL) return;
-    ListeGenerique liste = createListe(data);
+void inserQueue(Liste *l, int elem) {
+    if (l == NULL) return;
+    Liste liste = createListe(elem);
     if (liste == NULL) return;
 
     if (*l == NULL) {
@@ -179,7 +165,7 @@ void inserQueue(ListeGenerique *l, const Data *data) {
         return;
     }
 
-    ListeGenerique queue = queueListe(*l);
+    Liste queue = queueListe(*l);
     queue->suivant = liste;
 }
 
@@ -191,34 +177,34 @@ void inserQueue(ListeGenerique *l, const Data *data) {
  * @brief Supprime la cellule en tête de la liste et libère sa mémoire.
  * @param l - Adresse du pointeur vers la tête de la liste.
  */
-void suppTete(ListeGenerique *l) {
+void suppTete(Liste *l) {
     if (estVideListe(*l)) return;
-    ListeGenerique tmp = *l;
+    Liste tmp = *l;
     *l = suivantListe(*l);
-    libereCelluleCourante(tmp);
+    free(tmp);
 }
 
 /**
  * @brief Supprime la cellule en queue de la liste et libère sa mémoire.
- * @note  Parcourt la liste jusqu'à l'avant-dernier élément.
+ * @note  Parcourt la liste jusqu’à l’avant-dernier élément.
  *        Complexité O(N).
  * @param l - Adresse du pointeur vers la tête de la liste.
  */
-void suppQueue(ListeGenerique *l) {
+void suppQueue(Liste *l) {
     if (l == NULL || *l == NULL) return;
 
     if (suivantListe(*l) == NULL) {
-        libereCelluleCourante(*l);
+        free(*l);
         *l = NULL;
         return;
     }
 
-    ListeGenerique courant = *l;
+    Liste courant = *l;
     while (suivantListe(suivantListe(courant)) != NULL) {
         courant = suivantListe(courant);
     }
 
-    libereCelluleCourante(suivantListe(courant));
+    free(suivantListe(courant));
     courant->suivant = NULL;
 }
 
@@ -227,12 +213,29 @@ void suppQueue(ListeGenerique *l) {
     Fonction de parcours
 *******************************************/
 /**
- * @brief Parcourt la liste et affiche chaque donnée via traiterData.
+ * @brief Affiche le contenu d’une ListeGenerique dans la sortie standard.
+ * @note  Affiche les éléments dans l’ordre avec une flèche entre chaque cellule.
  * @param l - Pointeur vers la tête de la liste.
  */
-void parcoursListeGenerique(ListeGenerique l) {
-    while (l != NULL) {
-        traiterData(&l->data);
-        l = suivantListe(l);
+void printListeGenerique(Liste l) {
+    if (estVideListe(l)) {
+        printf("Liste : [Vide]\n");
+        return;
     }
+
+    Liste courant = l;
+    printf("Liste : ");
+
+    while (courant != NULL) {
+        printf("[%d]", courant->data);
+
+        // On affiche la flèche seulement s'il y a un élément suivant
+        if (courant->suivant != NULL) {
+            printf(" -> ");
+        }
+
+        courant = suivantListe(courant);
+    }
+
+    printf(" -> NULL\n");
 }

@@ -1,5 +1,15 @@
 #pragma once
-#include "structure.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+/**
+ * La structure processus sert à la représentation d'un processus.
+ * Elle est utilisé pour traduire le CSV en code C.
+ */
+
+
 
 #define NBMAXCHAR 50
 
@@ -9,8 +19,8 @@
 ********************************************/
 typedef struct {
     char name[NBMAXCHAR];	// Le nom du processus
-    int time_arrival;		// Sa date d'arrivé
-    int nb_quantum;       	// Son nombre de quantums / ticks nécéssaire avant la fin du programme
+    int timeArrival;		// Sa date d'arrivé
+    int nbQuantum;       	// Son nombre de quantums / ticks nécéssaire avant la fin du programme
 } Processus;
 
 
@@ -42,4 +52,11 @@ void initProcessus(Processus *processus);
 const char *processusName(const Processus *processus);
 int timeArrival(Processus processus);
 int nbQuantum(Processus processus);
-void traiterProcessus(const Processus *processus);
+
+
+
+/******************************************
+    Fonction consoles
+*******************************************/
+
+void afficherProcessus(const Processus *processus);

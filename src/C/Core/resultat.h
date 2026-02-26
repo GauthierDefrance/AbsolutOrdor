@@ -1,13 +1,21 @@
 #pragma once
-#include "structure.h"
+#include "liste_tq.h"
+#include "processus.h"
 
+/**
+ * Resultat sert pour afficher le resultat de nos fonctions Algo d'ordonnancement.
+ * Il y a donc, un tableau de Processus de taille N, indiquant les infos de chaque processus.
+ * Mais il y a aussi une ListeTQ d'éléments indiquant la position d'un processus en particulier dans le tableau.
+ */
 
 
 /*******************************************
     Structure de données
 ********************************************/
 typedef struct {
-    int donnee;
+    int nbProcessus;
+    Processus *tabProcessus;
+    ListeTQ *listeTQ;
 } Resultat;
 
 
@@ -15,26 +23,27 @@ typedef struct {
 /*******************************************
     Fonction allocation mémoire
 ********************************************/
-Resultat* allocMemResultat();			// Retourne un pointeur, car Data est une union de pointeur
+Resultat* allocMemResultat(int sizeTabProcessus);			// Retourne un pointeur, car Data est une union de pointeur
 
 
 
 /*******************************************
     Fonction libération mémoire
 ********************************************/
-void libMemResultat(Resultat **resultat);				// Passe directement la structure non pointée en paramètre
+void libMemResultat(Resultat *resultat);
 
 
 
 /******************************************
     Fonction d'initialisation
 ******************************************/
-void initResultat(Resultat *resultat);
+void initResultat(const Resultat *resultat);
 
 
 
 /******************************************
     Fonction primitive
 *******************************************/
-int donnee(Resultat resultat);
-void traiterResultat(const Resultat *resultat);
+int nbProcess(const Resultat *resultat);
+Processus *getProcess(const Resultat *resultat);
+ListeTQ* getListeTQ(const Resultat *resultat);

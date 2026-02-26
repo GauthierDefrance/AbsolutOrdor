@@ -12,15 +12,12 @@ add_executable(
 add_executable(
         Tests
         Tests/Test_Core.cpp
-        C/Core/structure.h
         C/Core/resultat.h
-        C/Core/data.h
-        C/Core/liste_generique.h
+        C/Core/liste.h
         C/Core/liste_tq.h
         C/Core/processus.c
         C/Core/resultat.c
-        C/Core/data.c
-        C/Core/liste_generique.c
+        C/Core/liste.c
         C/Core/liste_tq.c
         C/Core/processus.h
 )
