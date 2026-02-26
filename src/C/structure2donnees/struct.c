@@ -246,12 +246,14 @@ int donnee(ListeResultat l){ return l->donnee; }
 void inserProcessusTete(TGenerique *l, FonctionAlloc alloc, const char *name, int timeArrival, int nbQuantum){
 	CelluleProcessus *cellule = (CelluleProcessus *) alloc();
 
+	if (cellule == NULL ) return;
+
 	// remplissage des données
 	strcpy(cellule->processus_name, name);	// copie une chaine de char
 	cellule->time_arrival = timeArrival;
 	cellule->nb_quantum = nbQuantum;
 	cellule->suivant = (CelluleProcessus *) *l;
-	*l = (TGenerique *) cellule;
+	*l = (TGenerique) cellule;
 }
 
 
@@ -272,7 +274,7 @@ void inserResultatTete(TGenerique *l, FonctionAlloc alloc, int donnee){
 	// remplissage des données
 	cellule->donnee = donnee;
 	cellule->suivant = (CelluleResultat *) *l;
-	*l = (TGenerique *) cellule; 
+	*l = (TGenerique) cellule;
 }
 
 
