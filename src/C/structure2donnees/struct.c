@@ -133,12 +133,53 @@ TGenerique suivant_resultat(TGenerique cellule) {
  * 
  * @returns {TGenerique} l : la dernière cellule de la liste chainée
  * */
-TGenerique queueListe(TGenerique l, FonctionSuivant suivant) {
-	/* Renvoie le dernier element de la liste chainée */
-	while ( !est_videListe(suivant(l)) ) {
-		l = suivant(l);
+
+// FONCTION DEPRECIE O(N) contre O(1) avec ListeTQ
+
+// TGenerique queueListe(TGenerique l, FonctionSuivant suivant) {
+// 	/* Renvoie le dernier element de la liste chainée */
+// 	while ( !est_videListe(suivant(l)) ) {
+// 		l = suivant(l);
+// 	}
+// 	return l;
+// }
+
+
+
+
+
+
+
+TGenerique queueLTQ(ListeTQ listeTQ) {
+	return listeTQ->queue;
+}
+
+TGenerique teteLTQ(ListeTQ listeTQ) {
+	return listeTQ->tete;
+}
+
+void inserTeteLTQ(ListeTQ listeTQ, TGenerique elem) {
+	//Opération impossible
+	if ( elem == NULL  || listeTQ == NULL) return;
+
+	//On a 0 éléments
+	if (teteLTQ(listeTQ) == NULL ) {
+		listeTQ->tete = elem;
+		listeTQ->queue = elem;
+		return;
 	}
-	return l;
+
+	//On a 1 éléments ou plus
+
+
+
+}
+
+void inserQueueLTQ(ListeTQ listeTQ, TGenerique elem) {
+	if (listeTQ == NULL ) {
+
+	}
+
 }
 
 
@@ -230,6 +271,14 @@ int donnee(ListeResultat l){ return l->donnee; }
 /******************************************
 	Fonction d'insertion
 *******************************************/
+
+
+void inserTete(TGenerique *l, TGenerique elem) {
+
+}
+
+
+
 /**
  * Effectue l'insertion en tête dans la liste des processus.
  * Elle fait l'allocation mémoire de la nouvelle cellule,
