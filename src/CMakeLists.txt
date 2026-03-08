@@ -20,4 +20,6 @@ add_executable(
         C/Core/liste.c
         C/Core/liste_tq.c
         C/Core/processus.h
+        C/Core/csv_reader.c
+        C/Core/csv_reader.h
 )

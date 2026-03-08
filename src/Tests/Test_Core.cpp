@@ -9,14 +9,61 @@ extern "C" {
     #include "../C/Core/liste.h"
     #include "../C/Core/processus.h"
     #include "../C/Core/resultat.h"
-    // Note : data.h et structure.h n'ont pas été fournis dans l'upload,
-    // assurez-vous qu'ils existent ou retirez-les si inutilisés.
+    #include "../C/Core/csv_reader.h"
 }
 
 #define LOG_STEP(msg) std::cout << "  [STEP] " << msg << std::endl;
 
 static void print_test(const char* name, bool ok) {
     std::cout << (ok ? "[OK]   " : "[FAIL] ") << name << "\n";
+}
+
+bool testTabProcessusCSV() {
+    LOG_STEP("Creation d'un fichier CSV temporaire");
+
+    // Cree un CSV temporaire
+    const char* filename = "input.csv";
+    FILE* f = fopen(filename, "w");
+    if (!f) return false;
+
+    // Contenu avec commentaires et lignes vides
+    fprintf(f, "# Ceci est un commentaire\n");
+    fprintf(f, "\n");
+    fprintf(f, "3\n");              // Nombre de processus
+    fprintf(f, "# Commentaire\n");
+    fprintf(f, "P1;0;5\n");
+    fprintf(f, "P2;2;8\n");
+    fprintf(f, "P3;4;3\n");
+    fclose(f);
+
+    LOG_STEP("Lecture du CSV via createTabProcessusFromCSV");
+    TabProcessus tab = createTabProcessusFromCSV((char*)filename);
+    if (!tab) return false;
+
+    LOG_STEP("Verification du nombre de processus");
+    if (tab->nbProcess != 3) return false;
+
+    LOG_STEP("Verification des donnees de chaque processus");
+    if (strcmp(tab->tabProcess[0].name, "P1") != 0) return false;
+    if (tab->tabProcess[0].timeArrival != 0) return false;
+    if (tab->tabProcess[0].nbQuantum != 5) return false;
+
+    if (strcmp(tab->tabProcess[1].name, "P2") != 0) return false;
+    if (tab->tabProcess[1].timeArrival != 2) return false;
+    if (tab->tabProcess[1].nbQuantum != 8) return false;
+
+    if (strcmp(tab->tabProcess[2].name, "P3") != 0) return false;
+    if (tab->tabProcess[2].timeArrival != 4) return false;
+    if (tab->tabProcess[2].nbQuantum != 3) return false;
+
+    LOG_STEP("Liberation memoire");
+    freeTabProcessus(&tab);
+    if (tab != NULL) return false;
+
+    // Supprime le fichier temporaire
+    remove(filename);
+
+    return true;
 }
 
 /**
@@ -105,7 +152,7 @@ bool testResultat() {
     Processus* tab = getProcess(res);
     if (!tab) return false;
 
-    // Test d'accès au premier élément du tableau calloc
+    // Test d'acces au premier element du tableau calloc
     if (tab[0].timeArrival != 0) return false;
 
     libMemResultat(res);
@@ -120,7 +167,8 @@ int main() {
         {"Structure Liste Simple", testListe},
         {"Structure ListeTQ",      testListeTQ},
         {"Structure Processus",    testProcessus},
-        {"Structure Resultat",     testResultat}
+        {"Structure Resultat",     testResultat},
+        {"Test lecture CSV", testTabProcessusCSV}
     };
 
     int passed = 0;
