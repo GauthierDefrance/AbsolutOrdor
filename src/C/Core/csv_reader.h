@@ -21,3 +21,4 @@ TabProcessus createTabProcessusFromCSV(char *fileName);
 bool isCommentLine(FILE *f);
 void skipLine(FILE *f);
 void skipAllIgnoredLines(FILE *f);
+bool isTabProcessusValid(TabProcessus tab);

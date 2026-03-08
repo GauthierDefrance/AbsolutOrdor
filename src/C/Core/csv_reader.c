@@ -140,3 +140,11 @@ void skipAllIgnoredLines(FILE *f) {
     if (f==NULL) {return;}
     while (isCommentLine(f)) skipLine(f);
 }
+
+bool isTabProcessusValid(TabProcessus tab) {
+    if (tab == NULL) return false;
+    if (tab->tabProcess == NULL) return false;
+    if (tab->nbProcess <= 0) return false;
+
+    return true;
+}

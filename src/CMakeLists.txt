@@ -22,4 +22,6 @@ add_executable(
         C/Core/processus.h
         C/Core/csv_reader.c
         C/Core/csv_reader.h
+        C/Core/AlgoController.cpp
+        C/Core/AlgoController.h
 )
