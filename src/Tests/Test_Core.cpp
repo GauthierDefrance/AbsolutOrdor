@@ -3,6 +3,7 @@
 #include <cstring>
 #include <vector>
 #include <cstdlib>
+#include "process/AlgoController.h"
 
 extern "C" {
     #include "data/struct/liste_tq.h"
@@ -10,7 +11,6 @@ extern "C" {
     #include "data/struct/processus.h"
     #include "data/struct/resultat.h"
     #include "process/utilities/csv_reader.h"
-    #include "process/AlgoController.h"
 }
 
 #define LOG_STEP(msg) std::cout << "  [STEP] " << msg << std::endl;
@@ -160,6 +160,59 @@ bool testResultat() {
     return true;
 }
 
+
+bool testAlgoControllerSJF() {
+    LOG_STEP("Creation d'un CSV temporaire pour AlgoController");
+
+    const char* filename = "algo_test.csv";
+    FILE* f = fopen(filename, "w");
+    if (!f) return false;
+
+    fprintf(f, "3\n");
+    fprintf(f, "P1;0;5\n");
+    fprintf(f, "P2;2;8\n");
+    fprintf(f, "P3;4;3\n");
+    fclose(f);
+
+    LOG_STEP("Chargement CSV via AlgoController");
+    AlgoController::setCSV((char*)filename);
+
+    LOG_STEP("Execution de l'algorithme SJF");
+    Resultat* res = AlgoController::selectAlgorithm(SJF);
+    if (!res) return false;
+
+    LOG_STEP("Verification du nombre de processus dans le resultat");
+    if (nbProcess(res) != 3) return false;
+
+    LOG_STEP("Verification de l'ordre SJF attendu");
+
+    Processus* tab = getProcess(res);
+    if (!tab) return false;
+
+    /*
+       SJF non preemptif attendu :
+
+       P1 arrive 0 -> executé
+       P3 arrive 4 -> plus court
+       P2 dernier
+
+       ordre : P1 -> P3 -> P2
+    */
+
+    if (strcmp(tab[0].name, "P1") != 0) return false;
+    if (strcmp(tab[1].name, "P3") != 0) return false;
+    if (strcmp(tab[2].name, "P2") != 0) return false;
+
+    LOG_STEP("Liberation memoire resultat");
+    libMemResultat(res);
+
+    remove(filename);
+
+    return true;
+}
+
+
+
 // ---------------------------------------------------------
 // Runner
 // ---------------------------------------------------------
@@ -169,7 +222,8 @@ int main() {
         {"Structure ListeTQ",      testListeTQ},
         {"Structure Processus",    testProcessus},
         {"Structure Resultat",     testResultat},
-        {"Test lecture CSV", testTabProcessusCSV}
+        {"Test lecture CSV", testTabProcessusCSV},
+        {"Test SJF", testAlgoControllerSJF}
     };
 
     int passed = 0;

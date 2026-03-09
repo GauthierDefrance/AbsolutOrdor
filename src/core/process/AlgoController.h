@@ -1,6 +1,13 @@
 #pragma once
-#include "process/utilities/csv_reader.h"
-#include "data/struct/resultat.h"
+
+extern "C" {
+    #include "data/struct/liste_tq.h"
+    #include "data/struct/liste.h"
+    #include "data/struct/processus.h"
+    #include "data/struct/resultat.h"
+    #include "process/utilities/csv_reader.h"
+    #include "process/Algo/sjf.h"
+}
 
 
 enum SchedulingAlgorithm {
@@ -41,6 +48,6 @@ class AlgoController {
         static Resultat* selectAlgorithm(SchedulingAlgorithm algorithm);
 
     private:
-            static TabProcessus tabProcessus;
+        static  TabProcessus tabProcessus;
 
 };

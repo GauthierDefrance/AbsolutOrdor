@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../data/struct/processus.h"
+#include "data/struct/processus.h"
 #include <stdbool.h>
 
-typedef struct {
+typedef struct TabProcessus_s {
     int nbProcess;
     Processus *tabProcess;
 } *TabProcessus;

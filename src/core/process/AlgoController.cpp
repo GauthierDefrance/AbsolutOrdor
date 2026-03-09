@@ -4,6 +4,8 @@
 #include "Algo/sjf.h"
 
 
+TabProcessus AlgoController::tabProcessus = nullptr;
+
 /**
  * Renvoie l'instance unique d'AlgoController
  * @return INSTANCE AlgoController
@@ -29,10 +31,10 @@ AlgoController::~AlgoController() {
  * @param sourcepath
  */
 void AlgoController::setCSV(char *sourcepath) {
-    if (tabProcessus != NULL) {
-        freeTabProcessus(&tabProcessus);
+    if (AlgoController::tabProcessus != nullptr) {
+        freeTabProcessus(&AlgoController::tabProcessus);
     }
-    tabProcessus = createTabProcessusFromCSV(sourcepath);
+    AlgoController::tabProcessus = createTabProcessusFromCSV(sourcepath);
 }
 
 
@@ -45,20 +47,20 @@ void AlgoController::setCSV(char *sourcepath) {
  */
 Resultat* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm) {
 
-    if (tabProcessus== NULL) { return nullptr; }
+    if (AlgoController::tabProcessus== NULL) { return nullptr; }
 
     switch (algorithm) {
         case FIFO : {
-            //return fifo();
+            return nullptr;
         }
         case SJF : {
-            return sjf(tabProcessus->tabProcess, tabProcessus->nbProcess);
+            return sjf(AlgoController::tabProcessus->tabProcess, AlgoController::tabProcessus->nbProcess);
         }
         case SJRF : {
-            //return sjrf();
+            return nullptr;
         }
         case RR : {
-            //return rr();
+            return nullptr;
         }
         default: {
             return nullptr;
