@@ -62,4 +62,4 @@ void inserQueue(Liste *l, int elem);
 /******************************************
     Fonction d'affichage console
 *******************************************/
-void printListeGenerique(Liste l);
+void printListe(Liste l);

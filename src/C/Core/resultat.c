@@ -5,6 +5,7 @@
 
 
 #include "resultat.h"
+#include "liste_tq.h"
 
 
 /*******************************************
@@ -34,7 +35,7 @@ Resultat* allocMemResultat(int sizeTabProcessus) {
 
     res->nbProcessus = sizeTabProcessus;
     res->tabProcessus = process;
-
+    res->listeTQ = allocMemLTQ();
     return res;
 }
 
@@ -45,12 +46,14 @@ Resultat* allocMemResultat(int sizeTabProcessus) {
 ********************************************/
 /**
  * @brief Libère la mémoire associée à un Resultat.
- * @note  Ne libère pas les structures internes pointées par Resultat
+ * @note  Libère les structures internes avant de libérer la structure principale
  *        (ex. tabProcessus, listeTQ).
  * @param resultat - Pointeur vers le Resultat à libérer.
  */
 void libMemResultat(Resultat *resultat) {
-    if (resultat==NULL) return;
+    if (resultat == NULL) return;
+    free(resultat->tabProcessus);
+    libMemLTQ(resultat->listeTQ);
     free(resultat);
     resultat = NULL;
 }
@@ -95,3 +98,37 @@ Processus *getProcess(const Resultat *resultat) { return resultat->tabProcessus;
  * @return ListeTQ* - Pointeur vers la ListeTQ associée.
  */
 ListeTQ* getListeTQ(const Resultat *resultat) { return resultat->listeTQ; }
+
+
+
+/******************************************
+    Fonction consoles
+*******************************************/ 
+void afficherResultat(const Resultat *resultat) {
+    if (resultat == NULL) return;
+
+    // Affiche la liste des processus dans l'ordre SJF
+    printf("Liste de Processus :\n");
+    Processus *tab = getProcess(resultat);
+    int n = nbProcess(resultat);
+    for (int i = 0; i < n; i++) {
+        printf("%d. %s | timeArrival : %d | nbQuantum : %d\n",
+            i + 1,
+            tab[i].name,
+            getTimeArrival(tab[i]),
+            getNbQuantum(tab[i])
+        );
+    }
+
+    // Affiche la timeline tick par tick
+    int tick = 0;
+    printf("\nTimeline :\n");
+    ListeTQ ltq = *getListeTQ(resultat);
+    Liste courant = teteLTQ(ltq);
+    while (courant != NULL) {
+        int indice = donneeListe(courant);
+        printf("Tick %d : %s\n", tick, tab[indice].name);
+        courant = suivantListe(courant);
+        tick++;
+    }
+}

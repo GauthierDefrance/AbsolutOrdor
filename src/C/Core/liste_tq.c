@@ -35,6 +35,7 @@ ListeTQ allocMemLTQ() {
  * @warning Le pointeur ltq doit être valide et non NULL.
  */
 void libMemLTQ(ListeTQ *ltq) {
+    if (*ltq == NULL) return;
     free(*ltq);
     *ltq = NULL;
 }

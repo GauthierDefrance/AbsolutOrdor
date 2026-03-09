@@ -47,3 +47,10 @@ void initResultat(const Resultat *resultat);
 int nbProcess(const Resultat *resultat);
 Processus *getProcess(const Resultat *resultat);
 ListeTQ* getListeTQ(const Resultat *resultat);
+
+
+
+/******************************************
+    Fonction consoles
+*******************************************/
+void afficherResultat(const Resultat *resultat);

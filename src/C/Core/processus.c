@@ -70,9 +70,9 @@ void initProcessus(Processus *processus) {
  * @param l - Pointeur vers le Processus.
  * @return const char* - Pointeur vers le tableau name (lecture seule).
  */
-const char *processusName(const Processus *l) {
-    if (l==NULL) return NULL;
-    return l->name;
+const char *processusName(const Processus *p) {
+    if (p==NULL) return NULL;
+    return p->name;
 }
 
 /**
@@ -80,14 +80,14 @@ const char *processusName(const Processus *l) {
  * @param l - Le Processus (par valeur).
  * @return int - Date d’arrivée.
  */
-int timeArrival(Processus l){	return l.timeArrival; }
+int getTimeArrival(Processus p){	return p.timeArrival; }
 
 /**
  * @brief Retourne le nombre de quantums du processus.
  * @param l - Le Processus (par valeur).
  * @return int - Le nombre de quantums.
  */
-int nbQuantum(Processus l){ return l.nbQuantum; }
+int getNbQuantum(Processus p){ return p.nbQuantum; }
 
 
 /**
@@ -95,14 +95,14 @@ int nbQuantum(Processus l){ return l.nbQuantum; }
  * @param l - Pointeur vers le Processus à afficher.
  * @note  Délègue l’accès aux champs via les fonctions primitives.
  */
-void afficherProcessus(const Processus *l) {
-    if ( l == NULL ) {
+void afficherProcessus(const Processus *p) {
+    if ( p == NULL ) {
         printf("Le Processus est vide\n");
         return;
     }
     printf("[PROCESSUS] Nom : %s | Arrivee : %d | Quantum : %d\n",
-        processusName(l),
-        timeArrival(*l),
-        nbQuantum(*l)
+        processusName(p),
+        timeArrival(*p),
+        nbQuantum(*p)
     );
 }

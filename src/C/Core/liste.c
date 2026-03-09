@@ -10,8 +10,8 @@
     Fonction allocation mémoire
 ********************************************/
 /**
- * @brief Alloue la mémoire pour une cellule de ListeGenerique.
- * @return ListeGenerique - Pointeur vers la cellule allouée, NULL en cas d’échec.
+ * @brief Alloue la mémoire pour une cellule de Liste.
+ * @return Liste - Pointeur vers la cellule allouée, NULL en cas d’échec.
  */
 Liste allocListe() {
     Liste cellule = (Liste) malloc(sizeof(struct Cellule));
@@ -21,6 +21,7 @@ Liste allocListe() {
     }
     return cellule;
 }
+
 
 
 /*******************************************
@@ -33,7 +34,7 @@ Liste allocListe() {
     Fonction de destruction
 ******************************************/
 /**
- * @brief Détruit complètement une ListeGenerique.
+ * @brief Détruit complètement une Liste.
  * @note  Libère toutes les cellules de la liste en cascade à l’aide de suppTete().
  *        Aucun free final n’est nécessaire car chaque cellule est libérée.
  * @param liste - Pointeur vers la tête de la liste à détruire.
@@ -50,7 +51,7 @@ void destroyListe(Liste liste) {
     Fonction d'initialisation
 ******************************************/
 /**
- * @brief Initialise une cellule de ListeGenerique.
+ * @brief Initialise une cellule de Liste.
  * @note  Met le pointeur suivant à NULL.
  * @param cellule - Pointeur vers la cellule à initialiser.
  * @pre cellule != NULL
@@ -67,7 +68,7 @@ void initListe(Liste cellule) {
 /**
  * @brief Crée une nouvelle cellule et y stocke la donnée fournie.
  * @param elem - Élément à stocker dans la cellule.
- * @return ListeGenerique - Pointeur vers la cellule créée, NULL en cas d’échec.
+ * @return Liste - Pointeur vers la cellule créée, NULL en cas d’échec.
  */
 Liste createListe(int elem){
     Liste cellule = allocListe();
@@ -96,7 +97,7 @@ void setCelluleData(Liste cellule, int elem) {
 /**
  * @brief Retourne la cellule suivante dans la liste.
  * @param cellule - Pointeur vers la cellule courante.
- * @return ListeGenerique - Pointeur vers la cellule suivante, NULL si fin de liste.
+ * @return Liste - Pointeur vers la cellule suivante, NULL si fin de liste.
  */
 Liste suivantListe(Liste cellule) {
     if (cellule == NULL) return NULL;
@@ -107,7 +108,7 @@ Liste suivantListe(Liste cellule) {
  * @brief Retourne la dernière cellule de la liste.
  * @warning Complexité O(N) — préférer une structure avec pointeur queue si possible.
  * @param l - Pointeur vers la tête de la liste.
- * @return ListeGenerique - Pointeur vers la dernière cellule.
+ * @return Liste - Pointeur vers la dernière cellule.
  */
 Liste queueListe(Liste l) {
     while (!estVideListe(suivantListe(l))) {
@@ -213,11 +214,11 @@ void suppQueue(Liste *l) {
     Fonction de parcours
 *******************************************/
 /**
- * @brief Affiche le contenu d’une ListeGenerique dans la sortie standard.
+ * @brief Affiche le contenu d’une Liste dans la sortie standard.
  * @note  Affiche les éléments dans l’ordre avec une flèche entre chaque cellule.
  * @param l - Pointeur vers la tête de la liste.
  */
-void printListeGenerique(Liste l) {
+void printListe(Liste l) {
     if (estVideListe(l)) {
         printf("Liste : [Vide]\n");
         return;
