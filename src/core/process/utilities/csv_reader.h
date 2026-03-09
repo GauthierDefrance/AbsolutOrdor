@@ -1,6 +1,6 @@
 #pragma once
 
-#include "processus.h"
+#include "../../data/struct/processus.h"
 #include <stdbool.h>
 
 typedef struct {

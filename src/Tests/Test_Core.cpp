@@ -5,11 +5,11 @@
 #include <cstdlib>
 
 extern "C" {
-    #include "../C/Core/liste_tq.h"
-    #include "../C/Core/liste.h"
+    #include "../core/data/struct/liste_tq.h"
+#include "../C/Core/liste.h"
     #include "../C/Core/processus.h"
-    #include "../C/Core/resultat.h"
-    #include "../C/Core/csv_reader.h"
+    #include "../core/data/struct/resultat.h"
+#include "../core/process/utilities/csv_reader.h"
 }
 
 #define LOG_STEP(msg) std::cout << "  [STEP] " << msg << std::endl;
