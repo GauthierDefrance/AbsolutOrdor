@@ -31,4 +31,6 @@ add_executable(
         #Utilitaires
         core/process/utilities/csv_reader.h
         core/process/utilities/csv_reader.c
+        core/process/Algo/fifo.c
+        core/process/Algo/fifo.h
 )

@@ -83,6 +83,10 @@ TabProcessus createTabProcessusFromCSV(char *fileName) {
             &spawnDate,
             &nbQuantums);
 
+        //WARNING : Les données entrée par l'utilisateur ne sont pas vérifié.
+        //ADVICE : Il serait judicieux, de les vérifier en boucle pour détecter les erreurs.
+        //ADVICE : On pourrait également indiqué à quel ligne il y a une erreur (en rappellant le formatage) dans le .csv de l'utilisateur
+
         // Attribution des données
         strcpy(tab->tabProcess[i].name, processName);
         tab->tabProcess[i].nbQuantum = nbQuantums;
