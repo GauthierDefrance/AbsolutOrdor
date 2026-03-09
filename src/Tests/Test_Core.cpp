@@ -5,11 +5,11 @@
 #include <cstdlib>
 
 extern "C" {
-    #include "../core/data/struct/liste_tq.h"
-#include "../C/Core/liste.h"
-    #include "../C/Core/processus.h"
-    #include "../core/data/struct/resultat.h"
-#include "../core/process/utilities/csv_reader.h"
+    #include "data/struct/liste_tq.h"
+    #include "data/struct/liste.h"
+    #include "data/struct/processus.h"
+    #include "data/struct/resultat.h"
+    #include "process/utilities/csv_reader.h"
 }
 
 #define LOG_STEP(msg) std::cout << "  [STEP] " << msg << std::endl;
@@ -130,8 +130,8 @@ bool testProcessus() {
     p->nbQuantum = 10;
 
     if (strcmp(processusName(p), "TestProc") != 0) return false;
-    if (timeArrival(*p) != 5) return false;
-    if (nbQuantum(*p) != 10) return false;
+    if (getTimeArrival(*p) != 5) return false;
+    if (getNbQuantum(*p) != 10) return false;
 
     libMemProcessus(&p);
     return (p == NULL);

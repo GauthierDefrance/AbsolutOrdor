@@ -1,5 +1,6 @@
-#include "processus.h"
-#include "resultat.h"
+#pragma once
+#include "data/struct/processus.h"
+#include "data/struct/resultat.h"
 
 
 

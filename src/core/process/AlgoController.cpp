@@ -1,4 +1,4 @@
-#include "../C/Core/AlgoController.h"
+#include "AlgoController.h"
 
 
 AlgoController& AlgoController::getInstance() {

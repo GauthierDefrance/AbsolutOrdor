@@ -1,6 +1,6 @@
 #pragma once
-#include "../C/Core/csv_reader.h"
-#include "../C/Core/resultat.h"
+#include "process/utilities/csv_reader.h"
+#include "data/struct/resultat.h"
 
 
 enum SchedulingAlgorithm {
