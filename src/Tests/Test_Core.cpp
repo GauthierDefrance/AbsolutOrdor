@@ -10,6 +10,7 @@ extern "C" {
     #include "data/struct/processus.h"
     #include "data/struct/resultat.h"
     #include "process/utilities/csv_reader.h"
+    #include "process/AlgoController.h"
 }
 
 #define LOG_STEP(msg) std::cout << "  [STEP] " << msg << std::endl;

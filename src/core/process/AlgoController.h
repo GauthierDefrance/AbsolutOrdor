@@ -14,16 +14,23 @@ enum SchedulingAlgorithm {
 class AlgoController {
     public:
 
+
         /**
          * @return The singleton of the class
          */
         static AlgoController& getInstance();
 
+
+        /**
+         * Destructeur de classe
+         */
+        ~AlgoController();
+
         /**
          *
          * @param sourcepath
          */
-        void setCSV(const char *sourcepath);
+        static void setCSV(char *sourcepath);
 
 
         /**
@@ -31,9 +38,9 @@ class AlgoController {
          * @param algorithm
          * @return
          */
-        Resultat* selectAlgorithm(SchedulingAlgorithm algorithm);
+        static Resultat* selectAlgorithm(SchedulingAlgorithm algorithm);
 
     private:
-
+            static TabProcessus tabProcessus;
 
 };
