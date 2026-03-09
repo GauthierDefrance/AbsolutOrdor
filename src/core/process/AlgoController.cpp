@@ -47,7 +47,7 @@ void AlgoController::setCSV(char *sourcepath) {
  */
 Resultat* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm) {
 
-    if (AlgoController::tabProcessus== NULL) { return nullptr; }
+    if (AlgoController::tabProcessus== nullptr) { return nullptr; }
 
     switch (algorithm) {
         case FIFO : {
