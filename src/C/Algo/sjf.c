@@ -1,5 +1,4 @@
-#include "processus.h"
-#include "resultat.h"
+#include "sjf.h"
 
 
 
@@ -15,12 +14,13 @@
  *                     NULL en cas d'échec d'allocation mémoire.
  */
 Resultat* sjf(Processus tab[], int taille) {
+	//printf("dans sjf\n");
 	int n = nbQuantumTotal(tab, taille);
 	int temps_courant = 0;					// Temps courant
 	int nbProcessusTraiter = 0;
 	
 
-	Resultat *resultat = allocMemResultat(n);
+	Resultat *resultat = allocMemResultat(taille);
 	if ( resultat == NULL ) return NULL ; 
 	initResultat(resultat);
 	
@@ -28,11 +28,13 @@ Resultat* sjf(Processus tab[], int taille) {
 	// Tableau indicé par le numero du processus
 	bool processusTraiter[taille];
 	for ( int h = 0; h < taille; h++ ){ processusTraiter[h] = false; }	
-	
+    //printf("apres init tableau\n");
 
 	// Tant que tout les processus sont pas traiter
 	while ( nbProcessusTraiter < taille ) {
-		int minQuantum = estMinQuantum(tab, processusTraiter, taille);	// Quantum minimum parmis ceux non traiter
+        //printf("tour while : %d\n", nbProcessusTraiter);
+		int minQuantum = estMinQuantum(tab, processusTraiter, taille, temps_courant);	// Quantum minimum parmis ceux non traiter
+	    //printf("minQuantum : %d\n", minQuantum);
 		int bestCandidat = -1;
 		
 
@@ -42,7 +44,7 @@ Resultat* sjf(Processus tab[], int taille) {
 				bestCandidat = i; // On mémorise l'indice du meilleur candidat
 			}
 		}
-
+    	//printf("bestCandidat : %d\n", bestCandidat);
 
 		/**
 		 * Aucun candidat pour ce temps
@@ -52,15 +54,20 @@ Resultat* sjf(Processus tab[], int taille) {
 		 * */
 		if ( bestCandidat == -1 ) {
 			temps_courant = MinTimeArrival(tab, processusTraiter, taille);
+	        //printf("nouveau temps_courant : %d\n", temps_courant);
 			continue;	// Permet de refaire la boucle while avec le nouveau temps courant
 		}
 		
 
 		// traitement du meilleur candidat
-		resultat->tabProcessus[nbProcessusTraiter] = tab[bestCandidat];		// Insertion du bestCandidat dans le tableau de processus traiter
+		//printf("traitement de : %s\n", tab[bestCandidat].name);
+		resultat->tabProcessus[nbProcessusTraiter] = tab[bestCandidat];
+		//printf("apres tabProcessus\n");
 		for ( int j = 0; j < getNbQuantum(tab[bestCandidat]); j++){
-			inserQueueLTQ(resultat->listeTQ, bestCandidat);					// Insertion de chaque tick d'exécution du processus
+		    //printf("insertion tick %d\n", j);
+		    inserQueueLTQ(resultat->listeTQ, nbProcessusTraiter);
 		}
+		//printf("apres insertion LTQ\n");
 		
 
 		// Mise à jour
@@ -98,14 +105,16 @@ int nbQuantumTotal(Processus tab[], int taille) {
  * @param taille - Nombre de processus dans le tableau.
  * @return int - Valeur minimale de nbQuantum parmi les non traités.
  */
-int estMinQuantum(Processus tab[], bool processusTraiter[], int taille){
-	int min = getNbQuantum(tab[0]);
-	for ( int i=0; i < taille; i++){
-		if ( ( getNbQuantum(tab[i]) <= min ) && ( processusTraiter[i] == false ) ) {
-			min = getNbQuantum(tab[i]);	
-		} 
-	}
-	return min;
+int estMinQuantum(Processus tab[], bool processusTraiter[], int taille, int temps_courant){
+    int min = -1;
+    for ( int i = 0; i < taille; i++){
+        if ( processusTraiter[i] == false && getTimeArrival(tab[i]) <= temps_courant ) {
+            if ( min == -1 || getNbQuantum(tab[i]) < min ) {
+                min = getNbQuantum(tab[i]);
+            }
+        }
+    }
+    return min;
 }
 
 
@@ -121,11 +130,15 @@ int estMinQuantum(Processus tab[], bool processusTraiter[], int taille){
  * @return int - Valeur minimale de timeArrival parmi les non traités.
  */
 int MinTimeArrival(Processus tab[], bool processusTraiter[], int taille){
-	int min = getTimeArrival(tab[0]);
-	for ( int i=0; i < taille; i++){
-		if ( ( getTimeArrival(tab[i]) <= min ) && ( processusTraiter[i] == false ) ) {
-			min = getTimeArrival(tab[i]);	
-		} 
-	}
-	return min;
+    int min = -1;
+    for ( int i = 0; i < taille; i++){
+        //printf("tab[%d] timeArrival=%d nbQuantum=%d traite=%d\n", i, tab[i].timeArrival, tab[i].nbQuantum, processusTraiter[i]);
+        if ( processusTraiter[i] == false ) {
+            if ( min == -1 || getTimeArrival(tab[i]) < min ) {
+                min = getTimeArrival(tab[i]);
+            }
+        }
+    }
+    //printf("MinTimeArrival retourne : %d\n", min);
+    return min;
 }

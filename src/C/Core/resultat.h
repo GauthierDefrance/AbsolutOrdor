@@ -15,7 +15,7 @@
 typedef struct {
     int nbProcessus;
     Processus *tabProcessus; // Tableau des processus indexé et pointé par la listeTQ
-    ListeTQ *listeTQ; // Tableau d'indices de processus
+    ListeTQ listeTQ; // Tableau d'indices de processus
 } Resultat;
 
 
@@ -46,7 +46,7 @@ void initResultat(const Resultat *resultat);
 *******************************************/
 int nbProcess(const Resultat *resultat);
 Processus *getProcess(const Resultat *resultat);
-ListeTQ* getListeTQ(const Resultat *resultat);
+ListeTQ getListeTQ(const Resultat *resultat);
 
 
 

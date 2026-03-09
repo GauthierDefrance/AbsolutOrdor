@@ -80,7 +80,7 @@ const char *processusName(const Processus *p) {
  * @param l - Le Processus (par valeur).
  * @return int - Date d’arrivée.
  */
-int getTimeArrival(Processus p){	return p.timeArrival; }
+int getTimeArrival(Processus p) { return p.timeArrival; }
 
 /**
  * @brief Retourne le nombre de quantums du processus.
@@ -102,7 +102,7 @@ void afficherProcessus(const Processus *p) {
     }
     printf("[PROCESSUS] Nom : %s | Arrivee : %d | Quantum : %d\n",
         processusName(p),
-        timeArrival(*p),
-        nbQuantum(*p)
+        getTimeArrival(*p),
+        getNbQuantum(*p)
     );
 }
