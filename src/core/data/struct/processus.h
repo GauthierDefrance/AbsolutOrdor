@@ -50,13 +50,12 @@ void initProcessus(Processus *processus);
     Fonction primitive
 *******************************************/
 const char *processusName(const Processus *processus);
-int timeArrival(Processus processus);
-int nbQuantum(Processus processus);
+int getTimeArrival(Processus processus);
+int getNbQuantum(Processus processus);
 
 
 
 /******************************************
     Fonction consoles
 *******************************************/
-
 void afficherProcessus(const Processus *processus);
