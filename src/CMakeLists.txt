@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 3.31)
 project(AbsolutOrdor)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -28,12 +28,12 @@ add_executable(
         core/process/Algo/fifo.c
 )
 
-add_executable(
-        CLI
-        cli/main.cpp
-
-        cli/MainCli.cpp
-)
+#add_executable(
+#        CLI
+#        cli/main.cpp
+#
+#        cli/MainCli.cpp
+#)
 
 enable_testing()
 

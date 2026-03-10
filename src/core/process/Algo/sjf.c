@@ -15,7 +15,8 @@
  */
 Resultat* sjf(Processus tab[], int taille) {
 	//printf("dans sjf\n");
-	int n = nbQuantumTotal(tab, taille);
+
+	//int n = nbQuantumTotal(tab, taille);
 	int temps_courant = 0;					// Temps courant
 	int nbProcessusTraiter = 0;
 	
