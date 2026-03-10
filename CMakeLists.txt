@@ -1,23 +1,12 @@
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 3.31)
 project(AbsolutOrdor)
 
+# Active le support C++20
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(core)
+# Active les tests
+enable_testing()
 
-add_executable(
-        Tests
-        src/Tests/Test_Core.cpp
-        src/core/data/struct/resultat.h
-        src/core/data/struct/liste.h
-        src/core/data/struct/liste_tq.h
-        src/core/data/struct/processus.c
-        src/core/data/struct/resultat.c
-        src/core/data/struct/liste.c
-        src/core/data/struct/liste_tq.c
-        src/core/data/struct/processus.h
-        src/core/process/utilities/csv_reader.c
-        src/core/process/utilities/csv_reader.h
-        src/core/process/AlgoController.cpp
-        src/core/process/AlgoController.h
-)
+# Ajoute le sous-dossier Src (avec son propre CMakeLists.txt)
+add_subdirectory(Src)
