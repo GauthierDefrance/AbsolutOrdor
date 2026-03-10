@@ -34,3 +34,11 @@ add_executable(
         core/process/Algo/fifo.c
         core/process/Algo/fifo.h
 )
+
+add_executable(
+        CLI
+        cli/main.cpp
+
+        cli/MainCli.cpp
+        cli/MainCli.h
+)

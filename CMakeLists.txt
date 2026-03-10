@@ -3,10 +3,7 @@ project(AbsolutOrdor)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(
-        AbsolutOrdor
-        src/Tests/Test_Core.cpp
-)
+include_directories(core)
 
 add_executable(
         Tests
