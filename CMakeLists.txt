@@ -9,4 +9,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 enable_testing()
 
 # Ajoute le sous-dossier Src (avec son propre CMakeLists.txt)
-add_subdirectory(Src)
+add_subdirectory(src)
