@@ -30,6 +30,7 @@ class MainCli {
         void loadFile(char *filepath);
         void printCurrentFileName();
         void selectAlgorithm(SchedulingAlgorithm algorithm);
+        void loadFileAndSelectAlgorithm(char *filepath, SchedulingAlgorithm algorithm);
 
 
     private:
