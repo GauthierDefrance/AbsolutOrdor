@@ -1,203 +1,145 @@
-/**
- * @file liste_tq.c
- * @brief Implémentation des fonctions de gestion de la liste Tête-Queue (ListeTQ).
- */
-
-
 #include "liste_tq.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 
 /*******************************************
-    Fonction allocation mémoire
+    Allocation mémoire
 ********************************************/
-/**
- * @brief Alloue la mémoire pour une structure ListeTQ.
- * @note  Alloue uniquement la structure ListeTQ.
- *        Les champs tete et queue doivent être initialisés
- *        via initLTQ() après l’allocation.
- * @return ListeTQ - Pointeur vers la ListeTQ allouée, NULL en cas d’échec.
- */
 ListeTQ allocMemLTQ() {
-    ListeTQ lp = (ListeTQ) malloc(sizeof(*lp));
-    if ( lp == NULL ) { fprintf(stderr, "Erreur : echec de l'allocation memoire\n"); }
-    return lp;
+    ListeTQ ltq = malloc(sizeof(struct ListeTQ_Cellule));
+    if (!ltq) {
+        fprintf(stderr, "Erreur : echec allocation ListeTQ\n");
+        return NULL;
+    }
+    ltq->tete = NULL;
+    ltq->queue = NULL;
+    return ltq;
 }
 
 
-
 /*******************************************
-    Fonction libération mémoire
+    Libération mémoire
 ********************************************/
-/**
- * @brief Libère la mémoire de la structure ListeTQ et met le pointeur à NULL.
- * @note  Ne libère pas les cellules de la liste — utiliser destroyLTQ pour cela.
- * @param ltq - Adresse du pointeur vers la ListeTQ à libérer.
- * @warning Le pointeur ltq doit être valide et non NULL.
- */
 void libMemLTQ(ListeTQ *ltq) {
-    if (*ltq == NULL) return;
+    if (!ltq || !*ltq) return;
     free(*ltq);
     *ltq = NULL;
 }
 
+void destroyLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
+    if (!listeTQ) return;
 
+    Liste courant = listeTQ->tete;
+    while (courant != NULL) {
+        Liste tmp = courant;
+        courant = courant->suivant;
 
-/******************************************
-    Fonction de destruction
-******************************************/
-/**
- * @brief Détruit complètement une ListeTQ.
- * @note  Libère toutes les cellules de la liste ainsi que la structure ListeTQ.
- *        Utilise suppTeteLTQ pour supprimer les cellules en cascade.
- * @param listeTQ - ListeTQ à détruire (pointeur vers la structure).
- */
-void destroyLTQ(ListeTQ listeTQ) {
-    if ( listeTQ == NULL ) return;
-    while ( listeTQ->tete != NULL ) {
-        suppTeteLTQ(listeTQ);
+        if (freeData && tmp->data)
+            freeData(tmp->data);
+
+        free(tmp);
     }
+
     free(listeTQ);
 }
 
 
-
-/******************************************
-    Fonction d'initialisation
-******************************************/
-/**
- * @brief Initialise les champs tete et queue d'une ListeTQ à NULL.
- * @param listeTQ - ListeTQ à initialiser.
- * @pre listeTQ != NULL
- */
+/*******************************************
+    Initialisation
+********************************************/
 void initLTQ(ListeTQ listeTQ) {
+    if (!listeTQ) return;
     listeTQ->tete = NULL;
     listeTQ->queue = NULL;
 }
 
 
-
-/******************************************
-    Fonction primitive
-*******************************************/
-/**
- * @brief Retourne la tête de la ListeTQ.
- * @param listeTQ - ListeTQ.
- * @return Liste - Pointeur vers la cellule de tête, NULL si la liste est vide.
- */
+/*******************************************
+    Primitives
+********************************************/
 Liste teteLTQ(ListeTQ listeTQ) {
-    return listeTQ->tete;
+    return listeTQ ? listeTQ->tete : NULL;
 }
 
-
-/**
- * @brief Retourne la queue de la ListeTQ.
- * @note  Complexité O(1) — préférer cette fonction à un parcours complet.
- * @param listeTQ - ListeTQ.
- * @return Liste - Pointeur vers la cellule de queue, NULL si la liste est vide.
- */
 Liste queueLTQ(ListeTQ listeTQ) {
-    return listeTQ->queue;
+    return listeTQ ? listeTQ->queue : NULL;
 }
 
 
+/*******************************************
+    Insertion
+********************************************/
+void inserTeteLTQ(ListeTQ listeTQ, void *data) {
+    if (!listeTQ) return;
 
-/******************************************
-    Fonction d'insertion
-*******************************************/
-/**
- * @brief Insère un élément en tête de la ListeTQ.
- * @note  Met à jour les pointeurs tete et queue si la liste était vide.
- * @param listeTQ - ListeTQ.
- * @param elem - Élément à insérer.
- */
-void inserTeteLTQ(ListeTQ listeTQ, int elem) {
-    //Opération impossible
-    if (listeTQ == NULL) return;
+    Liste cellule = createListe(data);
+    if (!cellule) return;
 
-    //On a 0 éléments
-    if (teteLTQ(listeTQ) == NULL ) {
-        Liste liste = createListe(elem);
-        listeTQ->tete = liste;
-        listeTQ->queue = liste;
+    cellule->suivant = listeTQ->tete;
+    listeTQ->tete = cellule;
+
+    if (listeTQ->queue == NULL)
+        listeTQ->queue = cellule;
+}
+
+void inserQueueLTQ(ListeTQ listeTQ, void *data) {
+    if (!listeTQ) return;
+
+    Liste cellule = createListe(data);
+    if (!cellule) return;
+
+    if (listeTQ->tete == NULL) {
+        listeTQ->tete = cellule;
+        listeTQ->queue = cellule;
         return;
     }
 
-    //On a 1 élements ou plus
-    inserTete(&listeTQ->tete, elem);
+    listeTQ->queue->suivant = cellule;
+    listeTQ->queue = cellule;
 }
 
 
-/**
- * @brief Insère un élément en queue de la ListeTQ.
- * @note  Complexité O(1) grâce au pointeur queue.
- *        Met à jour les pointeurs tete et queue si la liste était vide.
- * @param listeTQ - ListeTQ.
- * @param elem - Élément à insérer.
- */
-void inserQueueLTQ(ListeTQ listeTQ, int elem) {
-    if (listeTQ == NULL) return; //OP Impossible
+/*******************************************
+    Suppression
+********************************************/
+void suppTeteLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
+    if (!listeTQ || !listeTQ->tete) return;
 
-    Liste nouvelle = createListe(elem);
-    if (nouvelle == NULL) return;
+    Liste tmp = listeTQ->tete;
+    listeTQ->tete = tmp->suivant;
 
-    if (listeTQ->tete == NULL) {
-        // On a 0 éléments
-        listeTQ->tete = nouvelle;
-        listeTQ->queue = nouvelle;
-    }
+    if (freeData && tmp->data)
+        freeData(tmp->data);
 
-    else {
-        //Cas classique, 1 élem ou plus
-        listeTQ->queue->suivant = nouvelle;
-        listeTQ->queue = nouvelle;
-    }
-}
+    free(tmp);
 
-
-
-/******************************************
-    Fonction de suppression
-*******************************************/
-/**
- * @brief Supprime la cellule en tête de la ListeTQ et libère sa mémoire.
- * @note  Met le pointeur queue à NULL si la liste devient vide.
- * @param listeTQ - ListeTQ.
- */
-void suppTeteLTQ(ListeTQ listeTQ) {
-    if (listeTQ == NULL || estVideListe(listeTQ->tete)) return;
-
-    suppTete(&(listeTQ->tete)); // suppTete effectue le décalage
-
-    if (listeTQ->tete == NULL) {
+    if (listeTQ->tete == NULL)
         listeTQ->queue = NULL;
-    }
 }
 
-
-/**
- * @brief Supprime la cellule en queue de la ListeTQ et libère sa mémoire.
- * @note  Met à jour le pointeur queue vers l’avant-dernier élément.
- *        Complexité O(N) car un parcours est nécessaire.
- * @param listeTQ - ListeTQ.
- */
-void suppQueueLTQ(ListeTQ listeTQ) {
-    if (listeTQ == NULL || estVideListe(listeTQ->tete)) return;
+void suppQueueLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
+    if (!listeTQ || !listeTQ->tete) return;
 
     // 1 élément
     if (listeTQ->tete == listeTQ->queue) {
+        if (freeData && listeTQ->tete->data)
+            freeData(listeTQ->tete->data);
+
         free(listeTQ->tete);
         listeTQ->tete = NULL;
         listeTQ->queue = NULL;
         return;
     }
 
-    //Localisation de l'avant dernier element
+    // Plusieurs éléments
     Liste courant = listeTQ->tete;
-    while (courant->suivant != listeTQ->queue) {
+    while (courant->suivant != listeTQ->queue)
         courant = courant->suivant;
-    }
 
-    //Libération mémoire du dernier elem
+    if (freeData && listeTQ->queue->data)
+        freeData(listeTQ->queue->data);
+
     free(listeTQ->queue);
     courant->suivant = NULL;
     listeTQ->queue = courant;

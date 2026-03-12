@@ -1,70 +1,93 @@
 #include "AlgoController.h"
-#include "process/utilities/csv_reader.h"
 
-#include "Algo/sjf.h"
+extern "C" {
+    #include "data/struct/liste_tq.h"
+    #include "process/utilities/csv_reader.h"
+    #include "data/struct/ExecutionTimeline.h"
+    #include "Algo/sjf.h"
+    // #include "Algo/fifo.h"
+    // #include "Algo/rr.h"
+    // #include "Algo/sjrf.h"
+}
 
+#include <iostream>
 
-TabProcessus AlgoController::tabProcessus = nullptr;
+// Liste générique de Processus* lue depuis le CSV
+ListeTQ AlgoController::listeProcessus = nullptr;
 
 /**
  * Renvoie l'instance unique d'AlgoController
- * @return INSTANCE AlgoController
  */
 AlgoController& AlgoController::getInstance() {
     static AlgoController instance;
     return instance;
 }
 
-
 /**
- * Destructeur de l'objet AlgoController, libération de la mémoire.
+ * Destructeur : libère la liste de processus si elle existe.
  */
 AlgoController::~AlgoController() {
-    if (tabProcessus != NULL) {
-        freeTabProcessus(&tabProcessus);
+    if (listeProcessus != nullptr) {
+        // Libère tous les Processus* contenus dans la liste
+        destroyLTQ(listeProcessus, (void (*)(void *)) libMemProcessus);
+        listeProcessus = nullptr;
     }
 }
 
-
 /**
- * Permet de lire un CSV et générer le tableau de Processus associé.
- * @param sourcepath
+ * Charge un CSV et génère la liste de Processus associée.
  */
 void AlgoController::setCSV(char *sourcepath) {
-    if (AlgoController::tabProcessus != nullptr) {
-        freeTabProcessus(&AlgoController::tabProcessus);
+    // On libère l’ancienne liste si elle existe
+    if (AlgoController::listeProcessus != nullptr) {
+        destroyLTQ(AlgoController::listeProcessus, (void (*)(void *)) libMemProcessus);
+        AlgoController::listeProcessus = nullptr;
     }
-    AlgoController::tabProcessus = createTabProcessusFromCSV(sourcepath);
+
+    AlgoController::listeProcessus = createListeProcessusFromCSV(sourcepath);
+
+    if (!isListeProcessusValid(AlgoController::listeProcessus)) {
+        std::cerr << "[AlgoController] Erreur : liste de processus invalide après lecture du CSV." << std::endl;
+        destroyLTQ(AlgoController::listeProcessus, (void (*)(void *)) libMemProcessus);
+        AlgoController::listeProcessus = nullptr;
+    }
 }
 
-
 /**
- * Cette méthode, permet de sélectionner un algorithme et généré son résultat.
- * Elle nécessite qu'un CSV est d'abord était chargé précédemment.
- *
- * @param algorithm, l'algorithme que vous voulez utiliser pour l'ordonnancement
- * @return Resultat* qui pourra être ensuite affiché
+ * Sélectionne un algorithme et génère sa timeline d’exécution.
+ * Nécessite qu’un CSV ait été chargé avant.
  */
-Resultat* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm) {
-
-    if (AlgoController::tabProcessus== nullptr) { return nullptr; }
+ExecutionTimeline* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm) {
+    if (AlgoController::listeProcessus == nullptr) {
+        std::cerr << "[AlgoController] Aucun CSV chargé, impossible de lancer un algorithme." << std::endl;
+        return nullptr;
+    }
 
     switch (algorithm) {
-        case FIFO : {
+        case FIFO: {
+            // TODO: implémenter FIFO(listeProcessus) → ExecutionTimeline*
+            std::cerr << "[AlgoController] FIFO non encore implémenté." << std::endl;
             return nullptr;
         }
-        case SJF : {
-            return sjf(AlgoController::tabProcessus->tabProcess, AlgoController::tabProcessus->nbProcess);
-        }
-        case SJRF : {
+        case SJF: {
+            // Signature attendue côté C :
+            // ExecutionTimeline* sjf(ListeTQ listeProcessus);
+            //return sjf(AlgoController::listeProcessus);
             return nullptr;
         }
-        case RR : {
+        case SJRF: {
+            // TODO: implémenter SJRF(listeProcessus)
+            std::cerr << "[AlgoController] SJRF non encore implémenté." << std::endl;
+            return nullptr;
+        }
+        case RR: {
+            // TODO: implémenter RR(listeProcessus)
+            std::cerr << "[AlgoController] RR non encore implémenté." << std::endl;
             return nullptr;
         }
         default: {
+            std::cerr << "[AlgoController] Algorithme inconnu." << std::endl;
             return nullptr;
         }
-
     }
 }

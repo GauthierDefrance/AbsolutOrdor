@@ -1,56 +1,69 @@
 #pragma once
 #include "liste.h"
 
-
 /**
- * Liste TQ Générique regroupant,
- * les listes de Resultat et les listes de Processus
+ * Liste Tête-Queue générique.
+ * Contient des cellules de type Liste (déjà générique).
  */
-typedef struct {
+typedef struct ListeTQ_Cellule {
     Liste tete;
     Liste queue;
 } *ListeTQ;
 
 
 /*******************************************
-    Fonction allocation mémoire
+    Allocation mémoire
 ********************************************/
 ListeTQ allocMemLTQ();
 
 
-
 /*******************************************
-    Fonction libération mémoire
+    Libération mémoire
 ********************************************/
+
+/**
+ * @brief Libère uniquement la structure ListeTQ (pas les cellules).
+ */
 void libMemLTQ(ListeTQ *ltq);
 
-
-/******************************************
-    Fonction de suppression
-*******************************************/
-void destroyLTQ(ListeTQ listeTQ);
-void suppTeteLTQ(ListeTQ listeTQ);
-void suppQueueLTQ(ListeTQ listeTQ);
-
+/**
+ * @brief Détruit complètement la liste TQ + toutes ses cellules.
+ * @param listeTQ - structure ListeTQ
+ * @param freeData - callback pour libérer data dans chaque cellule (optionnel)
+ */
+void destroyLTQ(ListeTQ listeTQ, void (*freeData)(void *));
 
 
-/******************************************
-    Fonction d'initialisation
-******************************************/
+/*******************************************
+    Initialisation
+********************************************/
 void initLTQ(ListeTQ listeTQ);
 
 
-
-/******************************************
-    Fonction primitive
-*******************************************/
+/*******************************************
+    Fonctions primitives
+********************************************/
 Liste teteLTQ(ListeTQ listeTQ);
-Liste queueLTQ(ListeTQ listeTQ);			// ADVICE : Choisissez celui-là si vous devez aller à la fin de la liste
+Liste queueLTQ(ListeTQ listeTQ);
 
 
+/*******************************************
+    Insertion
+********************************************/
 
-/******************************************
-    Fonction d'insertion
-*******************************************/
-void inserTeteLTQ(ListeTQ listeTQ, int elem);
-void inserQueueLTQ(ListeTQ listeTQ, int elem);
+/**
+ * @brief Insère un élément en tête (O(1)).
+ */
+void inserTeteLTQ(ListeTQ listeTQ, void *data);
+
+/**
+ * @brief Insère un élément en queue (O(1)).
+ */
+void inserQueueLTQ(ListeTQ listeTQ, void *data);
+
+
+/*******************************************
+    Suppression
+********************************************/
+void suppTeteLTQ(ListeTQ listeTQ, void (*freeData)(void *));
+void suppQueueLTQ(ListeTQ listeTQ, void (*freeData)(void *));

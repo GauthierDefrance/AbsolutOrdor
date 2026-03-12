@@ -1,118 +1,79 @@
 #include "csv_reader.h"
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-//***********************
-// Allocation mémoire
-//***********************
+static bool isCommentLine(FILE *f);
+static void skipLine(FILE *f);
+static void skipAllIgnoredLines(FILE *f);
 
-/**
- *
- * @param size
- * @return
- */
-TabProcessus allocTabProcessus(int size) {
-    if (size <= 0) return NULL;
-
-    // Alloue la structure
-    TabProcessus tab = (TabProcessus) malloc(sizeof(*tab));
-    if (!tab) return NULL;
-
-    tab->nbProcess = size;
-
-    // Alloue le tableau de Processus
-    tab->tabProcess = (Processus*) calloc(size, sizeof(Processus));
-    if (!tab->tabProcess) {
-        free(tab); // libère la structure si tableau non alloué
+ListeTQ createListeProcessusFromCSV(char *fileName) {
+    FILE *f = fopen(fileName, "r");
+    if (!f) {
+        fprintf(stderr, "Erreur : impossible d’ouvrir %s\n", fileName);
         return NULL;
     }
 
-    return tab;
-}
+    ListeTQ liste = allocMemLTQ();
+    initLTQ(liste);
 
-
-
-
-//***********************
-// Libération mémoire
-//***********************
-
-/**
- *
- * @param tab
- */
-void freeTabProcessus(TabProcessus *tab) {
-    if (tab && *tab) {
-        free((*tab)->tabProcess); // libère le tableau
-        free(*tab);               // libère la structure
-        *tab = NULL;              // évite dangling pointer
-    }
-}
-
-
-
-
-
-//***********************
-// Lecture du CSV et génération du tableau
-//***********************
-
-/**
- *
- * @param fileName
- * @return
- */
-TabProcessus createTabProcessusFromCSV(char *fileName) {
-    FILE *f = fopen(fileName, "r");
-    if (f==NULL) return NULL; // l'ouverture échoue
-
-    // Lecture du nombre de données à lire.
-    int size;
+    int size = 0;
     skipAllIgnoredLines(f);
     fscanf(f, "%d", &size);
-    TabProcessus tab = allocTabProcessus(size);
-    if (tab==NULL) return NULL; //Echec de l'allocation mémoire
 
-    // Lectures des données size fois
-    int nbQuantums, spawnDate;
     char processName[NBMAXCHAR];
-    for (int i=0; i<size; i++) {
+    int spawnDate;
+    int quantum;
+
+    for (int i = 0; i < size; i++) {
         skipAllIgnoredLines(f);
-        fscanf(f, "%[^;];%d;%d", //Le regex indique qu'on lit tous les characters possible sauf ;
-            processName,
-            &spawnDate,
-            &nbQuantums);
 
-        //WARNING : Les données entrée par l'utilisateur ne sont pas vérifié.
-        //ADVICE : Il serait judicieux, de les vérifier en boucle pour détecter les erreurs.
-        //ADVICE : On pourrait également indiqué à quel ligne il y a une erreur (en rappellant le formatage) dans le .csv de l'utilisateur
+        Processus *p = allocMemProcessus();
+        initProcessus(p);
 
-        // Attribution des données
-        strcpy(tab->tabProcess[i].name, processName);
-        tab->tabProcess[i].nbQuantum = nbQuantums;
-        tab->tabProcess[i].timeArrival = spawnDate;
+        // Lecture nom + date
+        if (fscanf(f, "%[^;];%d;", processName, &spawnDate) != 2) {
+            fprintf(stderr, "Erreur CSV ligne %d\n", i);
+            free(p);
+            break;
+        }
+
+        strncpy(p->name, processName, NBMAXCHAR - 1);
+        p->timeArrival = spawnDate;
+
+        // Lecture UC/ES
+        int index = 0;
+        while (fscanf(f, "%d", &quantum) == 1) {
+            Quantum *q = malloc(sizeof(Quantum));
+            q->nbQuantum = quantum;
+            q->type = (index % 2 == 0 ? UC : ES);
+
+            inserQueueLTQ(p->listeTQ, q);
+
+            index++;
+
+            int c = fgetc(f);
+            if (c == '\n' || c == EOF)
+                break;
+        }
+
+        inserQueueLTQ(liste, p);
     }
 
     fclose(f);
-    return tab;
+    return liste;
 }
 
+bool isListeProcessusValid(ListeTQ liste) {
+    return (liste != NULL);
+}
 
+/***********************
+ * Utilitaires CSV
+ ***********************/
 
-
-
-//***********************
-// Fonctions utilitaires
-//***********************
-
-/**
- *
- * @param f
- * @return
- */
-
-bool isCommentLine(FILE *f) {
-
+static bool isCommentLine(FILE *f) {
     long pos = ftell(f);
     if (pos == -1) return false;
 
@@ -125,30 +86,11 @@ bool isCommentLine(FILE *f) {
     return result;
 }
 
-/**
- * Procédure permettant de skip une ligne commençant par #
- * @param f
- */
-void skipLine(FILE *f) {
-    if (f==NULL) {return;}
+static void skipLine(FILE *f) {
     int c;
-    while ((c =fgetc(f)) != EOF && c != '\n');
+    while ((c = fgetc(f)) != EOF && c != '\n');
 }
 
-
-/**
- * Procédure permettant de skip tous les commentaires jusqu'à la prochaine donnée utile
- * @param f
- */
-void skipAllIgnoredLines(FILE *f) {
-    if (f==NULL) {return;}
+static void skipAllIgnoredLines(FILE *f) {
     while (isCommentLine(f)) skipLine(f);
-}
-
-bool isTabProcessusValid(TabProcessus tab) {
-    if (tab == NULL) return false;
-    if (tab->tabProcess == NULL) return false;
-    if (tab->nbProcess <= 0) return false;
-
-    return true;
 }

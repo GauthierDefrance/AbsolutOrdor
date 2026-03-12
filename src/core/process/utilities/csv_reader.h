@@ -1,24 +1,16 @@
 #pragma once
 
 #include "data/struct/processus.h"
+#include "data/struct/liste_tq.h"
 #include <stdbool.h>
 
-typedef struct TabProcessus_s {
-    int nbProcess;
-    Processus *tabProcess;
-} *TabProcessus;
+/**
+ * @brief Lit un fichier CSV et retourne une ListeTQ de Processus*.
+ * Chaque Processus contient une listeTQ de Quantum* (UC / ES uniquement).
+ */
+ListeTQ createListeProcessusFromCSV(char *fileName);
 
-// Allocation mémoire
-TabProcessus allocTabProcessus(int size);
-
-// Libération mémoire
-void freeTabProcessus(TabProcessus *tabProcessus);
-
-// Lecture du CSV et génération du tableau
-TabProcessus createTabProcessusFromCSV(char *fileName);
-
-// Fonctions utilitaires
-bool isCommentLine(FILE *f);
-void skipLine(FILE *f);
-void skipAllIgnoredLines(FILE *f);
-bool isTabProcessusValid(TabProcessus tab);
+/**
+ * @brief Vérifie si la liste est valide.
+ */
+bool isListeProcessusValid(ListeTQ liste);

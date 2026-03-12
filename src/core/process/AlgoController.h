@@ -1,14 +1,13 @@
 #pragma once
 
 extern "C" {
-    #include "data/struct/liste_tq.h"
-    #include "data/struct/liste.h"
-    #include "data/struct/processus.h"
-    #include "data/struct/resultat.h"
-    #include "process/utilities/csv_reader.h"
-    #include "process/Algo/sjf.h"
+#include "data/struct/liste_tq.h"
+#include "data/struct/liste.h"
+#include "data/struct/processus.h"
+#include "data/struct/ExecutionTimeline.h"
+#include "process/utilities/csv_reader.h"
+#include "process/Algo/sjf.h"
 }
-
 
 enum SchedulingAlgorithm {
     FIFO,
@@ -19,35 +18,33 @@ enum SchedulingAlgorithm {
 };
 
 class AlgoController {
-    public:
+public:
 
+    /**
+     * @return The singleton of the class
+     */
+    static AlgoController& getInstance();
 
-        /**
-         * @return The singleton of the class
-         */
-        static AlgoController& getInstance();
+    /**
+     * Destructeur de classe
+     */
+    ~AlgoController();
 
+    /**
+     * Charge un CSV et génère la liste de Processus*
+     */
+    static void setCSV(char *sourcepath);
 
-        /**
-         * Destructeur de classe
-         */
-        ~AlgoController();
+    /**
+     * Sélectionne un algorithme et renvoie la timeline d’exécution
+     */
+    static ExecutionTimeline* selectAlgorithm(SchedulingAlgorithm algorithm);
 
-        /**
-         *
-         * @param sourcepath
-         */
-        static void setCSV(char *sourcepath);
+private:
 
-
-        /**
-         *
-         * @param algorithm
-         * @return
-         */
-        static Resultat* selectAlgorithm(SchedulingAlgorithm algorithm);
-
-    private:
-        static  TabProcessus tabProcessus;
-
+    /**
+     * ListeTQ générique contenant des Processus*
+     * Issue du CSV
+     */
+    static ListeTQ listeProcessus;
 };

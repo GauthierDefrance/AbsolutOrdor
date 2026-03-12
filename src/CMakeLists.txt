@@ -17,15 +17,18 @@ add_executable(
         core/data/struct/liste.c
         core/data/struct/liste_tq.c
         core/data/struct/processus.c
-        core/data/struct/resultat.c
+        core/data/struct/ExecutionTimeline.c
+        core/data/struct/file.c
+        core/data/struct/file.h
+        core/data/struct/ProcessusIterator.c
+        core/data/struct/ProcessusIterator.h
 
         #Process
-        core/process/Algo/sjf.c
         core/process/AlgoController.cpp
 
         #Utilitaires
         core/process/utilities/csv_reader.c
-        core/process/Algo/fifo.c
+
 )
 
 #add_executable(

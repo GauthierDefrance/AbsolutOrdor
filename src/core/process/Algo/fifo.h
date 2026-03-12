@@ -1,5 +1,5 @@
 #pragma once
-#include "data/struct/resultat.h"
+#include "data/struct/ExecutionTimeline.h"
 #include "data/struct/processus.h"
 
 
