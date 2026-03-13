@@ -1,12 +1,17 @@
 #pragma once
 
 extern "C" {
-#include "data/struct/liste_tq.h"
-#include "data/struct/liste.h"
-#include "data/struct/processus.h"
-#include "data/struct/ExecutionTimeline.h"
-#include "process/utilities/csv_reader.h"
-#include "process/Algo/sjf.h"
+    #include "data/struct/liste_tq.h"
+    #include "data/struct/liste.h"
+    #include "data/struct/processus.h"
+    #include "data/struct/ExecutionTimeline.h"
+    #include "process/utilities/csv_reader.h"
+    #include "process/Algo/sjf.h"
+    #include "data/struct/liste_tq.h"
+    #include "process/utilities/csv_reader.h"
+    #include "data/struct/ExecutionTimeline.h"
+    #include "Algo/sjf.h"
+    #include "process/Algo/fifo.h"
 }
 
 enum SchedulingAlgorithm {

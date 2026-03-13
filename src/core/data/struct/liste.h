@@ -107,6 +107,9 @@ bool estVideListe(Liste l);
 void *donneeListe(Liste l);
 
 
+
+int tailleListe(Liste l);
+
 /******************************************
     Fonction d'insertion
 *******************************************/

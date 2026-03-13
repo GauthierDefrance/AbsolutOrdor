@@ -128,6 +128,16 @@ void *donneeListe(Liste l) {
 }
 
 
+int tailleListe(Liste l) {
+    if (l == NULL) return 0;
+    int compteur = 1;
+    while (l->suivant != NULL) {
+        l = l->suivant;
+        compteur++;
+    }
+    return compteur;
+}
+
 /******************************************
     Fonction d'insertion
 ******************************************/

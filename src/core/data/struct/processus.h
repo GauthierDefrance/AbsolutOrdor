@@ -40,6 +40,7 @@ typedef struct {
 ********************************************/
 Processus* allocMemProcessus();
 void libMemProcessus(Processus *processus);
+Quantum *allocQuantum(enum OperationProcessus type, int nbQuantum);
 
 /*******************************************
     Initialisation
@@ -52,6 +53,15 @@ void initProcessus(Processus *processus);
 const char *processusName(Processus *processus);
 int getTimeArrival(Processus *processus);
 ListeTQ getListeTQProcessus(Processus *processus);
+void pushOrMergeOperationProcessus(ListeTQ liste, enum OperationProcessus type, int n);
+
+/**
+ * Crée une copie profonde d'un Processus.
+ * Chaque Quantum est alloué indépendamment.
+ * À libérer avec libMemProcessus().
+ */
+Processus *deepCopyProcessus(Processus *src);
+Processus *deepCopyProcessusWithoutQuantums(Processus *src);
 
 
 /*******************************************

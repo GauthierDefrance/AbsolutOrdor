@@ -25,10 +25,14 @@ add_executable(
 
         #Process
         core/process/AlgoController.cpp
+        core/process/AlgoController.h
 
         #Utilitaires
         core/process/utilities/csv_reader.c
 
+        #Algo
+        core/process/Algo/fifo.c
+        core/process/Algo/fifo.h
 )
 
 #add_executable(

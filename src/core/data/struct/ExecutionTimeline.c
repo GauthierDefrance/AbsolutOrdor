@@ -37,6 +37,44 @@ void ajouterProcessusTimeline(ExecutionTimeline *tl, Processus *p) {
     inserQueueLTQ(tl->processus, p);
 }
 
+
+
+
+
+/**
+ * Initialise la timeline avec une copie (sans quantums) de chaque processus.
+ * L'ordre d'insertion est l'ordre d'arrivée dans la ListeTQ.
+ */
+void initTimelineProcessus(ExecutionTimeline *timeline, ListeTQ liste_tq) {
+    Liste elem = teteLTQ(liste_tq);
+    while (elem != NULL) {
+        Processus *src   = (Processus *)(elem->data);
+        Processus *copie = deepCopyProcessusWithoutQuantums(src);
+        inserQueueLTQ(timeline->processus, copie);
+        elem = suivantListe(elem);
+    }
+}
+
+/**
+ * Retourne le Processus* dans la timeline correspondant à l'iterator donné.
+ * On retrouve le bon processus par comparaison de nom.
+ */
+Processus *getTimelineProcessus(ExecutionTimeline *timeline, ProcessusIterator *it) {
+    Liste elem = teteLTQ(timeline->processus);
+    while (elem != NULL) {
+        Processus *p = (Processus *)(elem->data);
+        if (strcmp(p->name, it->processus->name) == 0)
+            return p;
+        elem = suivantListe(elem);
+    }
+    return NULL;
+}
+
+
+
+
+
+
 /**
  * Affiche la timeline finale :
  * Pour chaque processus, on affiche sa liste de quantum complète.

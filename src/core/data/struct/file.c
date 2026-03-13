@@ -7,7 +7,7 @@
     Allocation / Initialisation
 ********************************************/
 File allocFile() {
-    File f = malloc(sizeof(struct File));
+    File f = malloc(sizeof(struct File_Cellule));
     if (!f) {
         fprintf(stderr, "Erreur : allocation File\n");
         return NULL;

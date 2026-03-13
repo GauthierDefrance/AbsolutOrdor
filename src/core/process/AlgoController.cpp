@@ -1,14 +1,6 @@
 #include "AlgoController.h"
 
-extern "C" {
-    #include "data/struct/liste_tq.h"
-    #include "process/utilities/csv_reader.h"
-    #include "data/struct/ExecutionTimeline.h"
-    #include "Algo/sjf.h"
-    // #include "Algo/fifo.h"
-    // #include "Algo/rr.h"
-    // #include "Algo/sjrf.h"
-}
+
 
 #include <iostream>
 
@@ -65,9 +57,7 @@ ExecutionTimeline* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm
 
     switch (algorithm) {
         case FIFO: {
-            // TODO: implémenter FIFO(listeProcessus) → ExecutionTimeline*
-            std::cerr << "[AlgoController] FIFO non encore implémenté." << std::endl;
-            return nullptr;
+            return fifo(listeProcessus);
         }
         case SJF: {
             // Signature attendue côté C :

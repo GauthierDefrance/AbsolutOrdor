@@ -6,7 +6,7 @@
  * File générique basée sur ListeTQ.
  * FIFO : First-In First-Out
  */
-typedef struct File {
+typedef struct File_Cellule {
     ListeTQ ltq;
 } *File;
 
