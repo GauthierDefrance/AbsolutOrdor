@@ -4,6 +4,9 @@ project(AbsolutOrdor)
 set(CMAKE_CXX_STANDARD 20)
 
 include_directories(core)
+include_directories(Tests)
+include_directories(cli)
+
 add_compile_options(-Wall -Wextra -Werror)
 
 add_executable(
@@ -12,6 +15,12 @@ add_executable(
 
         # Main
         Tests/Test_Core.cpp
+        Tests/Test_Liste.cpp
+        Tests/Test_ListeTQ.cpp
+        Tests/Test_Processus.cpp
+        Tests/Test_CSV.cpp
+        Tests/Test_Timeline.cpp
+        Tests/Test_Algo.cpp
 
         # Structures
         core/data/struct/liste.c
@@ -29,6 +38,9 @@ add_executable(
 
         #Utilitaires
         core/process/utilities/csv_reader.c
+        core/process/utilities/csv_reader.h
+        cli/ConsoleStructPrinter.cpp
+        cli/ConsoleStructPrinter.h
 
         #Algo
         core/process/Algo/fifo.c
