@@ -13,29 +13,53 @@ project(AbsolutOrdor)
 # cmake --build build
 # --------------------
 
+# -----------------------
+# C++ Standard
+# -----------------------
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# -----------------------
 # Inclure les dossiers
+# -----------------------
 include_directories(core Tests cli gui)
 
+# -----------------------
+# CMake automatique Qt
+# -----------------------
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-# --- 1. Recherche de Qt6 (Version Ultra-Stricte) ---
+# -----------------------
+# Option pour désactiver Qt
+# -----------------------
+option(DISABLE_QT "Disable Qt GUI support" OFF)
 
-# On récupère le chemin passé par l'utilisateur.
-# Si l'utilisateur passe C:/Qt/6.10.4 (qui n'existe pas), find_package DOIT échouer.
-find_package(Qt6 REQUIRED COMPONENTS Widgets
-        HINTS "${CMAKE_PREFIX_PATH}"
-        NO_DEFAULT_PATH)
+# -----------------------
+# Recherche optionnelle de Qt6
+# -----------------------
+set(QT6_FOUND FALSE)
+if(NOT DISABLE_QT)
+    find_package(Qt6 COMPONENTS Widgets QUIET)
+    if(Qt6_FOUND)
+        set(QT6_FOUND TRUE)
+        message(STATUS "Qt6 trouvé, GUI activée")
+    else()
+        message(WARNING "Qt6 non trouvé, GUI désactivée")
+    endif()
+else()
+    message(STATUS "Qt GUI désactivée par option DISABLE_QT")
+endif()
 
-# --- 2. Options de compilation ---
+# -----------------------
+# Options de compilation
+# -----------------------
 add_compile_options(-Wall -Wextra -Werror)
 
-
-
+# -----------------------
+# Sources Core
+# -----------------------
 set(CORE_SOURCES
         core/data/struct/liste.c
         core/data/struct/liste_tq.c
@@ -48,9 +72,9 @@ set(CORE_SOURCES
         core/process/Algo/fifo.c
 )
 
-
-
-# --- 3. Executables ---
+# -----------------------
+# Executable Tests CLI
+# -----------------------
 add_executable(Tests
         ${CORE_SOURCES}
         Tests/Test_Core.cpp
@@ -63,72 +87,55 @@ add_executable(Tests
         cli/ConsoleStructPrinter.cpp
 )
 
-#add_executable(CLI
-#        ${CORE_SOURCES}
-#        cli/main.cpp  # Assure-toi d'avoir un main.cpp dans le dossier cli
-#        cli/ConsoleStructPrinter.cpp
-#)
-
-add_executable(GUI WIN32 MACOSX_BUNDLE
-        ${CORE_SOURCES}
-        gui/main.cpp
-        gui/MainGui.cpp
-)
-
-target_link_libraries(GUI PRIVATE Qt6::Widgets)
-
-# --- 4. Déploiement et Diagnostics ---
-
-get_target_property(_qmake_executable Qt6::qmake IMPORTED_LOCATION)
-get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
-
-message(STATUS "----------------------------------------------------")
-message(STATUS "CONFIRMATION : Qt utilisé depuis : ${_qt_bin_dir}")
-message(STATUS "----------------------------------------------------")
-
-# --- 3. Déploiement spécifique par OS ---
-
-get_target_property(_qmake_executable Qt6::qmake IMPORTED_LOCATION)
-get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
-
-if(WIN32)
-    # --- WINDOWS : windeployqt ---
-    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}" NO_DEFAULT_PATH)
-    if(WINDEPLOYQT_EXECUTABLE)
-        add_custom_command(TARGET GUI POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E env "PATH=${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
-                --no-compiler-runtime
-                "$<TARGET_FILE:GUI>"
-                COMMENT "Windows: Déploiement des DLL Qt..."
-        )
-    endif()
-
-elseif(APPLE)
-    # --- MACOS : macdeployqt ---
-    find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}" NO_DEFAULT_PATH)
-    if(MACDEPLOYQT_EXECUTABLE)
-        add_custom_command(TARGET GUI POST_BUILD
-                # Note : On donne le chemin du .app (Bundle), pas du binaire seul
-                COMMAND "${MACDEPLOYQT_EXECUTABLE}" "$<TARGET_BUNDLE_DIR:GUI>" -verbose=0
-                COMMENT "macOS: Création du bundle .app avec macdeployqt..."
-        )
-    endif()
-
-elseif(UNIX AND NOT APPLE)
-    # --- LINUX : RPATH ---
-    # Sur Linux, on demande à l'exécutable de chercher les libs dans le dossier de Qt
-    # que l'on a passé en argument. C'est idéal pour le développement.
-
-    # On récupère le dossier 'lib' de Qt
-    get_filename_component(_qt_lib_dir "${_qt_bin_dir}/../lib" ABSOLUTE)
-
-    # On inscrit ce chemin dans l'exécutable
-    set_target_properties(GUI PROPERTIES
-            INSTALL_RPATH "${_qt_lib_dir}"
-            BUILD_WITH_INSTALL_RPATH TRUE
+# -----------------------
+# Executable GUI (Qt seulement si trouvé)
+# -----------------------
+if(QT6_FOUND)
+    add_executable(GUI WIN32 MACOSX_BUNDLE
+            ${CORE_SOURCES}
+            gui/main.cpp
+            gui/MainGui.cpp
     )
-    message(STATUS "Linux: RPATH configuré vers ${_qt_lib_dir}")
+    target_link_libraries(GUI PRIVATE Qt6::Widgets)
+
+    # -----------------------
+    # Déploiement spécifique par OS
+    # -----------------------
+    get_target_property(_qmake_executable Qt6::qmake IMPORTED_LOCATION)
+    get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
+
+    if(WIN32)
+        find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}" NO_DEFAULT_PATH)
+        if(WINDEPLOYQT_EXECUTABLE)
+            add_custom_command(TARGET GUI POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E env "PATH=${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
+                    --no-compiler-runtime
+                    "$<TARGET_FILE:GUI>"
+                    COMMENT "Windows: Déploiement des DLL Qt..."
+            )
+        endif()
+
+    elseif(APPLE)
+        find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}" NO_DEFAULT_PATH)
+        if(MACDEPLOYQT_EXECUTABLE)
+            add_custom_command(TARGET GUI POST_BUILD
+                    COMMAND "${MACDEPLOYQT_EXECUTABLE}" "$<TARGET_BUNDLE_DIR:GUI>" -verbose=0
+                    COMMENT "macOS: Création du bundle .app avec macdeployqt..."
+            )
+        endif()
+
+    elseif(UNIX AND NOT APPLE)
+        get_filename_component(_qt_lib_dir "${_qt_bin_dir}/../lib" ABSOLUTE)
+        set_target_properties(GUI PROPERTIES
+                INSTALL_RPATH "${_qt_lib_dir}"
+                BUILD_WITH_INSTALL_RPATH TRUE
+        )
+        message(STATUS "Linux: RPATH configuré vers ${_qt_lib_dir}")
+    endif()
 endif()
 
+# -----------------------
+# Tests CTest
+# -----------------------
 enable_testing()
 add_test(NAME CoreTests COMMAND Tests)

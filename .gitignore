@@ -1,5 +1,6 @@
 # Folders
 */.idea/
+*/build/
 */cmake-build-debug/
 
 # Prerequisites
@@ -57,4 +58,3 @@ dkms.conf
 
 # debug information files
 *.dwo
-
