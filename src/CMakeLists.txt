@@ -70,6 +70,7 @@ set(CORE_SOURCES
         core/process/AlgoController.cpp
         core/process/utilities/csv_reader.c
         core/process/Algo/fifo.c
+        core/process/Algo/sjf.c
 )
 
 # -----------------------

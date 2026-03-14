@@ -1,7 +1,6 @@
 #include "AlgoController.h"
 
 
-
 #include <iostream>
 
 // Liste générique de Processus* lue depuis le CSV
@@ -60,10 +59,7 @@ ExecutionTimeline* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm
             return fifo(listeProcessus);
         }
         case SJF: {
-            // Signature attendue côté C :
-            // ExecutionTimeline* sjf(ListeTQ listeProcessus);
-            //return sjf(AlgoController::listeProcessus);
-            return nullptr;
+            return sjf(listeProcessus, tailleListe(listeProcessus->tete));
         }
         case SJRF: {
             // TODO: implémenter SJRF(listeProcessus)

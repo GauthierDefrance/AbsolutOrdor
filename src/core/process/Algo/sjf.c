@@ -2,6 +2,11 @@
 
 // ALGO NON-PRÉEMPTIF
 
+
+static void traiterUC(ProcessusIterator** surLeCPU,File *fileAttente, File *fileES, ExecutionTimeline *resultat, int *nbProcessusTraiter);
+static void traiterES(File *fileES, File *fileAttente, ExecutionTimeline *resultat, int *nbProcessusTraiter);
+static void traiterWait(File *fileAttente, ExecutionTimeline *resultat);
+
 /**
  * @param : listeTQ de processus
  * @return : listeTQ de processus ordonnée selon SJF
@@ -172,7 +177,7 @@ ProcessusIterator* estMinTempsUCProcessus(File* f){
 /**
  * 
  * */
-void traiterUC(ProcessusIterator** surLeCPU,File *fileAttente, File *fileES, ExecutionTimeline *resultat, int *nbProcessusTraiter){
+static void traiterUC(ProcessusIterator** surLeCPU,File *fileAttente, File *fileES, ExecutionTimeline *resultat, int *nbProcessusTraiter){
 	/**
 	 * Vérifivation de la disponibilité du CPU
 	 * et selectionne le processus avec le
@@ -215,7 +220,7 @@ void traiterUC(ProcessusIterator** surLeCPU,File *fileAttente, File *fileES, Exe
 /**
  * 
  * */
-void traiterES(File *fileES, File *fileAttente, ExecutionTimeline *resultat, int *nbProcessusTraiter) {
+static void traiterES(File *fileES, File *fileAttente, ExecutionTimeline *resultat, int *nbProcessusTraiter) {
 	if ( !fileES || estVideFile(*fileES) ) return;
 
 
@@ -247,7 +252,7 @@ void traiterES(File *fileES, File *fileAttente, ExecutionTimeline *resultat, int
 /**
  * 
  * */
-void traiterWait(File *fileAttente, ExecutionTimeline *resultat){
+static void traiterWait(File *fileAttente, ExecutionTimeline *resultat){
 	if ( !fileAttente || estVideFile(*fileAttente) ) return;
 
 	File tmp = allocFile();

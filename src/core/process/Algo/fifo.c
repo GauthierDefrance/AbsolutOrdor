@@ -64,7 +64,7 @@ static void traiterUC(ProcessusIterator *it, Processus *pTimeline, File file) {
  * @param it
  * @param pTimeline
  */
-void traiterES(ProcessusIterator *it, Processus *pTimeline) {
+static void traiterES(ProcessusIterator *it, Processus *pTimeline) {
     Quantum *completed = avancerIterator(it);
     if (completed) {
         pushOrMergeOperationProcessus(pTimeline->listeTQ, ES, completed->nbQuantum);
