@@ -88,17 +88,14 @@ ExecutionTimeline* sjf(ListeTQ liste, int taille) {
 	destroyFile(fileAttente, free);
 	destroyFile(fileES, free);
 	destroyLTQ(listeTriee, NULL);
+	
 	if ( surLeCPU ) free(surLeCPU);
-
 	afficherResultatsSJF(resultat);
+	afficherDiagramme(resultat);
 	return resultat;
 }
 
 
-/**
- * trié selon le temps d'arrivé des processus
- * @param ltq a trié 
- * */
 /**
  * Tri les processus selon leur temps d'arrivée.
  * @param ltq : la liste source non triée
@@ -158,7 +155,9 @@ ProcessusIterator* estMinTempsUCProcessus(File* f){
 	ProcessusIterator* min = (ProcessusIterator*) defilerFile(*f);
 	while ( !estVideFile(*f) ) {
 		ProcessusIterator* p = (ProcessusIterator*) defilerFile(*f);
-		if ( p->tempsRestant < min->tempsRestant ) {
+	if (p->tempsRestant < min->tempsRestant ||
+	   (p->tempsRestant == min->tempsRestant &&
+	    p->processus->timeArrival < min->processus->timeArrival)) {
 			enfilerFile(tmp, min);			// ancient min retourn dans la file temporaire
 			min = p;
 		} else {
@@ -173,6 +172,7 @@ ProcessusIterator* estMinTempsUCProcessus(File* f){
 	destroyFile(tmp,NULL);
 	return min;
 }
+
 
 /**
  * 
@@ -266,36 +266,4 @@ static void traiterWait(File *fileAttente, ExecutionTimeline *resultat){
 	}
 	destroyFile(*fileAttente, NULL);
 	*fileAttente = tmp;
-}
-
-
-void afficherResultatsSJF(ExecutionTimeline *tl) {
-    if (!tl || !tl->processus) return;
-
-    printf("\n--- RESULTATS DE LA SIMULATION SJF ---\n");
-
-    // On parcourt la liste des processus stockée dans la timeline
-    Liste courant = teteLTQ(tl->processus);
-    while (courant != NULL) {
-        Processus *p = (Processus *)(courant->data);
-        // Utilisation de p->name (ton champ dans la struct Processus)
-        printf("Processus [%s] : ", p->name);
-        
-        // On parcourt la listeTQ qui contient des Quantum*
-        Liste opCourante = teteLTQ(p->listeTQ);
-        while (opCourante != NULL) {
-            // Le type stocké dans la liste est "Quantum"
-            Quantum *q = (Quantum *)(opCourante->data);
-            
-            // Affichage selon le type enum OperationProcessus (UC=0, ES=1, W=2)
-            printf("[%s:%d] ", 
-                (q->type == UC ? "UC" : (q->type == ES ? "ES" : "W")), 
-                q->nbQuantum);
-            
-            opCourante = opCourante->suivant;
-        }
-        printf("\n");
-        courant = courant->suivant;
-    }
-    printf("---------------------------------------\n");
 }
