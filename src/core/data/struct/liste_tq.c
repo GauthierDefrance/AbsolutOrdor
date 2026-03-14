@@ -144,3 +144,47 @@ void suppQueueLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
     courant->suivant = NULL;
     listeTQ->queue = courant;
 }
+
+/**
+ * Supprime un noeud spécifique d'une liste sans casser la structure globale.
+ * @param ltq : La liste dont on veut supprimer un maillon
+ * @param cible : Le noeud (cellule) à retirer
+ * @param freeData : Fonction de libération de la donnée (passer NULL si non utilisé)
+ */
+void supprimerNoeudLTQ(ListeTQ ltq, Liste cible, void (*freeData)(void *)) {
+    if (!ltq || !cible) return;
+
+    // --- 1. Cas : C'est la tête de liste ---
+    if (ltq->tete == cible) {
+        ltq->tete = cible->suivant;
+        if (ltq->tete == NULL) ltq->queue = NULL;
+    } 
+    // --- 2. Cas : C'est ailleurs ou à la queue ---
+    else {
+        Liste courant = ltq->tete;
+        // On cherche le prédécesseur du noeud cible
+        while (courant != NULL && courant->suivant != cible) {
+            courant = courant->suivant;
+        }
+
+        // Si on a trouvé le prédécesseur
+        if (courant != NULL) {
+            courant->suivant = cible->suivant;
+            // Si c'était la queue, on met à jour le pointeur queue
+            if (cible == ltq->queue) {
+                ltq->queue = courant;
+            }
+        } else {
+            // Le noeud cible n'appartient pas à la liste
+            return;
+        }
+    }
+
+    // --- 3. Libération de la mémoire ---
+    // On libère la donnée si le callback est fourni
+    if (freeData && cible->data) {
+        freeData(cible->data);
+    }
+    // On libère la cellule elle-même
+    free(cible);
+}

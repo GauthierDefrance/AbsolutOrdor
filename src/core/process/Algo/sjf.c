@@ -1,146 +1,262 @@
-// #include "sjf.h"
-//
-//
-//
-// /**
-//  * @brief Réalise l'algorithme SJF (Shortest Job First) d'ordonnancement
-//  *        de processus non préemptif.
-//  * @note  Sélectionne à chaque étape le processus disponible avec le plus
-//  *        petit nombre de quantums. Si aucun processus n'est disponible
-//  *        au temps courant, avance au prochain temps d'arrivée.
-//  * @param tab - Tableau des processus à ordonnancer.
-//  * @param taille - Nombre de processus dans le tableau.
-//  * @return Resultat* - Pointeur vers le résultat de l'ordonnancement,
-//  *                     NULL en cas d'échec d'allocation mémoire.
-//  */
-// Resultat* sjf(Processus tab[], int taille) {
-// 	//printf("dans sjf\n");
-//
-// 	//int n = nbQuantumTotal(tab, taille);
-// 	int temps_courant = 0;					// Temps courant
-// 	int nbProcessusTraiter = 0;
-//
-//
-// 	Resultat *resultat = allocMemResultat(taille);
-//
-// 	if ( resultat == NULL ) return NULL ;
-// 	initResultat(resultat);
-//
-//
-// 	// Tableau indicé par le numero du processus
-// 	bool processusTraiter[taille];
-// 	for ( int h = 0; h < taille; h++ ){ processusTraiter[h] = false; }
-//     //printf("apres init tableau\n");
-//
-// 	// Tant que tout les processus sont pas traiter
-// 	while ( nbProcessusTraiter < taille ) {
-//         //printf("tour while : %d\n", nbProcessusTraiter);
-// 		int minQuantum = estMinQuantum(tab, processusTraiter, taille, temps_courant);	// Quantum minimum parmis ceux non traiter
-// 	    //printf("minQuantum : %d\n", minQuantum);
-// 		int bestCandidat = -1;
-//
-//
-// 		// On selectionne le meilleur candidat
-// 		for ( int i = 0; i < taille; i++) {
-// 			if ( ( processusTraiter[i] == false ) && ( getTimeArrival(tab[i]) <= temps_courant ) && ( getNbQuantum(tab[i]) == minQuantum ) ) {
-// 				bestCandidat = i; // On mémorise l'indice du meilleur candidat
-// 			}
-// 		}
-//     	//printf("bestCandidat : %d\n", bestCandidat);
-//
-// 		/**
-// 		 * Aucun candidat pour ce temps
-// 		 * on avance jusqu'au plus petit temps d'arrivé
-// 		 * d'un processus non traiter
-// 		 * pour par perdre du temps
-// 		 * */
-// 		if ( bestCandidat == -1 ) {
-// 			temps_courant = MinTimeArrival(tab, processusTraiter, taille);
-// 	        //printf("nouveau temps_courant : %d\n", temps_courant);
-// 			continue;	// Permet de refaire la boucle while avec le nouveau temps courant
-// 		}
-//
-//
-// 		// traitement du meilleur candidat
-// 		//printf("traitement de : %s\n", tab[bestCandidat].name);
-// 		resultat->tabProcessus[nbProcessusTraiter] = tab[bestCandidat];
-// 		//printf("apres tabProcessus\n");
-// 		for ( int j = 0; j < getNbQuantum(tab[bestCandidat]); j++){
-// 		    //printf("insertion tick %d\n", j);
-// 		    inserQueueLTQ(resultat->listeTQ, nbProcessusTraiter);
-// 		}
-// 		//printf("apres insertion LTQ\n");
-//
-//
-// 		// Mise à jour
-// 		temps_courant += getNbQuantum(tab[bestCandidat]);
-// 		processusTraiter[bestCandidat] = true;
-// 		nbProcessusTraiter ++;
-// 	}
-// 	return resultat;
-// }
-//
-//
-// /**
-//  * @brief Calcule le nombre total de quantums de tous les processus.
-//  * @note  Utilisé pour déterminer la taille de la listeTQ du résultat.
-//  * @param tab - Tableau des processus.
-//  * @param taille - Nombre de processus dans le tableau.
-//  * @return int - Somme des nbQuantum de tous les processus.
-//  */
-// int nbQuantumTotal(Processus tab[], int taille) {
-// 	int quantumTotal = 0;
-// 	for ( int i = 0; i < taille; i++) {
-// 		quantumTotal += getNbQuantum(tab[i]);
-// 	}
-// 	return quantumTotal;
-// }
-//
-//
-// /**
-//  * @brief Retourne le nombre de quantums minimum parmi les processus
-//  *        non encore traités.
-//  * @note  Utilisé par sjf() pour identifier le meilleur candidat.
-//  * @param tab - Tableau des processus.
-//  * @param processusTraiter - Tableau de booléens indiquant les processus
-//  *                           déjà traités (true = traité).
-//  * @param taille - Nombre de processus dans le tableau.
-//  * @return int - Valeur minimale de nbQuantum parmi les non traités.
-//  */
-// int estMinQuantum(Processus tab[], bool processusTraiter[], int taille, int temps_courant){
-//     int min = -1;
-//     for ( int i = 0; i < taille; i++){
-//         if ( processusTraiter[i] == false && getTimeArrival(tab[i]) <= temps_courant ) {
-//             if ( min == -1 || getNbQuantum(tab[i]) < min ) {
-//                 min = getNbQuantum(tab[i]);
-//             }
-//         }
-//     }
-//     return min;
-// }
-//
-//
-// /**
-//  * @brief Retourne le temps d'arrivée minimum parmi les processus
-//  *        non encore traités.
-//  * @note  Utilisé par sjf() pour avancer le temps courant quand aucun
-//  *        processus n'est disponible.
-//  * @param tab - Tableau des processus.
-//  * @param processusTraiter - Tableau de booléens indiquant les processus
-//  *                           déjà traités (true = traité).
-//  * @param taille - Nombre de processus dans le tableau.
-//  * @return int - Valeur minimale de timeArrival parmi les non traités.
-//  */
-// int MinTimeArrival(Processus tab[], bool processusTraiter[], int taille){
-//     int min = -1;
-//     for ( int i = 0; i < taille; i++){
-//         //printf("tab[%d] timeArrival=%d nbQuantum=%d traite=%d\n", i, tab[i].timeArrival, tab[i].nbQuantum, processusTraiter[i]);
-//         if ( processusTraiter[i] == false ) {
-//             if ( min == -1 || getTimeArrival(tab[i]) < min ) {
-//                 min = getTimeArrival(tab[i]);
-//             }
-//         }
-//     }
-//     //printf("MinTimeArrival retourne : %d\n", min);
-//     return min;
-// }
+#include "sjf.h"
+
+// ALGO NON-PRÉEMPTIF
+
+/**
+ * @param : listeTQ de processus
+ * @return : listeTQ de processus ordonnée selon SJF
+ * */
+ExecutionTimeline* sjf(ListeTQ liste, int taille) {
+	int temps_courant = 0;					// Temps courant
+	int nbProcessusTraiter = 0;
+
+
+	// Liste d'ordonnancement SJF en sortie
+	ExecutionTimeline *resultat = allocTimeline();
+	initTimelineProcessus(resultat, liste);
+
+
+	// Crée un liste dynamique de processus ranger par temps d'arrivé
+	ListeTQ listeTriee = trieListe(liste);
+
+
+	// Crée les File nécessaire au traitement SJF
+	File fileAttente = allocFile();				// File d'attent du CPU qui accumule W
+	File fileES = allocFile();					// ES en cours en parallèle
+	ProcessusIterator *surLeCPU = NULL;			// Processus en cours d'exécution sur le CPU
+
+	// Vérifiaction des structure
+	if ( !resultat || !fileAttente || !fileES || !listeTriee ) return NULL;
+	initFile(fileAttente);						// Contient des ProcessusIterator
+	initFile(fileES);							// Contient des ProcessusIterator
+
+
+
+	Liste tete = teteLTQ(listeTriee);
+
+
+	// Ajoute dans une File les processus à traiter 
+	while ( nbProcessusTraiter < taille ) {
+    	//printf("=== tick %d | traités: %d/%d ===\n", temps_courant, nbProcessusTraiter, taille);
+		/**
+		 * Ajout des processus a traiter dans la file d'attente
+		 * auquel leur temps d'arrivée correspond au temps courant
+		 * */
+		while ( tete != NULL && ( ((Processus*)tete->data)->timeArrival == temps_courant ) ) {
+	        //printf("  -> %s arrive dans fileAttente\n", ((Processus*)tete->data)->name);
+			ProcessusIterator *it = malloc(sizeof(ProcessusIterator));
+			initIterator((Processus*)tete->data,it);
+			enfilerFile(fileAttente, it); 
+			tete = suivantListe(tete);
+		}
+
+    	//printf("  surLeCPU: %s\n", surLeCPU ? surLeCPU->processus->name : "NULL");
+
+		
+		//
+		traiterES(&fileES, &fileAttente, resultat, &nbProcessusTraiter);
+
+    	//printf("  apres traiterUC: surLeCPU=%s | nbTraites=%d\n", surLeCPU ? surLeCPU->processus->name : "NULL", nbProcessusTraiter);
+		// Avancer tous les processus dans la fileES d'un tick
+		traiterUC(&surLeCPU, &fileAttente, &fileES, resultat, &nbProcessusTraiter);
+
+
+		// Faire accumuler W à tout les processus dans la fileAttente
+		traiterWait(&fileAttente, resultat);
+		// 3. Log minimaliste et efficace
+	    /*if (temps_courant % 10 == 0) { // Log tous les 10 ticks pour ne pas inonder la console
+	        printf("Tick %d : Traités %d/%d | CPU: %s\n", 
+	                temps_courant, nbProcessusTraiter, taille, 
+	                surLeCPU ? surLeCPU->processus->name : "IDLE");
+	    }*/
+
+		temps_courant ++;
+	    /*if (temps_courant > 2000) {
+	        //printf("TIMEOUT - boucle infinie detectee\n");
+	        break;
+	    }*/
+
+
+	}
+
+	// libération mémoire des structure intermédiaire
+	destroyFile(fileAttente, free);
+	destroyFile(fileES, free);
+	destroyLTQ(listeTriee, NULL);
+	if ( surLeCPU ) free(surLeCPU);
+	return resultat;
+}
+
+
+/**
+ * trié selon le temps d'arrivé des processus
+ * @param ltq a trié 
+ * */
+/**
+ * Tri les processus selon leur temps d'arrivée.
+ * @param ltq : la liste source non triée
+ * @return : une nouvelle liste chaînée triée
+ */
+ListeTQ trieListe(ListeTQ ltq) {
+    if (!ltq || teteLTQ(ltq) == NULL) return NULL;
+
+    ListeTQ resultat = allocMemLTQ();
+    ListeTQ copieTravail = allocMemLTQ();
+    
+    // 1. On recopie les pointeurs des processus dans une liste temporaire
+    Liste courant = teteLTQ(ltq);
+    while (courant != NULL) {
+        inserQueueLTQ(copieTravail, courant->data);
+        courant = suivantListe(courant);
+    }
+
+    // 2. On extrait itérativement le processus avec le temps d'arrivée min
+    while (teteLTQ(copieTravail) != NULL) {
+        Liste minNode = teteLTQ(copieTravail);
+        Processus* minProc = (Processus*)minNode->data;
+        Liste it = minNode->suivant;
+
+        // Chercher le plus petit temps d'arrivée
+        while (it != NULL) {
+            Processus* p = (Processus*)it->data;
+            if (p->timeArrival < minProc->timeArrival) {
+                minProc = p;
+                minNode = it;
+            }
+            it = suivantListe(it);
+        }
+
+        // Ajouter au résultat et supprimer de la copie sans détruire le processus
+        inserQueueLTQ(resultat, minProc);
+        supprimerNoeudLTQ(copieTravail, minNode, NULL); 
+    }
+
+    // 3. Libération de la liste temporaire (les cellules seulement)
+    destroyLTQ(copieTravail, NULL); 
+    return resultat;
+}
+
+
+/**
+ * 
+ * */
+ProcessusIterator* estMinTempsUCProcessus(File* f){
+	if ( estVideFile(*f) ) return NULL;
+
+	// File temporaire pour pas casser la FileAttente
+	File tmp = allocFile();
+	if ( !tmp ) return NULL;
+
+	// le minimum par defaut est le 1er element de la file
+	ProcessusIterator* min = (ProcessusIterator*) defilerFile(*f);
+	while ( !estVideFile(*f) ) {
+		ProcessusIterator* p = (ProcessusIterator*) defilerFile(*f);
+		if ( p->tempsRestant < min->tempsRestant ) {
+			enfilerFile(tmp, min);			// ancient min retourn dans la file temporaire
+			min = p;
+		} else {
+			enfilerFile(tmp,p);				// p retourn dans la file temporaire
+		}
+	}
+
+	// Remettre les autres dans la file d'origine (qui est maintenant vide)
+    while (!estVideFile(tmp)) {
+        enfilerFile(*f, defilerFile(tmp));
+    }
+	destroyFile(tmp,NULL);
+	return min;
+}
+
+/**
+ * 
+ * */
+void traiterUC(ProcessusIterator** surLeCPU,File *fileAttente, File *fileES, ExecutionTimeline *resultat, int *nbProcessusTraiter){
+	/**
+	 * Vérifivation de la disponibilité du CPU
+	 * et selectionne le processus avec le
+	 * minimum de temps d'UC
+	 * */
+	if ( *surLeCPU == NULL ) {
+		// WARNING : surLeCPU peut être NULL si fileAttente est vide
+		*surLeCPU = estMinTempsUCProcessus(fileAttente);
+	} 
+
+
+	/** 
+	 * On avancer le CPU d'un tick.
+	 * De plus, on vérifie si le processus qui utilise le CPU a maintenant des temps ES
+	 * sinon si le processus est fini alors dans les 2 cas personne n'utilise le CPU.
+	 * 
+	 * Ici, si on met pas surLeCPU à NULL quand le processus passe en ES ou est terminé
+	 * alors au tick suivant on va appeler avancerIterator(surLeCPU) sur un 
+	 * processus soit en ES soit terminé ce qui est faut 
+	 * */
+	if ( *surLeCPU != NULL ) {
+		avancerIterator(*surLeCPU);
+		Processus* p = getTimelineProcessus(resultat, *surLeCPU);
+		pushOrMergeOperationProcessus(p->listeTQ, UC, 1);
+
+		if ( iteratorEstFini(*surLeCPU) ) {
+			(*nbProcessusTraiter)++;
+			free(*surLeCPU);
+			*surLeCPU = NULL;
+		} else if ( etatIterator(*surLeCPU) == ES ) {
+			//printf("  [traiterUC] %s passe en ES\n", (*surLeCPU)->processus->name);
+			enfilerFile(*fileES, *surLeCPU);	
+			*surLeCPU = NULL; 
+		} 
+
+	}
+}
+
+
+/**
+ * 
+ * */
+void traiterES(File *fileES, File *fileAttente, ExecutionTimeline *resultat, int *nbProcessusTraiter) {
+	if ( !fileES || estVideFile(*fileES) ) return;
+
+
+	File tmp = allocFile();
+	if ( !tmp ) return;
+
+	while ( !estVideFile(*fileES) ) {
+		ProcessusIterator* it = (ProcessusIterator*) defilerFile(*fileES);
+		avancerIterator(it);
+		//printf("  [traiterES] it=%s etat=%d tempsRestant=%d\n", it->processus->name, etatIterator(it), it->tempsRestant);
+
+		Processus *p = getTimelineProcessus(resultat, it);
+		pushOrMergeOperationProcessus(p->listeTQ, ES, 1);
+		// Si le temps ES est fini et qu'il a encore des temps de PCU
+		if ( etatIterator(it) == UC ) {
+			enfilerFile(*fileAttente, it);
+		} else if ( iteratorEstFini(it) ) {
+			(*nbProcessusTraiter)++;
+			free(it);
+		} else {
+			enfilerFile(tmp, it);
+		}
+	}
+	destroyFile(*fileES, NULL);
+	*fileES = tmp;
+}
+
+
+/**
+ * 
+ * */
+void traiterWait(File *fileAttente, ExecutionTimeline *resultat){
+	if ( !fileAttente || estVideFile(*fileAttente) ) return;
+
+	File tmp = allocFile();
+	if ( !tmp ) return;
+
+	while ( !estVideFile(*fileAttente) ) {
+		ProcessusIterator* it = (ProcessusIterator*) defilerFile(*fileAttente);
+		Processus *p = getTimelineProcessus(resultat, it);
+		pushOrMergeOperationProcessus(p->listeTQ, W, 1);
+		enfilerFile(tmp, it);
+	}
+	destroyFile(*fileAttente, NULL);
+	*fileAttente = tmp;
+}

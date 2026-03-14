@@ -67,3 +67,4 @@ void inserQueueLTQ(ListeTQ listeTQ, void *data);
 ********************************************/
 void suppTeteLTQ(ListeTQ listeTQ, void (*freeData)(void *));
 void suppQueueLTQ(ListeTQ listeTQ, void (*freeData)(void *));
+void supprimerNoeudLTQ(ListeTQ ltq, Liste cible, void (*freeData)(void *));
