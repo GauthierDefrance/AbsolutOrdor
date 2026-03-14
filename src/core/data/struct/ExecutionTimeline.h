@@ -49,13 +49,3 @@ void ajouterProcessusTimeline(ExecutionTimeline *tl, Processus *p);
  * Recherche par comparaison de nom.
  */
 Processus *getTimelineProcessus(ExecutionTimeline *timeline, ProcessusIterator *it);
-
-
-/*******************************************
-    Affichage
-********************************************/
-
-/**
- * Affiche, pour chaque processus, sa séquence de quantum finale.
- */
-void afficherTimeline(ExecutionTimeline *tl);
