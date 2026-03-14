@@ -34,7 +34,7 @@ class MainCli {
         //Fonctions d'affichages
         static void showHelp();
         static void printBuiltinAlgorithm();
-        static void printAlgorithmResultat(Resultat resultat);
+        //static void printAlgorithmResultat(Resultat resultat);
 
         //Méthodes utilitaire
         void loadFile(char *filepath);
@@ -47,7 +47,7 @@ class MainCli {
         MainCli();
 
         Fichier *f = nullptr;
-        Resultat resultat;
+        //Resultat resultat;
         static MainCli* INSTANCE;
 
 };
