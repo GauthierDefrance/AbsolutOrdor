@@ -25,12 +25,12 @@ void initProcessus(Processus *processus) {
     initLTQ(processus->listeTQ);
 }
 
-const char *processusName(Processus *p) {
+const char *processusName(const Processus *p) {
     if (p==NULL) return NULL;
     return p->name;
 }
 
-int getTimeArrival(Processus *p) {
+int getTimeArrival(const Processus *p) {
     if (p==NULL) return -1;
     return p->timeArrival;
 }

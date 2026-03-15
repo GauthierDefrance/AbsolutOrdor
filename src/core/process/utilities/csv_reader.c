@@ -78,7 +78,9 @@ static bool isCommentLine(FILE *f) {
     if (pos == -1) return false;
 
     int c;
-    while ((c = fgetc(f)) != EOF && isspace(c) && c != '\n');
+    while ((c = fgetc(f)) != EOF && isspace(c) && c != '\n') {
+
+    }
 
     bool result = (c == '#' || c == '\n' || c == EOF);
 

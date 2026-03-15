@@ -12,9 +12,9 @@
 
 
 /* Prototypes des fonctions internes (statiques) */
-static void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, ExecutionTimeline *resultat, int *nbProcessusTraiter);
-static void traiterES(File *fileES, const File *fileAttente, ExecutionTimeline *resultat, int *nbProcessusTraiter);
-static void traiterWait(const File *fileAttente, ExecutionTimeline *resultat);
+static void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, const ExecutionTimeline *resultat, int *nbProcessusTraiter);
+static void traiterES(File *fileES, const File *fileAttente, const ExecutionTimeline *resultat, int *nbProcessusTraiter);
+static void traiterWait(const File *fileAttente, const ExecutionTimeline *resultat);
 
 
 /**
@@ -176,7 +176,7 @@ ProcessusIterator* retirerMinTempsUC(const File* f) {
  * @param resultat Chronologie à mettre à jour.
  * @param nbProcessusTraiter Compteur de processus terminés à incrémenter.
  */
-static void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, ExecutionTimeline *resultat, int *nbProcessusTraiter) {
+static void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, const ExecutionTimeline *resultat, int *nbProcessusTraiter) {
 	if (*surLeCPU == NULL) return;
 
 	ProcessusIterator *it = *surLeCPU;
@@ -208,7 +208,7 @@ static void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, Executio
  * @param resultat Chronologie à mettre à jour.
  * @param nbProcessusTraiter Compteur de processus terminés.
  */
-static void traiterES(File *fileES, const File *fileAttente, ExecutionTimeline *resultat, int *nbProcessusTraiter) {
+static void traiterES(File *fileES, const File *fileAttente, const ExecutionTimeline *resultat, int *nbProcessusTraiter) {
 	if ( estVideFile(*fileES) ) return;
 
 
@@ -241,7 +241,7 @@ static void traiterES(File *fileES, const File *fileAttente, ExecutionTimeline *
  * @param fileAttente File des processus prêts (Ready Queue).
  * @param resultat Chronologie à mettre à jour.
  */
-static void traiterWait(const File *fileAttente, ExecutionTimeline *resultat) {
+static void traiterWait(const File *fileAttente, const ExecutionTimeline *resultat) {
 	if (estVideFile(*fileAttente)) return;
 
 	File tmp = allocFile();

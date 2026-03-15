@@ -16,13 +16,13 @@ void afficherCSVCharge(ListeTQ liste) {
     std::cout << std::string(50, '-') << "\n";
 
     for (Liste c = liste->tete; c; c = c->suivant) {
-        Processus *p = (Processus*)c->data;
+        auto* p = static_cast<Processus*>(c->data);
 
         std::cout << std::setw(14) << p->name
                   << std::setw(10) << p->timeArrival;
 
         for (Liste qc = p->listeTQ->tete; qc; qc = qc->suivant) {
-            Quantum *q = (Quantum*)qc->data;
+            auto *q = static_cast<Quantum*>(qc->data);
 
             std::cout << (q->type == UC ? "UC" :
                          (q->type == ES ? "ES" : "W"))
@@ -39,21 +39,22 @@ void afficherCSVCharge(ListeTQ liste) {
 /* =========================
  * Affichage timeline simple
  * ========================= */
-void afficherTimeline(ExecutionTimeline *tl) {
+void afficherTimeline(const ExecutionTimeline *tl) {
     if (!tl) return;
 
     std::cout << "\n===== EXECUTION TIMELINE =====\n";
 
     for (Liste cell = tl->processus->tete; cell; cell = cell->suivant) {
 
-        Processus *p = (Processus*)cell->data;
+        auto *p = static_cast<Processus*>(cell->data);
 
         std::cout << std::left << std::setw(12) << p->name
                   << " (t=" << p->timeArrival << ") : ";
 
         for (Liste qc = p->listeTQ->tete; qc; qc = qc->suivant) {
 
-            Quantum *q = (Quantum*)qc->data;
+            auto *q = static_cast<Quantum*>(qc->data);
+
 
             std::cout << (q->type == UC ? "UC" :
                          (q->type == ES ? "ES" : "W"))
@@ -70,23 +71,23 @@ void afficherTimeline(ExecutionTimeline *tl) {
 /* =========================
  * Affichage console avec décalage temporel
  * ========================= */
-void afficherTimelineAvecDecalage(ExecutionTimeline *tl) {
+void afficherTimelineAvecDecalage(const ExecutionTimeline *tl) {
 
     if (!tl) return;
 
-    const int LABEL_WIDTH = 12;
-    const int TICK_WIDTH  = 2;
+    constexpr int LABEL_WIDTH = 12;
+    constexpr int TICK_WIDTH  = 2;
 
     int tMax = 0;
 
     for (Liste cell = tl->processus->tete; cell; cell = cell->suivant) {
 
-        Processus *p = (Processus*)cell->data;
+        auto *p = static_cast<Processus*>(cell->data);
 
         int t = p->timeArrival;
 
         for (Liste qc = p->listeTQ->tete; qc; qc = qc->suivant)
-            t += ((Quantum*)qc->data)->nbQuantum;
+            t += static_cast<Quantum*>(qc->data)->nbQuantum;
 
         if (t > tMax)
             tMax = t;
@@ -118,11 +119,11 @@ void afficherTimelineAvecDecalage(ExecutionTimeline *tl) {
 
     for (Liste cell = tl->processus->tete; cell; cell = cell->suivant) {
 
-        Processus *p = (Processus*)cell->data;
+        auto *p = static_cast<Processus*>(cell->data);
 
         std::string nom(p->name);
 
-        if ((int)nom.size() > LABEL_WIDTH)
+        if ( nom.size() > static_cast<std::size_t>(LABEL_WIDTH) )
             nom = nom.substr(0, LABEL_WIDTH);
 
         std::cout << nom
@@ -133,7 +134,8 @@ void afficherTimelineAvecDecalage(ExecutionTimeline *tl) {
 
         for (Liste qc = p->listeTQ->tete; qc; qc = qc->suivant) {
 
-            Quantum *q = (Quantum*)qc->data;
+            auto *q = static_cast<Quantum*>(qc->data);
+
 
             char sym = (q->type == UC) ? 'C' :
                        (q->type == ES) ? 'E' : 'W';
@@ -142,7 +144,7 @@ void afficherTimelineAvecDecalage(ExecutionTimeline *tl) {
 
                 std::cout << sym;
 
-                if (TICK_WIDTH > 1)
+                if constexpr (TICK_WIDTH > 1)
                     std::cout << std::string(TICK_WIDTH - 1, ' ');
             }
         }

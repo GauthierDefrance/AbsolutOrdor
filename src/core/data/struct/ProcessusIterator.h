@@ -66,7 +66,7 @@ Quantum *avancerIterator(ProcessusIterator *it);
 bool iteratorEstFini(ProcessusIterator *it);
 
 
-bool enAttenteIterator(ProcessusIterator *it);
+bool enAttenteIterator(const ProcessusIterator *it);
 
 
 /*******************************************
@@ -78,7 +78,6 @@ bool enAttenteIterator(ProcessusIterator *it);
  *
  * @param tab   tableau d'iterators
  * @param n     taille du tableau
- * @param time  temps courant de la simulation
  * @return      nombre d'iterators actifs
  */
 int countAlive(ProcessusIterator *tab, int n);

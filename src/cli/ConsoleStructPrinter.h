@@ -13,5 +13,5 @@ extern "C" {
 
 
 void afficherCSVCharge(ListeTQ liste);
-void afficherTimeline(ExecutionTimeline *tl);
-void afficherTimelineAvecDecalage(ExecutionTimeline *tl);
+void afficherTimeline(const ExecutionTimeline *tl);
+void afficherTimelineAvecDecalage(const ExecutionTimeline *tl);

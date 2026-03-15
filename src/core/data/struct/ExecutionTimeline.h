@@ -32,7 +32,7 @@ void destroyTimeline(ExecutionTimeline *tl);
  * Initialise la timeline avec une copie (sans quantums) de chaque processus.
  * L'ordre d'insertion est l'ordre d'arrivée dans la ListeTQ.
  */
-void initTimelineProcessus(ExecutionTimeline *timeline, ListeTQ liste_tq);
+void initTimelineProcessus(const ExecutionTimeline *timeline, ListeTQ liste_tq);
 
 /**
  * Ajoute un processus (déjà ordonnancé) dans la timeline.
@@ -48,4 +48,4 @@ void ajouterProcessusTimeline(ExecutionTimeline *tl, Processus *p);
  * Retourne le Processus* dans la timeline correspondant à l'iterator donné.
  * Recherche par comparaison de nom.
  */
-Processus *getTimelineProcessus(ExecutionTimeline *timeline, ProcessusIterator *it);
+Processus *getTimelineProcessus(const ExecutionTimeline *timeline, const ProcessusIterator *it);

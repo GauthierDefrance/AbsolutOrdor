@@ -90,7 +90,7 @@ ProcessusIterator *createTabIteratorFromLTQ(ListeTQ listeTQ, int *outSize) {
 }
 
 
-bool enAttenteIterator(ProcessusIterator *it) {
+bool enAttenteIterator(const ProcessusIterator *it) {
     if (it==NULL) return false;
     return it->enAttente;
 }

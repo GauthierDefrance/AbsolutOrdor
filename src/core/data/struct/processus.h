@@ -50,8 +50,8 @@ void initProcessus(Processus *processus);
 /*******************************************
     Primitives
 ********************************************/
-const char *processusName(Processus *processus);
-int getTimeArrival(Processus *processus);
+const char *processusName(const Processus *processus);
+int getTimeArrival(const Processus *processus);
 ListeTQ getListeTQProcessus(Processus *processus);
 void pushOrMergeOperationProcessus(ListeTQ liste, enum OperationProcessus type, int n);
 

@@ -11,7 +11,7 @@
  * @param file
  * @param timeline
  */
-static void executerTeteFile(File file, ExecutionTimeline *timeline) {
+static void executerTeteFile(File file, const ExecutionTimeline *timeline) {
     //Si la tete de file est NULL on ne fait rien
     if (estVideFile(file)) return;
 
@@ -39,7 +39,7 @@ static void executerTeteFile(File file, ExecutionTimeline *timeline) {
  * @param pTimeline
  * @param file
  */
-static void traiterUC(ProcessusIterator *it, Processus *pTimeline, File file) {
+static void traiterUC(ProcessusIterator *it, const Processus *pTimeline, File file) {
 
     //Si le processus était déjà en attente avant, on le laisse
     if (enAttenteIterator(it)) {
@@ -64,7 +64,7 @@ static void traiterUC(ProcessusIterator *it, Processus *pTimeline, File file) {
  * @param it
  * @param pTimeline
  */
-static void traiterES(ProcessusIterator *it, Processus *pTimeline) {
+static void traiterES(ProcessusIterator *it, const Processus *pTimeline) {
     Quantum *completed = avancerIterator(it);
     if (completed) {
         pushOrMergeOperationProcessus(pTimeline->listeTQ, ES, completed->nbQuantum);
