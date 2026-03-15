@@ -65,6 +65,17 @@ bool estVideFile(File f) {
 }
 
 
+int tailleFile(File f) {
+    // Vérification de sécurité : si la file ou la liste interne n'existe pas
+    if (!f || !f->ltq) {
+        return 0;
+    }
+
+    // On délègue le calcul à la fonction tailleListe existante
+    // en passant la tête de liste contenue dans le ListeTQ
+    return tailleListe(f->ltq->tete);
+}
+
 /*******************************************
     Destruction
 ********************************************/

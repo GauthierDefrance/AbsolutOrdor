@@ -44,6 +44,10 @@ void *teteFile(File f);
  */
 bool estVideFile(File f);
 
+/**
+ * @brief Renvoie la taille de la file.
+ */
+int tailleFile(File f);
 
 /*******************************************
     Destruction
