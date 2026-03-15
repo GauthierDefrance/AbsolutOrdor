@@ -14,7 +14,7 @@
 /* Prototypes des fonctions internes (statiques) */
 static void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, const ExecutionTimeline *resultat, int *nbProcessusTraiter);
 static void traiterES(File *fileES, const File *fileAttente, const ExecutionTimeline *resultat, int *nbProcessusTraiter);
-static void traiterWait(const File *fileAttente, const ExecutionTimeline *resultat);
+static void traiterWait(const File *fileAttente, const ExecutionTimeline *resultat, int temps_courant);
 
 
 /**
@@ -42,17 +42,24 @@ ExecutionTimeline* sjf(ListeTQ liste, int taille) {
 
 	while (nbProcessusTraiter < taille) {
 
+		// DEBUG
+		printf("[t=%d] fileAttente=%d | fileES=%d | CPU=%s\n",
+			temps_courant,
+			tailleFile(fileAttente),
+			tailleFile(fileES),
+			surLeCPU ? surLeCPU->processus->name : "libre");
+
 		// On traite les processus qui arrivent
 		while (tete != NULL && (((Processus*)tete->data)->timeArrival == temps_courant)) {
 			ProcessusIterator *it = malloc(sizeof(ProcessusIterator));
 			initIterator((Processus*)tete->data, it);
 			enfilerFile(fileAttente, it);
-
 			tete = suivantListe(tete);
 		}
 
 		// On avance les E/S, et on récupère ceux qui ont fini
 		traiterES(&fileES, &fileAttente, resultat, &nbProcessusTraiter);
+
 
 		// Choix du meilleur processus si CPU libre
 		if (surLeCPU == NULL) {
@@ -67,8 +74,7 @@ ExecutionTimeline* sjf(ListeTQ liste, int taille) {
 		}
 
 		// Marquer le "Wait" pour ceux qui sont restés dans la file
-		// WARNING : On ne marque W que si le processus est arrivé AVANT ce tick
-		traiterWait(&fileAttente, resultat);
+		traiterWait(&fileAttente, resultat, temps_courant);
 
 		temps_courant++;
 	}
@@ -182,11 +188,13 @@ static void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, const Ex
 	ProcessusIterator *it = *surLeCPU;
 	Processus* p = getTimelineProcessus(resultat, it);
 
+	// On avance (si le bloc finit, tempsRestant est mis à jour vers le bloc suivant)
+	avancerIterator(it);
+
 	// On marque l'UC dans la timeline
 	pushOrMergeOperationProcessus(p->listeTQ, UC, 1);
 
-	// On avance (si le bloc finit, tempsRestant est mis à jour vers le bloc suivant)
-	avancerIterator(it);
+
 
 	// VERIFICATION IMMEDIATE
 	if (iteratorEstFini(it)) {
@@ -223,6 +231,7 @@ static void traiterES(File *fileES, const File *fileAttente, const ExecutionTime
 		pushOrMergeOperationProcessus(p->listeTQ, ES, 1);
 		// Si le temps ES est fini et qu'il a encore des temps de PCU
 		if ( etatIterator(it) == UC ) {
+			it->enAttente = true;   // ← signaler "vient d'arriver ce tick"
 			enfilerFile(*fileAttente, it);
 		} else if ( iteratorEstFini(it) ) {
 			(*nbProcessusTraiter)++;
@@ -240,22 +249,23 @@ static void traiterES(File *fileES, const File *fileAttente, const ExecutionTime
  * @brief Enregistre le temps d'attente pour tous les processus en file d'attente.
  * @param fileAttente File des processus prêts (Ready Queue).
  * @param resultat Chronologie à mettre à jour.
+ * @param temps_courant Tick courant de la simulation
  */
-static void traiterWait(const File *fileAttente, const ExecutionTimeline *resultat) {
+static void traiterWait(const File *fileAttente, const ExecutionTimeline *resultat, int temps_courant) {
 	if (estVideFile(*fileAttente)) return;
 
 	File tmp = allocFile();
 	while (!estVideFile(*fileAttente)) {
 		ProcessusIterator* it = (ProcessusIterator*) defilerFile(*fileAttente);
-
-		// Si le processus n'est pas arrivé à cet instant précis, il attend.
 		Processus *p = getTimelineProcessus(resultat, it);
-		pushOrMergeOperationProcessus(p->listeTQ, W, 1);
 
+		// Arrivé strictement avant ce tick = il attend ce tick
+		if (p->timeArrival <= temps_courant && !it->enAttente) {
+			pushOrMergeOperationProcessus(p->listeTQ, W, 1);
+		}
+		it->enAttente = false;
 		enfilerFile(tmp, it);
 	}
-
-	// On restaure la file
 	while (!estVideFile(tmp)) enfilerFile(*fileAttente, defilerFile(tmp));
 	destroyFile(tmp, NULL);
 }
