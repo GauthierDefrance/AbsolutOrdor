@@ -109,7 +109,7 @@ bool testAlgoControllerSJRF() {
     }
 
     // Nombre de processus
-    fprintf(f,"2\n");
+    fprintf(f,"8\n");
 
     // Format: nom;temps_arrivee;UC1;ES1;UC2;ES2;...
     fprintf(f,"P1;0;5;3;4\n");

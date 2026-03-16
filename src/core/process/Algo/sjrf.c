@@ -65,19 +65,16 @@ ExecutionTimeline* sjrf(ListeTQ liste, int taille) {
 
 		// MÉCANISME DE PRÉEMPTION
 		// Si le CPU est occupé, on regarde si un processus plus court vient d'arriver en file d'attente
-		if (surLeCPU != NULL && !estVideFile(fileAttente) ) {
-			ProcessusIterator* bestCandidat = retirerMinTempsUC(&fileAttente);
-			if (bestCandidat != NULL && bestCandidat->tempsRestant < surLeCPU->tempsRestant ) {
-				// DÉCISION DE PRÉEMPTION : Le candidat est plus court que celui sur le CPU
-				//printf("[PREEMPT t=%d] %s(restant=%d) preempte %s(restant=%d)\n", temps_courant, bestCandidat->processus->name, bestCandidat->tempsRestant, surLeCPU->processus->name, surLeCPU->tempsRestant);
+		// MÉCANISME DE PRÉEMPTION
+		if (surLeCPU != NULL && !estVideFile(fileAttente)) {
+			ProcessusIterator* bestCandidat = retirerMinTempsUCSJRF(&fileAttente);  // ← SJRF
+			if (bestCandidat != NULL && bestCandidat->tempsRestant < surLeCPU->tempsRestant) {
 				surLeCPU->tempsEntreeFile = temps_courant;
 				enfilerFile(fileAttente, surLeCPU);
 				surLeCPU = bestCandidat;
 			} else {
-				// Pas de préemption : on remet le candidat en file s'il n'était pas meilleur
-				if (bestCandidat != NULL ) enfilerFile(fileAttente, bestCandidat);
+				if (bestCandidat != NULL) enfilerFile(fileAttente, bestCandidat);
 			}
-
 		}
 
 		// ÉLECTION (si CPU libre) : Si personne n'est sur le CPU, on choisit le plus court
