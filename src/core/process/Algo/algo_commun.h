@@ -4,4 +4,3 @@
 #include "data/struct/file.h"
 
 ListeTQ trieListe(ListeTQ ltq);
-ProcessusIterator* retirerMinTempsUC(const File* f);

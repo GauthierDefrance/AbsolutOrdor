@@ -6,6 +6,7 @@ void initIterator(Processus *p, ProcessusIterator *it) {
 
     it->processus = p;
     it->enAttente = false;
+    it->tempsEntreeFile = 0;
     it->quantumCourant = p->listeTQ->tete;
 
     if (it->quantumCourant) {

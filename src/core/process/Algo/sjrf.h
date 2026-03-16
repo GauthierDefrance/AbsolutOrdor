@@ -4,3 +4,4 @@
 
 
 ExecutionTimeline* sjrf(ListeTQ liste, int taille);
+ProcessusIterator* retirerMinTempsUCSJRF(const File* f);

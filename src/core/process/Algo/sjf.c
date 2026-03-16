@@ -42,13 +42,6 @@ ExecutionTimeline* sjf(ListeTQ liste, int taille) {
 
 	while (nbProcessusTraiter < taille) {
 
-		// DEBUG
-		/*printf("[t=%d] fileAttente=%d | fileES=%d | CPU=%s\n",
-			temps_courant,
-			tailleFile(fileAttente),
-			tailleFile(fileES),
-			surLeCPU ? surLeCPU->processus->name : "libre");*/
-
 		// On traite les processus qui arrivent
 		while (tete != NULL && (((Processus*)tete->data)->timeArrival == temps_courant)) {
 			ProcessusIterator *it = (ProcessusIterator*) malloc(sizeof(ProcessusIterator));

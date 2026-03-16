@@ -109,7 +109,7 @@ bool testAlgoControllerSJRF() {
     }
 
     // Nombre de processus
-    fprintf(f,"8\n");
+    fprintf(f,"2\n");
 
     // Format: nom;temps_arrivee;UC1;ES1;UC2;ES2;...
     fprintf(f,"P1;0;5;3;4\n");
@@ -120,6 +120,15 @@ bool testAlgoControllerSJRF() {
     fprintf(f,"P6;6;4\n");
     fprintf(f,"P7;10;2;2;3\n");
     fprintf(f,"P8;35;5\n");
+
+    // exemple fin page pdf de jlb
+    /*fprintf(f,"P1;0;3;4;2;3;3\n");
+    fprintf(f,"P2;1;1;2;4;1;4\n");*/
+
+    // exemple dans le discord AbsolutOrdor dans l'onglet Document
+    /*fprintf(f,"P1;0;3;2;2;2;2\n");
+    fprintf(f,"P2;1;2;2;3;3;2\n");*/
+
 
     fclose(f);
 

@@ -19,6 +19,7 @@ typedef struct ProcessusIterator {
     Liste quantumCourant;   // Pointeur vers la cellule Quantum* actuelle
     int tempsRestant;       // Temps restant dans ce quantum
     bool enAttente; //True = le processus attend
+    int tempsEntreeFile;
 } ProcessusIterator;
 
 

@@ -79,7 +79,9 @@ ProcessusIterator* retirerMinTempsUC(const File* f) {
 	while (!estVideFile(tmp)) {
 		enfilerFile(*f, defilerFile(tmp));
 	}
+
 	destroyFile(tmp, NULL);
+	//printf("  [MIN] => retourne %s restant=%d\n", min->processus->name, min->tempsRestant);
 
 	return min; // On retourne le min, il a bien été retiré de la file 'f'
 }
