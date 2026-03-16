@@ -11,6 +11,7 @@ extern "C" {
     #include "data/struct/ExecutionTimeline.h"
     #include "process/Algo/fifo.h"
     #include "process/Algo/sjf.h"
+    #include "process/Algo/sjrf.h"
 }
 
 enum SchedulingAlgorithm {

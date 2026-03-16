@@ -62,9 +62,7 @@ ExecutionTimeline* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm
             return sjf(listeProcessus, tailleListe(listeProcessus->tete));
         }
         case SJRF: {
-            // TODO: implémenter SJRF(listeProcessus)
-            std::cerr << "[AlgoController] SJRF non encore implémenté." << std::endl;
-            return nullptr;
+            return sjrf(listeProcessus, tailleListe(listeProcessus->tete));
         }
         case RR: {
             // TODO: implémenter RR(listeProcessus)

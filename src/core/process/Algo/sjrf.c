@@ -1,6 +1,6 @@
 /**
-* @file sjf.c
- * @brief Implémentation de l'ordonnanceur Shortest Job First (SJF) non-préemptif.
+* @file sjrf.c
+ * @brief Implémentation de l'ordonnanceur  (SJRF) préemptif.
  * * Ce module simule un ordonnancement court terme prenant en charge les cycles
  * d'Unités de Calcul (UC), les Entrées/Sorties (ES) et les temps d'attente (Wait).
  * L'algorithme est non-préemptif : un processus occupant le CPU ne le libère
@@ -8,7 +8,7 @@
  */
 
 
-#include "sjf.h"
+#include "sjrf.h"
 
 
 /* Prototypes des fonctions internes (statiques) */
@@ -18,14 +18,14 @@ static void traiterWait(const File *fileAttente, const ExecutionTimeline *result
 
 
 /**
- * @brief Point d'entrée principal de l'algorithme SJF.
+ * @brief Point d'entrée principal de l'algorithme SJRF.
  * Pilote la simulation tick par tick. Gère les arrivées, le dispatching CPU,
  * l'exécution des cycles UC/ES et la mise à jour de la chronologie d'exécution.
  * @param liste  ListeTQ des processus à ordonnancer.
  * @param taille Nombre total de processus dans le système.
  * @return ExecutionTimeline* Pointeur vers l'historique complet de l'exécution.
  */
-ExecutionTimeline* sjf(ListeTQ liste, int taille) {
+ExecutionTimeline* sjrf(ListeTQ liste, int taille) {
 	int temps_courant = 0;
 	int nbProcessusTraiter = 0;
 
@@ -42,13 +42,6 @@ ExecutionTimeline* sjf(ListeTQ liste, int taille) {
 
 	while (nbProcessusTraiter < taille) {
 
-		// DEBUG
-		/*printf("[t=%d] fileAttente=%d | fileES=%d | CPU=%s\n",
-			temps_courant,
-			tailleFile(fileAttente),
-			tailleFile(fileES),
-			surLeCPU ? surLeCPU->processus->name : "libre");*/
-
 		// On traite les processus qui arrivent
 		while (tete != NULL && (((Processus*)tete->data)->timeArrival == temps_courant)) {
 			ProcessusIterator *it = (ProcessusIterator*) malloc(sizeof(ProcessusIterator));
@@ -62,13 +55,24 @@ ExecutionTimeline* sjf(ListeTQ liste, int taille) {
 
 
 		// Choix du meilleur processus si CPU libre
-		if (surLeCPU == NULL) {
-			if (!estVideFile(fileAttente)) {
-				surLeCPU = retirerMinTempsUC(&fileAttente);
+		if (surLeCPU != NULL && !estVideFile(fileAttente) ) {
+			ProcessusIterator* bestCandidat = retirerMinTempsUC(&fileAttente);
+			if ( bestCandidat != NULL && (bestCandidat->tempsRestant < surLeCPU->tempsRestant) ) {
+				//surLeCPU->enAttente = true;
+				enfilerFile(fileAttente, surLeCPU);
+				surLeCPU = bestCandidat;
+			} else {
+				if (bestCandidat != NULL ) enfilerFile(fileAttente, bestCandidat);
 			}
+
 		}
 
-		// Le processus sur le CPU travaille
+		// Sélection initiale si CPU libre
+		else if (surLeCPU == NULL && !estVideFile(fileAttente)) {
+			surLeCPU = retirerMinTempsUC(&fileAttente);
+		}
+
+		// UC
 		if (surLeCPU != NULL) {
 			traiterUC(&surLeCPU, &fileES, resultat, &nbProcessusTraiter);
 		}

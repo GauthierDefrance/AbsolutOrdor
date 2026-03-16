@@ -71,6 +71,8 @@ set(CORE_SOURCES
         core/process/utilities/csv_reader.c
         core/process/Algo/fifo.c
         core/process/Algo/sjf.c
+        core/process/Algo/sjrf.c
+        core/process/Algo/algo_commun.c
 )
 
 # -----------------------

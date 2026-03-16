@@ -3,4 +3,4 @@
 #include "data/struct/ExecutionTimeline.h"
 
 
-ExecutionTimeline* sjf(ListeTQ liste, int taille);
+ExecutionTimeline* sjrf(ListeTQ liste, int taille);

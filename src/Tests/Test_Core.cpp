@@ -8,6 +8,7 @@ bool testCSVReader();
 bool testExecutionTimeline();
 bool testAlgoControllerFIFO();
 bool testAlgoControllerSJF();
+bool testAlgoControllerSJRF();
 
 static void print_test(const char* name, bool ok) {
     std::cout << (ok ? "[OK]   " : "[FAIL] ") << name << "\n";
@@ -25,7 +26,8 @@ int main() {
         {"ExecutionTimeline depuis CSV",   testExecutionTimeline},
 
         {"AlgoController FIFO",            testAlgoControllerFIFO},
-        {"AlgoController SJF",            testAlgoControllerSJF}
+        {"AlgoController SJF",             testAlgoControllerSJF},
+        {"AlgoController SJRF",            testAlgoControllerSJRF}
     };
 
     int passed = 0;
