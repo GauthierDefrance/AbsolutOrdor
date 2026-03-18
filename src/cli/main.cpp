@@ -9,5 +9,5 @@
  */
 int main(int argc, char** argv) {
     MainCli cli = MainCli::getInstance();
-    cli.run(argc, argv);
+    return cli.run(argc, argv);
 }

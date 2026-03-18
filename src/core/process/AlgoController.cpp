@@ -1,10 +1,10 @@
 #include "AlgoController.h"
-
-
 #include <iostream>
 
 // Liste générique de Processus* lue depuis le CSV
-ListeTQ AlgoController::listeProcessus = nullptr;
+ListeTQ     AlgoController::listeProcessus = nullptr;
+std::string AlgoController::currentCSVPath = "";
+std::string AlgoController::currentCSVName = "";
 
 /**
  * Renvoie l'instance unique d'AlgoController
@@ -23,13 +23,16 @@ AlgoController::~AlgoController() {
         destroyLTQ(listeProcessus, (void (*)(void *)) libMemProcessus);
         listeProcessus = nullptr;
     }
+    currentCSVPath = "";
+    currentCSVName = "";
 }
 
 /**
  * Charge un CSV et génère la liste de Processus associée.
  */
+
 void AlgoController::setCSV(char *sourcepath) {
-    // On libère l’ancienne liste si elle existe
+
     if (AlgoController::listeProcessus != nullptr) {
         destroyLTQ(AlgoController::listeProcessus, (void (*)(void *)) libMemProcessus);
         AlgoController::listeProcessus = nullptr;
@@ -38,9 +41,26 @@ void AlgoController::setCSV(char *sourcepath) {
     AlgoController::listeProcessus = createListeProcessusFromCSV(sourcepath);
 
     if (!isListeProcessusValid(AlgoController::listeProcessus)) {
-        std::cerr << "[AlgoController] Erreur : liste de processus invalide après lecture du CSV." << std::endl;
+        std::cerr << "[AlgoController] Erreur : liste de processus invalide." << std::endl;
         destroyLTQ(AlgoController::listeProcessus, (void (*)(void *)) libMemProcessus);
         AlgoController::listeProcessus = nullptr;
+
+        // reset aussi les infos fichier
+        currentCSVPath = "";
+        currentCSVName = "";
+        return;
+    }
+
+    // 🔽 Stocker le path
+    currentCSVPath = sourcepath;
+
+    // 🔽 Extraire le nom du fichier
+    std::string pathStr(sourcepath);
+    size_t pos = pathStr.find_last_of("/\\");
+    if (pos != std::string::npos) {
+        currentCSVName = pathStr.substr(pos + 1);
+    } else {
+        currentCSVName = pathStr;
     }
 }
 
@@ -74,4 +94,12 @@ ExecutionTimeline* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm
             return nullptr;
         }
     }
+}
+
+std::string AlgoController::getCurrentCSVPath() {
+    return currentCSVPath;
+}
+
+std::string AlgoController::getCurrentCSVName() {
+    return currentCSVName;
 }

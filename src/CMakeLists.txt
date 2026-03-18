@@ -90,6 +90,29 @@ add_executable(Tests
         cli/ConsoleStructPrinter.cpp
 )
 
+add_executable(
+        CLI
+        ${CORE_SOURCES}
+        cli/main.cpp
+        cli/MainCli.cpp
+        cli/ConsoleStructPrinter.cpp
+)
+
+# -----------------------
+# DLLs MinGW pour CLI (Windows)
+# -----------------------
+if(WIN32)
+    target_link_options(CLI PRIVATE
+            -static
+            -static-libgcc
+            -static-libstdc++
+    )
+endif()
+
+
+
+
+
 # -----------------------
 # Executable GUI (Qt seulement si trouvé)
 # -----------------------

@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 extern "C" {
     #include "data/struct/liste_tq.h"
@@ -38,12 +39,16 @@ public:
     /**
      * Charge un CSV et génère la liste de Processus*
      */
-    static void setCSV(char *sourcepath);
+    void setCSV(char *sourcepath);
 
     /**
      * Sélectionne un algorithme et renvoie la timeline d’exécution
      */
     static ExecutionTimeline* selectAlgorithm(SchedulingAlgorithm algorithm);
+
+
+    std::string getCurrentCSVPath();
+    std::string getCurrentCSVName();
 
 private:
 
@@ -52,4 +57,6 @@ private:
      * Issue du CSV
      */
     static ListeTQ listeProcessus;
+    static std::string currentCSVPath;
+    static std::string currentCSVName;
 };

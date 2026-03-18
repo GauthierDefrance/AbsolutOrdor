@@ -1,5 +1,7 @@
 #pragma once
-
+#include "stdio.h"
+#include "process/AlgoController.h"
+#include "ConsoleStructPrinter.h"
 
 extern "C" {
     #include "data/struct/liste.h"
@@ -7,7 +9,7 @@ extern "C" {
     #include "data/struct/processus.h"
     #include "data/struct/ExecutionTimeline.h"
     #include "process/utilities/csv_reader.h"
-    #include "process/AlgoController.h"
+
 }
 
 
@@ -28,7 +30,7 @@ class MainCli {
 
 
         // Etat du CLI
-        void run(int argc, char** argv); // The reading of the input from the user loop and reacting to it
+        int run(int argc, char** argv); // The reading of the input from the user loop and reacting to it
 
 
         //Fonctions d'affichages
