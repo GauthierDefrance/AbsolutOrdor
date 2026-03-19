@@ -88,6 +88,8 @@ add_executable(Tests
         Tests/Test_Timeline.cpp
         Tests/Test_Algo.cpp
         cli/ConsoleStructPrinter.cpp
+        core/process/utilities/TimelineStatsCalculator.c
+        core/process/utilities/TimelineStatsCalculator.h
 )
 
 add_executable(
@@ -96,6 +98,8 @@ add_executable(
         cli/main.cpp
         cli/MainCli.cpp
         cli/ConsoleStructPrinter.cpp
+        core/process/utilities/TimelineStatsCalculator.c
+        core/process/utilities/TimelineStatsCalculator.h
 )
 
 # -----------------------
