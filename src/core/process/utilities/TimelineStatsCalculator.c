@@ -134,3 +134,43 @@ double tauxOccupationCPU(ExecutionTimeline *timeline) {
     free(cpuActif);
     return ((double) ticksCPUActif / (double) tMax) * 100.0;
 }
+
+int getTimelineMax(const ExecutionTimeline *timeline) {
+    int tMax = 0;
+    for (Liste cell = timeline->processus->tete; cell; cell = cell->suivant) {
+        Processus *p = (Processus *) cell->data;
+        int t = p->timeArrival;
+        for (Liste qc = p->listeTQ->tete; qc; qc = qc->suivant)
+            t += ((Quantum *) qc->data)->nbQuantum;
+        if (t > tMax) tMax = t;
+    }
+    return tMax;
+}
+
+int getTimelineDebut(const ExecutionTimeline *timeline) {
+    int tDebut = INT_MAX;
+    for (Liste cell = timeline->processus->tete; cell; cell = cell->suivant) {
+        Processus *p = (Processus *) cell->data;
+        if (p->timeArrival < tDebut) tDebut = p->timeArrival;
+    }
+    return (tDebut == INT_MAX) ? 0 : tDebut;
+}
+
+int getTimelineNbProcessus(const ExecutionTimeline *timeline) {
+    int n = 0;
+    for (Liste cell = timeline->processus->tete; cell; cell = cell->suivant)
+        n++;
+    return n;
+}
+
+int getTimelineTicksType(const ExecutionTimeline *timeline, enum OperationProcessus type) {
+    int total = 0;
+    for (Liste cell = timeline->processus->tete; cell; cell = cell->suivant) {
+        Processus *p = (Processus *) cell->data;
+        for (Liste qc = p->listeTQ->tete; qc; qc = qc->suivant) {
+            Quantum *q = (Quantum *) qc->data;
+            if (q->type == type) total += q->nbQuantum;
+        }
+    }
+    return total;
+}

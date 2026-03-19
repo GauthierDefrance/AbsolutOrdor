@@ -58,3 +58,11 @@ double tempRepMoyProcessus(ExecutionTimeline *timeline);
  * @return               Pourcentage du temps où le CPU a été utilisé
  */
 double tauxOccupationCPU(ExecutionTimeline *timeline);
+
+int getTimelineMax(const ExecutionTimeline *timeline);
+
+int getTimelineDebut(const ExecutionTimeline *timeline);
+
+int getTimelineNbProcessus(const ExecutionTimeline *timeline);
+
+int getTimelineTicksType(const ExecutionTimeline *timeline, enum OperationProcessus type);
