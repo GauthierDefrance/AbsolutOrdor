@@ -2,6 +2,7 @@
 #include "data/struct/processus.h"
 #include "data/struct/ProcessusIterator.h"
 #include "data/struct/ExecutionTimeline.h"
+#include <limits.h>
 
 /**
  * Calcul du nombre de quanta d'un certain type pour un processus
