@@ -29,7 +29,9 @@ bool testAlgoControllerFIFO() {
 
     fclose(f);
 
-    AlgoController::setCSV((char*)filename);
+    AlgoController& controller = AlgoController::getInstance();
+
+    controller.setCSV((char*)filename);
 
     ExecutionTimeline* tl = AlgoController::selectAlgorithm(FIFO);
 
@@ -73,7 +75,9 @@ bool testAlgoControllerSJF() {
     fclose(f);
 
     // On initialise l'algorithme avec le CSV
-    AlgoController::setCSV((char*)filename);
+    AlgoController& controller = AlgoController::getInstance();
+
+    controller.setCSV((char*)filename);
 
     // Appel de SJF
     ExecutionTimeline* tl = AlgoController::selectAlgorithm(SJF);
@@ -133,7 +137,9 @@ bool testAlgoControllerSJRF() {
     fclose(f);
 
     // On initialise l'algorithme avec le CSV
-    AlgoController::setCSV((char*)filename);
+    AlgoController& controller = AlgoController::getInstance();
+
+    controller.setCSV((char*)filename);
 
     // Appel de SJF
     ExecutionTimeline* tl = AlgoController::selectAlgorithm(SJRF);
