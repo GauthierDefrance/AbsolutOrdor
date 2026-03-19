@@ -1,3 +1,11 @@
+/**
+ * @file liste_tq.c
+ * @brief Implémentation des primitives de gestion de Liste Tête-Queue.
+ *
+ * Ce module permet de gérer des listes chaînées avec un accès en temps constant O(1)
+ * à la fois sur le premier et le dernier élément, ce qui est crucial pour
+ * l'implémentation performante de files d'attente.
+ */
 #include "liste_tq.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -6,6 +14,15 @@
 /*******************************************
     Allocation mémoire
 ********************************************/
+
+
+/**
+ * @brief Alloue et sécurise la structure de contrôle ListeTQ.
+ *
+ * Crée l'enveloppe qui contient les pointeurs de début et de fin.
+ *
+ * @return ListeTQ Le pointeur vers la structure initialisée, ou NULL en cas d'échec.
+ */
 ListeTQ allocMemLTQ() {
     ListeTQ ltq = malloc(sizeof(struct ListeTQ_Cellule));
     if (!ltq) {
@@ -21,12 +38,32 @@ ListeTQ allocMemLTQ() {
 /*******************************************
     Libération mémoire
 ********************************************/
+
+
+/**
+ * @brief Libère uniquement le conteneur ListeTQ.
+ *
+ * Cette fonction ne libère pas les maillons de la liste. Elle est utile si
+ * la liste a déjà été vidée ou si les maillons sont gérés ailleurs.
+ *
+ * @param ltq Double pointeur vers la structure à libérer (mis à NULL après libération).
+ */
 void libMemLTQ(ListeTQ *ltq) {
     if (!ltq || !*ltq) return;
     free(*ltq);
     *ltq = NULL;
 }
 
+
+/**
+ * @brief Nettoyage complet, récursif et sécurisé de la liste.
+ *
+ * Parcourt chaque maillon, libère la donnée utilisateur via le callback freeData,
+ * puis libère le maillon lui-même avant de libérer le conteneur final.
+ *
+ * @param listeTQ  La liste à détruire.
+ * @param freeData Fonction de libération de la donnée (passer NULL pour ne pas libérer data).
+ */
 void destroyLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
     if (!listeTQ) return;
 
@@ -48,6 +85,13 @@ void destroyLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
 /*******************************************
     Initialisation
 ********************************************/
+
+
+/**
+ * @brief Remet à zéro les pointeurs d'une liste existante.
+ *
+ * @param listeTQ La structure à réinitialiser.
+ */
 void initLTQ(ListeTQ listeTQ) {
     if (!listeTQ) return;
     listeTQ->tete = NULL;
@@ -58,10 +102,23 @@ void initLTQ(ListeTQ listeTQ) {
 /*******************************************
     Primitives
 ********************************************/
+
+
+/**
+ * @brief Accesseur vers le premier maillon.
+ *
+ * @return Liste Le pointeur vers la tête de liste.
+ */
 Liste teteLTQ(ListeTQ listeTQ) {
     return listeTQ ? listeTQ->tete : NULL;
 }
 
+
+/**
+ * @brief Accesseur vers le dernier maillon.
+ *
+ * @return Liste Le pointeur vers la queue de liste.
+ */
 Liste queueLTQ(ListeTQ listeTQ) {
     return listeTQ ? listeTQ->queue : NULL;
 }
@@ -70,6 +127,16 @@ Liste queueLTQ(ListeTQ listeTQ) {
 /*******************************************
     Insertion
 ********************************************/
+
+
+/**
+ * @brief Insère un nouvel élément au début de la liste (O(1)).
+ *
+ * Gère la mise à jour automatique du pointeur de queue si la liste était vide.
+ *
+ * @param listeTQ La liste cible.
+ * @param data    La donnée à stocker dans le nouveau maillon.
+ */
 void inserTeteLTQ(ListeTQ listeTQ, void *data) {
     if (!listeTQ) return;
 
@@ -83,6 +150,16 @@ void inserTeteLTQ(ListeTQ listeTQ, void *data) {
         listeTQ->queue = cellule;
 }
 
+
+/**
+ * @brief Insertion en queue optimisée (O(1)).
+ *
+ * Utilise le pointeur de queue pour ajouter l'élément sans parcourir la liste.
+ * C'est l'opération fondamentale pour les algorithmes d'ordonnancement (Ready Queue).
+ *
+ * @param listeTQ La liste cible.
+ * @param data    La donnée à stocker.
+ */
 void inserQueueLTQ(ListeTQ listeTQ, void *data) {
     if (!listeTQ) return;
 
@@ -103,6 +180,17 @@ void inserQueueLTQ(ListeTQ listeTQ, void *data) {
 /*******************************************
     Suppression
 ********************************************/
+
+
+/**
+ * @brief Supprime le premier maillon de la liste (O(1)).
+ *
+ * Met à jour le pointeur de tête et assure la cohérence du pointeur de queue
+ * si la liste devient vide.
+ *
+ * @param listeTQ  La liste cible.
+ * @param freeData Callback pour libérer la donnée du maillon supprimé.
+ */
 void suppTeteLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
     if (!listeTQ || !listeTQ->tete) return;
 
@@ -118,6 +206,16 @@ void suppTeteLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
         listeTQ->queue = NULL;
 }
 
+
+/**
+ * @brief Supprime le dernier maillon de la liste (O(n)).
+ *
+ * Nécessite un parcours de la liste pour trouver l'avant-dernier élément afin
+ * de mettre à jour le pointeur de queue.
+ *
+ * @param listeTQ  La liste cible.
+ * @param freeData Callback de libération de la donnée.
+ */
 void suppQueueLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
     if (!listeTQ || !listeTQ->tete) return;
 
@@ -146,10 +244,14 @@ void suppQueueLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
 }
 
 /**
- * Supprime un noeud spécifique d'une liste sans casser la structure globale.
- * @param ltq : La liste dont on veut supprimer un maillon
- * @param cible : Le noeud (cellule) à retirer
- * @param freeData : Fonction de libération de la donnée (passer NULL si non utilisé)
+ * @brief Extraction chirurgicale d'un noeud spécifique.
+ * Cette fonction permet de retirer un processus du milieu d'une file (par exemple
+ * pour un algorithme de priorité ou SJF). Elle gère les transitions de tête,
+ * de queue et le recollage des maillons adjacents.
+ *
+ * @param ltq      La liste dont on veut extraire le maillon.
+ * @param cible    Le maillon exact à retirer.
+ * @param freeData Callback pour libérer la donnée (passer NULL pour garder la donnée).
  */
 void supprimerNoeudLTQ(ListeTQ ltq, Liste cible, void (*freeData)(void *)) {
     if (!ltq || !cible) return;

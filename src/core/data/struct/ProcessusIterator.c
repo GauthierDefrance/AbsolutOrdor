@@ -1,6 +1,21 @@
+/**
+ * @file ProcessusIterator.c
+ * @brief Implémentation des mécanismes d'avancement du temps de simulation.
+ */
+
+
 #include "ProcessusIterator.h"
 
 
+/**
+ * @brief Prépare l'itérateur pour le début de la simulation.
+ *
+ * Extrait le premier quantum de la liste du processus et initialise le décompte.
+ * Si le processus n'a aucun quantum défini, il est immédiatement considéré comme fini.
+ *
+ * @param p Processus source.
+ * @param it Itérateur cible.
+ */
 void initIterator(Processus *p, ProcessusIterator *it) {
     if (!p || !it) return;
 
@@ -17,6 +32,16 @@ void initIterator(Processus *p, ProcessusIterator *it) {
     }
 }
 
+
+/**
+ * @brief Analyse le type de quantum pointé par l'itérateur.
+ *
+ * Cette fonction permet à l'ordonnanceur de savoir si le processus demande
+ * le CPU (UC) ou une ressource d'E/S (ES).
+ *
+ * @param it L'itérateur actif.
+ * @return Le type d'opération ou -1 si `quantumCourant` est NULL.
+ */
 enum OperationProcessus etatIterator(ProcessusIterator *it) {
     if (!it || !it->quantumCourant)
         return -1; // FINI
@@ -25,6 +50,16 @@ enum OperationProcessus etatIterator(ProcessusIterator *it) {
     return q->type;
 }
 
+
+/**
+ * @brief Gère la transition entre les phases d'un processus.
+ *
+ * C'est le coeur du moteur : à chaque appel, le temps restant diminue.
+ * Si le compteur tombe à zéro, la fonction effectue une transition vers le
+ * noeud suivant de la liste chaînée.
+ * @param it L'itérateur à avancer.
+ * @return Un pointeur vers le Quantum qui vient d'être achevé (utile pour les stats).
+ */
 Quantum *avancerIterator(ProcessusIterator *it) {
     if (!it || !it->quantumCourant) return NULL;
 
@@ -45,20 +80,28 @@ Quantum *avancerIterator(ProcessusIterator *it) {
     return NULL;
 }
 
+
+/**
+ * @brief Détermine la fin de vie d'un processus dans la simulation.
+ *
+ * @param it Itérateur à tester.
+ * @return true si le curseur a dépassé le dernier quantum de la liste.
+ */
 bool iteratorEstFini(ProcessusIterator *it) {
     return (!it || it->quantumCourant == NULL);
 }
 
+
 /**
- * Crée un tableau de ProcessusIterator depuis une ListeTQ de Processus*.
+ * @brief Alloue et initialise un ensemble d'itérateurs.
  *
- * - Parcourt la ListeTQ pour compter les processus
- * - Alloue un tableau de N ProcessusIterator
- * - Initialise chaque iterator avec le Processus* correspondant
+ * Effectue une première passe pour compter les éléments, alloue le bloc mémoire
+ * contigu nécessaire, puis effectue une seconde passe pour initialiser chaque
+ * case du tableau avec les données du processus correspondant.
  *
- * @param listeTQ  ListeTQ de Processus*
- * @param outSize  [OUT] nombre d'éléments dans le tableau retourné
- * @return         tableau alloué (à libérer avec free()), ou NULL si erreur
+ * @param listeTQ Liste des processus sources.
+ * @param outSize Pointeur de sortie pour la taille du tableau.
+ * @return Un tableau d'itérateurs alloué sur le tas.
  */
 ProcessusIterator *createTabIteratorFromLTQ(ListeTQ listeTQ, int *outSize) {
     if (!listeTQ || !outSize) return NULL;
@@ -91,6 +134,9 @@ ProcessusIterator *createTabIteratorFromLTQ(ListeTQ listeTQ, int *outSize) {
 }
 
 
+/**
+ * @brief Accesseur simple pour l'état d'attente.
+ */
 bool enAttenteIterator(const ProcessusIterator *it) {
     if (it==NULL) return false;
     return it->enAttente;
@@ -98,7 +144,11 @@ bool enAttenteIterator(const ProcessusIterator *it) {
 
 
 /**
- * Compte le nombre d'iterators encore en vie
+ * @brief Calcule le nombre de processus encore présents dans le système.
+ *
+ * @param tab Tableau d'itérateurs.
+ * @param n Taille du tableau.
+ * @return Nombre de processus dont l'itérateur n'est pas "Fini".
  */
 int countAlive(ProcessusIterator *tab, int n) {
     int alive = 0;
