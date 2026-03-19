@@ -1,17 +1,28 @@
-#include "fifo.h"
-#include "data/struct/ProcessusIterator.h"
+/**
+ * @file fifo.c
+ * @brief Implémentation de l'ordonnanceur First-In, First-Out (FIFO).
+ * * Ce module simule un ordonnancement de type "premier arrivé, premier servi".
+ * La gestion des processus repose sur une file (Ready Queue) où le processus
+ * en tête dispose de l'usage exclusif du processeur jusqu'à ce qu'il se bloque
+ * (E/S) ou qu'il se termine. Aucun mécanisme de préemption n'est appliqué ici.
+ */
 
-/* ==============================================
-    Traitement par type d'opération
-   ============================================== */
+
+#include "fifo.h"
+
 
 /**
- * Fonction qui est appellé en boucle avant tout le monde dans FIFO,
- * elle donne la prio
- * @param file
- * @param timeline
+ * @brief Orchestre l'exécution du processus détenteur du CPU.
+ *
+ * Cette fonction identifie le processus en tête de la file d'attente et lui
+ * alloue une unité de temps (tick). Elle assure la mise à jour de la chronologie
+ * et gère la sortie du processus de la Ready Queue si celui-ci entame une phase
+ * d'E/S ou s'achève, permettant ainsi au processus suivant de devenir la nouvelle tête.
+ *
+ * @param file La file d'attente contenant les processus prêts (Ready Queue).
+ * @param timeline Structure de résultats où l'activité UC est enregistrée.
  */
-static void executerTeteFile(File file, const ExecutionTimeline *timeline) {
+void executerTeteFile(File file, const ExecutionTimeline *timeline) {
     //Si la tete de file est NULL on ne fait rien
     if (estVideFile(file)) return;
 
@@ -34,12 +45,18 @@ static void executerTeteFile(File file, const ExecutionTimeline *timeline) {
 
 
 /**
+ * @brief Gère l'admission et la mise en attente des processus candidats au CPU.
  *
- * @param it
- * @param pTimeline
- * @param file
+ * Pour chaque processus en phase de calcul, cette fonction vérifie s'il est déjà
+ * présent dans la file d'attente. Si ce n'est pas le cas, il y est inséré.
+ * Elle comptabilise également le temps d'attente (Wait) si le processus est bloqué
+ * derrière un autre occupant déjà la tête de file.
+ *
+ * @param it L'itérateur représentant l'état actuel du processus.
+ * @param pTimeline Référence du processus dans la chronologie pour l'enregistrement.
+ * @param file La file d'attente (Ready Queue) où le processus doit patienter.
  */
-static void traiterUC(ProcessusIterator *it, const Processus *pTimeline, File file) {
+void traiterUC_FIFO(ProcessusIterator *it, const Processus *pTimeline, File file) {
 
     //Si le processus était déjà en attente avant, on le laisse
     if (enAttenteIterator(it)) {
@@ -55,31 +72,40 @@ static void traiterUC(ProcessusIterator *it, const Processus *pTimeline, File fi
         // Quelqu'un devant → on attend ce tick
         pushOrMergeOperationProcessus(pTimeline->listeTQ, W, 1);
     }
-    // Si file était vide → pas de W ici,
-    // executerTeteFile() s'occupe de l'UC dans la passe 2
+    // Si file était vide : pas de W ici,
 }
 
+
 /**
+ * @brief Simule la progression d'une opération d'Entrée/Sortie (E/S).
+ * Fait progresser l'itérateur du processus pour ses cycles d'E/S. Contrairement
+ * à l'UC, les E/S peuvent être traitées de manière concurrente pour tous les
+ * processus concernés. Les résultats sont fusionnés dans la timeline pour
+ * optimiser la lecture du diagramme final.
  *
- * @param it
- * @param pTimeline
+ * @param it L'itérateur du processus actuellement bloqué en E/S.
+ * @param pTimeline Référence du processus pour l'enregistrement de l'opération ES.
  */
-static void traiterES(ProcessusIterator *it, const Processus *pTimeline) {
+void traiterES_FIFO(ProcessusIterator *it, const Processus *pTimeline) {
     Quantum *completed = avancerIterator(it);
     if (completed) {
         pushOrMergeOperationProcessus(pTimeline->listeTQ, ES, completed->nbQuantum);
     }
 }
 
-/* ==============================================
-    Boucle principale FIFO
-   ============================================== */
-
 
 /**
+ * @brief Pilote la boucle de simulation principale de l'algorithme FIFO.
  *
- * @param liste_tq
- * @return
+ * Cette fonction initialise l'environnement de simulation et itère tick par tick.
+ * Elle opère en deux phases :
+ * - Une phase de mise à jour où elle identifie les nouveaux arrivants et fait
+ * progresser les processus en E/S.
+ * - Une phase d'exécution où seule la tête de file est autorisée à consommer du CPU.
+ * La simulation s'arrête lorsqu'aucun processus n'est plus "vivant" dans le système.
+ *
+ * @param liste_tq La liste initiale des processus (et leurs cycles) à traiter.
+ * @return Un pointeur vers la chronologie complète (Gantt) de l'exécution.
  */
 ExecutionTimeline *fifo(ListeTQ liste_tq) {
 
@@ -110,8 +136,8 @@ ExecutionTimeline *fifo(ListeTQ liste_tq) {
             Processus *pTimeline = getTimelineProcessus(timeline, &tab[i]);
 
             switch (etatIterator(&tab[i])) {
-                case UC: traiterUC(&tab[i], pTimeline, file); break;
-                case ES: traiterES(&tab[i], pTimeline); break;
+                case UC: traiterUC_FIFO(&tab[i], pTimeline, file); break;
+                case ES: traiterES_FIFO(&tab[i], pTimeline); break;
                 default: avancerIterator(&tab[i]); break;
             }
         }

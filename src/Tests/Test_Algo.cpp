@@ -72,6 +72,9 @@ bool testAlgoControllerSJF() {
     fprintf(f,"P7;10;2;2;3\n");
     fprintf(f,"P8;35;5\n");
 
+    /*fprintf(f,"P1;0;3;2;2;2;2\n");
+    fprintf(f,"P2;1;2;2;3;3;2\n");*/
+
     fclose(f);
 
     // On initialise l'algorithme avec le CSV

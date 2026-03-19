@@ -1,28 +1,26 @@
 /**
  * @file sjrf.c
  * @brief Implémentation de l'ordonnanceur Shortest Job Remaining First (SJRF).
- * Le SJRF est la variante préemptive du SJF. À chaque tick d'horloge, l'algorithme
- * vérifie si un processus avec un temps d'exécution restant plus court est prêt.
- * Si c'est le cas, le processus actuel est interrompu (préempté).
+ *
+ * Le SJRF est la variante préemptive du SJF (Shortest Job First). À chaque tick d'horloge,
+ * l'algorithme évalue si un nouveau processus arrivé ou sortant d'E/S possède un temps
+ * d'exécution restant inférieur à celui du processus en cours.
+ * Si c'est le cas, le processus actuel est préempté et replacé en file d'attente.
  */
 
 
 #include "sjrf.h"
 
 
-/* --- Prototypes des fonctions internes --- */
-static void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, const ExecutionTimeline *resultat, int *nbProcessusTraiter);
-static void traiterES(File *fileES, const File *fileAttente, const ExecutionTimeline *resultat, int *nbProcessusTraiter, int temps_courant);
-static void traiterWait(const File *fileAttente, const ExecutionTimeline *resultat, int temps_courant);
-
-
 /**
  * @brief Algorithme SJRF : Pilote la simulation tick par tick.
- * Pilote la simulation tick par tick. Gère les arrivées, le dispatching CPU,
- * l'exécution des cycles UC/ES et la mise à jour de la chronologie d'exécution.
+ *
+ * Cette fonction gère le cycle de vie complet : arrivées, exécution CPU (UC),
+ * attentes en file d'E/S et mécanisme de préemption basé sur le temps restant.
+ *
  * @param liste  ListeTQ des processus à ordonnancer.
- * @param taille Nombre total de processus dans le système.
- * @return ExecutionTimeline* Pointeur vers l'historique complet de l'exécution.
+ * @param taille Nombre total de processus (condition d'arrêt).
+ * @return ExecutionTimeline* Historique complet des états pour chaque tick.
  */
 ExecutionTimeline* sjrf(ListeTQ liste, int taille) {
 	int temps_courant = 0;
@@ -44,48 +42,43 @@ ExecutionTimeline* sjrf(ListeTQ liste, int taille) {
 
 	// Boucle de simulation principale
 	while (nbProcessusTraiter < taille) {
-
-		// ARRIVÉES : On enfile les processus dont l'heure d'arrivée correspond au tick actuel
+		// 1. ARRIVÉES
 		while (tete != NULL && (((Processus*)tete->data)->timeArrival == temps_courant)) {
-			ProcessusIterator *it = (ProcessusIterator*) malloc(sizeof(ProcessusIterator));
+			ProcessusIterator *it = malloc(sizeof(ProcessusIterator));
 			initIterator((Processus*)tete->data, it);
-			//it->enAttente = true;
 			it->tempsEntreeFile = temps_courant;
 			enfilerFile(fileAttente, it);
 			tete = suivantListe(tete);
 		}
 
-		// ENTRÉES/SORTIES : On fait avancer les processus en ES
-		traiterES(&fileES, &fileAttente, resultat, &nbProcessusTraiter, temps_courant);
+		// 2. ENTRÉES/SORTIES (Ceux qui finissent vont en fileAttente)
+		traiterES_SJRF(&fileES, &fileAttente, resultat, &nbProcessusTraiter, temps_courant);
 
-		// UNITÉ DE CALCUL : Le processus sur le CPU avance d'un tick
+		// 3. EXÉCUTION CPU (On fait travailler celui qui était là)
 		if (surLeCPU != NULL) {
 			traiterUC(&surLeCPU, &fileES, resultat, &nbProcessusTraiter);
+			// Si traiterUC a fini le bloc, surLeCPU est maintenant NULL
 		}
 
-		// MÉCANISME DE PRÉEMPTION
-		// Si le CPU est occupé, on regarde si un processus plus court vient d'arriver en file d'attente
-		// MÉCANISME DE PRÉEMPTION
-		if (surLeCPU != NULL && !estVideFile(fileAttente)) {
-			ProcessusIterator* bestCandidat = retirerMinTempsUCSJRF(&fileAttente);  // ← SJRF
-			if (bestCandidat != NULL && bestCandidat->tempsRestant < surLeCPU->tempsRestant) {
-				surLeCPU->tempsEntreeFile = temps_courant;
-				enfilerFile(fileAttente, surLeCPU);
-				surLeCPU = bestCandidat;
-			} else {
-				if (bestCandidat != NULL) enfilerFile(fileAttente, bestCandidat);
+		// 4. PRÉEMPTION / ÉLECTION (On décide qui sera sur le CPU au prochain tick)
+		if (surLeCPU != NULL) {
+			if (!estVideFile(fileAttente)) {
+				ProcessusIterator* best = retirerMinTempsUC(&fileAttente);
+				if (best->tempsRestant < surLeCPU->tempsRestant) {
+					printf("[TICK %d] PREEMPTION: %s prend la place de %s\n", temps_courant, best->processus->name, surLeCPU->processus->name);
+					enfilerFile(fileAttente, surLeCPU);
+					surLeCPU = best;
+				} else {
+					enfilerFile(fileAttente, best);
+				}
 			}
+		} else if (!estVideFile(fileAttente)) {
+			surLeCPU = retirerMinTempsUC(&fileAttente);
+			printf("[TICK %d] ELECTION: %s\n", temps_courant, surLeCPU->processus->name);
 		}
 
-		// ÉLECTION (si CPU libre) : Si personne n'est sur le CPU, on choisit le plus court
-		if (surLeCPU == NULL && !estVideFile(fileAttente)) {
-			surLeCPU = retirerMinTempsUCSJRF(&fileAttente);
-			//printf("[SELECT t=%d] => %s restant=%d\n", temps_courant, surLeCPU->processus->name, surLeCPU->tempsRestant);
-		}
-
-
-		// ATTENTE : On enregistre le temps passé en file d'attente pour les processus "Prêts"
-		traiterWait(&fileAttente, resultat, temps_courant);
+		// 5. COMPTER L'ATTENTE (Tous ceux qui n'ont pas été élus)
+		traiterWait_SJFR(&fileAttente, resultat, temps_courant);
 
 		temps_courant++;
 	}
@@ -101,47 +94,18 @@ ExecutionTimeline* sjrf(ListeTQ liste, int taille) {
 
 
 /**
- * @brief Exécute une unité de temps sur le processeur.
- * @param surLeCPU Double pointeur vers le processus actif (permet la mise à NULL si fini).
- * @param fileES File où envoyer le processus s'il entame un cycle d'ES.
- * @param resultat Chronologie à mettre à jour.
- * @param nbProcessusTraiter Compteur de processus terminés à incrémenter.
+ * @brief Gère l'avancement des processus en phase d'Entrées/Sorties.
+ *
+ * Décrémente le temps restant en E/S pour chaque processus bloqué.
+ * Si une E/S se termine, le processus est replacé dans la file d'attente (Prêt).
+ *
+ * @param fileES Pointeur vers la file des processus en E/S.
+ * @param fileAttente File des processus prêts (pour le retour d'E/S).
+ * @param resultat Structure de chronologie à mettre à jour.
+ * @param nbProcessusTraiter Compteur incrémenté si un processus se termine en E/S.
+ * @param temps_courant Horloge actuelle de la simulation.
  */
-static void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, const ExecutionTimeline *resultat, int *nbProcessusTraiter) {
-	if (*surLeCPU == NULL) return;
-
-	ProcessusIterator *it = *surLeCPU;
-	Processus* p = getTimelineProcessus(resultat, it);
-
-	// Décrémente le temps restant du bloc CPU actuel
-	avancerIterator(it);
-
-	// Enregistre l'activité CPU dans la chronologie (fusionne si bloc continu)
-	pushOrMergeOperationProcessus(p->listeTQ, UC, 1);
-
-	// Vérification du changement d'état
-	if (iteratorEstFini(it)) {
-		(*nbProcessusTraiter)++;
-		free(it);
-		*surLeCPU = NULL;
-	}
-	else if (etatIterator(it) == ES) {
-		// Le bloc UC est fini, le processus doit maintenant faire une E/S
-		it->enAttente = true;
-		enfilerFile(*fileES, it);
-		*surLeCPU = NULL;
-	}
-}
-
-/**
- * @brief Gère l'avancement des processus effectuant des Entrées/Sorties.
- * @param fileES File des processus en ES.
- * @param fileAttente File où replacer les processus redevenus prêts.
- * @param resultat Chronologie à mettre à jour.
- * @param nbProcessusTraiter Compteur de processus terminés.
- * @param temps_courant Tick courant de la simulation
- */
-static void traiterES(File *fileES, const File *fileAttente, const ExecutionTimeline *resultat, int *nbProcessusTraiter, int temps_courant) {
+void traiterES_SJRF(File *fileES, const File *fileAttente, const ExecutionTimeline *resultat, int *nbProcessusTraiter, int temps_courant) {
 	if ( estVideFile(*fileES) ) return;
 
 	// File temporaire pour reconstruire la file ES
@@ -175,12 +139,18 @@ static void traiterES(File *fileES, const File *fileAttente, const ExecutionTime
 
 
 /**
- * @brief Enregistre les statistiques d'attente pour la Ready Queue.
- * @param fileAttente File des processus prêts (Ready Queue).
- * @param resultat Chronologie à mettre à jour.
- * @param temps_courant Tick courant de la simulation
+ * @brief Enregistre une unité de temps d'attente pour les processus en file.
+ *
+ * Parcourt l'ensemble de la file d'attente (Ready Queue) et incrémente l'état
+ * "Wait" (W) dans la chronologie pour chaque processus dont l'heure d'arrivée
+ * est inférieure ou égale au temps actuel. Cette fonction est appelée après
+ * les décisions d'élection et de préemption pour garantir la précision du diagramme.
+ *
+ * @param fileAttente   Pointeur vers la file des processus prêts à être exécutés.
+ * @param resultat      Pointeur vers la structure globale de suivi de l'exécution.
+ * @param temps_courant Horloge actuelle de la simulation (tick).
  */
-static void traiterWait(const File *fileAttente, const ExecutionTimeline *resultat, int temps_courant) {
+void traiterWait_SJFR(const File *fileAttente, const ExecutionTimeline *resultat, int temps_courant) {
 	if (estVideFile(*fileAttente)) return;
 
 	File tmp = allocFile();
@@ -188,49 +158,16 @@ static void traiterWait(const File *fileAttente, const ExecutionTimeline *result
 		ProcessusIterator* it = (ProcessusIterator*) defilerFile(*fileAttente);
 		Processus *p = getTimelineProcessus(resultat, it);
 
-		// Si le processus est en file et n'est pas marqué "en cours de transition"
-		if (p->timeArrival <= temps_courant && !it->enAttente) {
+		// On enregistre un Wait (W) pour TOUS ceux qui sont en file
+		// condition p->timeArrival <= temps_courant est une sécurité
+		if (it->processus->timeArrival <= temps_courant) {
 			pushOrMergeOperationProcessus(p->listeTQ, W, 1);
 		}
 
-		// Gestion du flag de transition pour éviter de compter l'attente au tick d'arrivée exact
-		if (it->tempsEntreeFile < temps_courant) {
-			it->enAttente = false;
-		}
 		enfilerFile(tmp, it);
 	}
 
 	// Restauration de la file
 	while (!estVideFile(tmp)) enfilerFile(*fileAttente, defilerFile(tmp));
 	destroyFile(tmp, NULL);
-}
-
-/**
- * @brief Recherche et extrait le processus avec le temps de calcul restant le plus court.
- * Critère : tempsRestant MIN, puis temps d'arrivée MIN en cas d'égalité.
- */
-ProcessusIterator* retirerMinTempsUCSJRF(const File* f) {
-	if (*f == NULL || estVideFile(*f)) return NULL;
-
-	File tmp = allocFile();
-	ProcessusIterator* min = NULL;
-	int n = tailleFile(*f);
-
-	for (int i = 0; i < n; i++) {
-		ProcessusIterator* p = (ProcessusIterator*) defilerFile(*f);
-
-		if (min == NULL || p->tempsRestant < min->tempsRestant || (p->tempsRestant == min->tempsRestant && p->tempsEntreeFile < min->tempsEntreeFile)) {
-
-			if (min != NULL) enfilerFile(tmp, min);
-			min = p;
-		} else {
-			enfilerFile(tmp, p);
-		}
-	}
-
-	// Remettre les autres processus dans la file d'origine
-	while (!estVideFile(tmp))
-		enfilerFile(*f, defilerFile(tmp));
-	destroyFile(tmp, NULL);
-	return min;
 }
