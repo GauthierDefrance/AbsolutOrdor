@@ -1,7 +1,7 @@
 #include "ConsoleStructPrinter.h"
 
 /* =========================
- * Affichage brut du CSV chargé
+ * Affichage brut du CSV charge
  * ========================= */
 void afficherCSVCharge(ListeTQ liste) {
     if (!liste) return;
@@ -69,7 +69,7 @@ void afficherTimeline(const ExecutionTimeline *tl) {
 
 
 /* =========================
- * Affichage console avec décalage temporel
+ * Affichage console avec decalage temporel
  * ========================= */
 void afficherTimelineAvecDecalage(const ExecutionTimeline *tl) {
 
@@ -155,4 +155,40 @@ void afficherTimelineAvecDecalage(const ExecutionTimeline *tl) {
     std::cout << std::string(LABEL_WIDTH + 4 + tMax * TICK_WIDTH, '-') << "\n";
 
     std::cout << "  Legende : C=UC  E=ES  W=Wait\n\n";
+}
+
+
+void afficherStatsTimeline(const ExecutionTimeline *tl) {
+    if (!tl) return;
+
+    double attenteMoy          = attenteMoyProcessus((ExecutionTimeline*)tl);
+    double tempsRestitutionMoy = restitutionMoyProcessus((ExecutionTimeline*)tl);
+    double reponseMoy          = tempRepMoyProcessus((ExecutionTimeline*)tl);
+    double cpuUtil             = tauxOccupationCPU((ExecutionTimeline*)tl);
+
+    int tDebut    = getTimelineDebut(tl);
+    int tMax      = getTimelineMax(tl);
+    int nbProc    = getTimelineNbProcessus(tl);
+    int ticksUC   = getTimelineTicksType(tl, UC);
+    int ticksES   = getTimelineTicksType(tl, ES);
+    int ticksWait = getTimelineTicksType(tl, W);
+
+    std::cout << "\n===== STATISTIQUES TIMELINE =====\n";
+    std::cout << std::fixed << std::setprecision(2);
+
+    std::cout << std::left << std::setw(25) << "Nb processus"              << ": " << nbProc             << "\n";
+    std::cout << std::left << std::setw(25) << "Debut / Fin"               << ": t=" << tDebut << " / t=" << tMax << "\n";
+    std::cout << std::left << std::setw(25) << "Duree totale"              << ": " << (tMax - tDebut)    << "\n";
+    std::cout << std::left << std::setw(25) << "Ticks UC total"            << ": " << ticksUC            << "\n";
+    std::cout << std::left << std::setw(25) << "Ticks ES total"            << ": " << ticksES            << "\n";
+    std::cout << std::left << std::setw(25) << "Ticks Wait total"          << ": " << ticksWait          << "\n";
+
+    std::cout << "---------------------------------\n";
+
+    std::cout << std::left << std::setw(25) << "Temps d'attente moyen"     << ": " << attenteMoy          << "\n";
+    std::cout << std::left << std::setw(25) << "Temps restitution moyen"   << ": " << tempsRestitutionMoy << "\n";
+    std::cout << std::left << std::setw(25) << "Temps de reponse moyen"    << ": " << reponseMoy          << "\n";
+    std::cout << std::left << std::setw(25) << "Taux d'occupation CPU"     << ": " << cpuUtil             << " %\n";
+
+    std::cout << "=================================\n\n";
 }

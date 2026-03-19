@@ -108,8 +108,7 @@ ProcessusIterator *createTabIteratorFromLTQ(ListeTQ listeTQ, int *outSize) {
 
     // 1. Compter les processus
     int n = 0;
-    for (Liste c = listeTQ->tete; c != NULL; c = c->suivant)
-        n++;
+    for (Liste c = listeTQ->tete; c != NULL; c = c->suivant) n++;
 
     *outSize = n;
 

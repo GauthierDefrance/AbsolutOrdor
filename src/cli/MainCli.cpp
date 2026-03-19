@@ -62,6 +62,7 @@ void MainCli::selectAlgorithm(SchedulingAlgorithm algorithm) {
         return;
     }
     afficherTimelineAvecDecalage(tl);
+    afficherStatsTimeline(tl);
     destroyTimeline(tl);
 }
 
