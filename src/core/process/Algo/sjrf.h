@@ -35,3 +35,18 @@ ExecutionTimeline* sjrf(ListeTQ liste, int taille);
  * @param temps_courant      Horloge actuelle du système.
  */
 void traiterES_SJRF(File *fileES, const File *fileAttente, const ExecutionTimeline *resultat, int *nbProcessusTraiter, int temps_courant);
+
+
+/**
+ * @brief Enregistre une unité de temps d'attente pour les processus en file.
+ *
+ * Parcourt l'ensemble de la file d'attente (Ready Queue) et incrémente l'état
+ * "Wait" (W) dans la chronologie pour chaque processus dont l'heure d'arrivée
+ * est inférieure ou égale au temps actuel. Cette fonction assure qu'aucun
+ * processus prêt n'est oublié dans les statistiques d'attente.
+ *
+ * @param fileAttente   Pointeur constant vers la file des processus en état "Prêt".
+ * @param resultat      Pointeur vers la structure de chronologie à mettre à jour.
+ * @param temps_courant Horloge actuelle de la simulation (unité de temps).
+ */
+void traiterWait_SJFR(const File *fileAttente, const ExecutionTimeline *resultat, int temps_courant);

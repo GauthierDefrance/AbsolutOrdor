@@ -30,3 +30,13 @@ ExecutionTimeline* sjf(ListeTQ liste, int taille);
  * @param[in,out] nbProcessusTraiter Compteur de processus ayant terminé leur cycle de vie.
  */
 void traiterES_SJF(File *fileES, const File *fileAttente, const ExecutionTimeline *resultat, int *nbProcessusTraiter);
+
+
+/**
+ * @brief Enregistre les temps d'attente pour tous les processus en file "Prêt".
+ *
+ * @param[in,out] fileAttente File des processus en attente de CPU.
+ * @param[in] resultat Structure de chronologie à mettre à jour.
+ * @param[in] temps_courant Horloge actuelle de la simulation.
+ */
+void traiterWait_SJF(const File *fileAttente, const ExecutionTimeline *resultat, int temps_courant);

@@ -62,7 +62,7 @@ ExecutionTimeline* sjf(ListeTQ liste, int taille) {
 		}
 
 		// Marquer le "Wait" pour ceux qui sont restés dans la file
-		traiterWait(&fileAttente, resultat, temps_courant);
+		traiterWait_SJF(&fileAttente, resultat, temps_courant);
 
 		temps_courant++;
 	}
@@ -114,4 +114,40 @@ void traiterES_SJF(File *fileES, const File *fileAttente, const ExecutionTimelin
 	}
 	destroyFile(*fileES, NULL);
 	*fileES = tmp;
+}
+
+
+/**
+ * @brief Enregistre les statistiques d'attente pour la Ready Queue.
+ *
+ * Parcourt la file d'attente et ajoute une unité de temps "Wait" (W) dans la
+ * chronologie pour chaque processus prêt à être exécuté.
+ *
+ * @param fileAttente   File des processus prêts (Ready Queue).
+ * @param resultat      Chronologie à mettre à jour.
+ * @param temps_courant Tick courant de la simulation (horloge).
+ */
+void traiterWait_SJF(const File *fileAttente, const ExecutionTimeline *resultat, int temps_courant) {
+	if (estVideFile(*fileAttente)) return;
+
+	File tmp = allocFile();
+	while (!estVideFile(*fileAttente)) {
+		ProcessusIterator* it = (ProcessusIterator*) defilerFile(*fileAttente);
+		Processus *p = getTimelineProcessus(resultat, it);
+
+		// Si le processus est en file et n'est pas marqué "en cours de transition"
+		if (p->timeArrival <= temps_courant && !it->enAttente) {
+			pushOrMergeOperationProcessus(p->listeTQ, W, 1);
+		}
+
+		// Gestion du flag de transition pour éviter de compter l'attente au tick d'arrivée exact
+		if (it->tempsEntreeFile < temps_courant) {
+			it->enAttente = false;
+		}
+		enfilerFile(tmp, it);
+	}
+
+	// Restauration de la file
+	while (!estVideFile(tmp)) enfilerFile(*fileAttente, defilerFile(tmp));
+	destroyFile(tmp, NULL);
 }

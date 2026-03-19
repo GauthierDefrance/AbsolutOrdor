@@ -42,48 +42,43 @@ ExecutionTimeline* sjrf(ListeTQ liste, int taille) {
 
 	// Boucle de simulation principale
 	while (nbProcessusTraiter < taille) {
-
-		// ARRIVÉES : On enfile les processus dont l'heure d'arrivée correspond au tick actuel
+		// 1. ARRIVÉES
 		while (tete != NULL && (((Processus*)tete->data)->timeArrival == temps_courant)) {
-			ProcessusIterator *it = (ProcessusIterator*) malloc(sizeof(ProcessusIterator));
+			ProcessusIterator *it = malloc(sizeof(ProcessusIterator));
 			initIterator((Processus*)tete->data, it);
-			//it->enAttente = true;
 			it->tempsEntreeFile = temps_courant;
 			enfilerFile(fileAttente, it);
 			tete = suivantListe(tete);
 		}
 
-		// ENTRÉES/SORTIES : On fait avancer les processus en ES
+		// 2. ENTRÉES/SORTIES (Ceux qui finissent vont en fileAttente)
 		traiterES_SJRF(&fileES, &fileAttente, resultat, &nbProcessusTraiter, temps_courant);
 
-		// UNITÉ DE CALCUL : Le processus sur le CPU avance d'un tick
+		// 3. EXÉCUTION CPU (On fait travailler celui qui était là)
 		if (surLeCPU != NULL) {
 			traiterUC(&surLeCPU, &fileES, resultat, &nbProcessusTraiter);
+			// Si traiterUC a fini le bloc, surLeCPU est maintenant NULL
 		}
 
-		// MÉCANISME DE PRÉEMPTION
-		// On compare le processus actif avec le "meilleur" candidat prêt.
-		// Si le candidat est plus court, on procède à un changement de contexte.
-		if (surLeCPU != NULL && !estVideFile(fileAttente)) {
-			ProcessusIterator* bestCandidat = retirerMinTempsUC(&fileAttente);  // ← SJRF
-			if (bestCandidat != NULL && bestCandidat->tempsRestant < surLeCPU->tempsRestant) {
-				surLeCPU->tempsEntreeFile = temps_courant;
-				enfilerFile(fileAttente, surLeCPU);
-				surLeCPU = bestCandidat;
-			} else {
-				if (bestCandidat != NULL) enfilerFile(fileAttente, bestCandidat);
+		// 4. PRÉEMPTION / ÉLECTION (On décide qui sera sur le CPU au prochain tick)
+		if (surLeCPU != NULL) {
+			if (!estVideFile(fileAttente)) {
+				ProcessusIterator* best = retirerMinTempsUC(&fileAttente);
+				if (best->tempsRestant < surLeCPU->tempsRestant) {
+					printf("[TICK %d] PREEMPTION: %s prend la place de %s\n", temps_courant, best->processus->name, surLeCPU->processus->name);
+					enfilerFile(fileAttente, surLeCPU);
+					surLeCPU = best;
+				} else {
+					enfilerFile(fileAttente, best);
+				}
 			}
-		}
-
-		// ÉLECTION (si CPU libre) : Si personne n'est sur le CPU, on choisit le plus court
-		if (surLeCPU == NULL && !estVideFile(fileAttente)) {
+		} else if (!estVideFile(fileAttente)) {
 			surLeCPU = retirerMinTempsUC(&fileAttente);
-			//printf("[SELECT t=%d] => %s restant=%d\n", temps_courant, surLeCPU->processus->name, surLeCPU->tempsRestant);
+			printf("[TICK %d] ELECTION: %s\n", temps_courant, surLeCPU->processus->name);
 		}
 
-
-		// ATTENTE : On enregistre le temps passé en file d'attente pour les processus "Prêts"
-		traiterWait(&fileAttente, resultat, temps_courant);
+		// 5. COMPTER L'ATTENTE (Tous ceux qui n'ont pas été élus)
+		traiterWait_SJFR(&fileAttente, resultat, temps_courant);
 
 		temps_courant++;
 	}
@@ -140,4 +135,39 @@ void traiterES_SJRF(File *fileES, const File *fileAttente, const ExecutionTimeli
 	}
 	destroyFile(*fileES, NULL);
 	*fileES = tmp;
+}
+
+
+/**
+ * @brief Enregistre une unité de temps d'attente pour les processus en file.
+ *
+ * Parcourt l'ensemble de la file d'attente (Ready Queue) et incrémente l'état
+ * "Wait" (W) dans la chronologie pour chaque processus dont l'heure d'arrivée
+ * est inférieure ou égale au temps actuel. Cette fonction est appelée après
+ * les décisions d'élection et de préemption pour garantir la précision du diagramme.
+ *
+ * @param fileAttente   Pointeur vers la file des processus prêts à être exécutés.
+ * @param resultat      Pointeur vers la structure globale de suivi de l'exécution.
+ * @param temps_courant Horloge actuelle de la simulation (tick).
+ */
+void traiterWait_SJFR(const File *fileAttente, const ExecutionTimeline *resultat, int temps_courant) {
+	if (estVideFile(*fileAttente)) return;
+
+	File tmp = allocFile();
+	while (!estVideFile(*fileAttente)) {
+		ProcessusIterator* it = (ProcessusIterator*) defilerFile(*fileAttente);
+		Processus *p = getTimelineProcessus(resultat, it);
+
+		// On enregistre un Wait (W) pour TOUS ceux qui sont en file
+		// condition p->timeArrival <= temps_courant est une sécurité
+		if (it->processus->timeArrival <= temps_courant) {
+			pushOrMergeOperationProcessus(p->listeTQ, W, 1);
+		}
+
+		enfilerFile(tmp, it);
+	}
+
+	// Restauration de la file
+	while (!estVideFile(tmp)) enfilerFile(*fileAttente, defilerFile(tmp));
+	destroyFile(tmp, NULL);
 }

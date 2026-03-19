@@ -41,13 +41,3 @@ ProcessusIterator* retirerMinTempsUC(const File* f);
  * @param[in,out] nbProcessusTraiter Compteur global de processus terminés.
  */
 void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, const ExecutionTimeline *resultat, int *nbProcessusTraiter);
-
-
-/**
- * @brief Enregistre les temps d'attente pour tous les processus en file "Prêt".
- *
- * @param[in,out] fileAttente File des processus en attente de CPU.
- * @param[in] resultat Structure de chronologie à mettre à jour.
- * @param[in] temps_courant Horloge actuelle de la simulation.
- */
-void traiterWait(const File *fileAttente, const ExecutionTimeline *resultat, int temps_courant);
