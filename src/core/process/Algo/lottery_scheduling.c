@@ -1,5 +1,22 @@
+/**
+ * @file lottery_scheduling.c
+ * @brief Implémentation de l'ordonnancement par loterie (Lottery Scheduling) en mode rafale.
+ *
+ * Cet algorithme utilise une approche probabiliste où chaque processus en file d'attente
+ * possède un nombre de tickets proportionnel à son temps d'exécution restant (UC).
+ * Le mode "rafale" garantit qu'une fois un processus élu, il conserve le CPU jusqu'à
+ * la fin de son bloc de calcul ou son passage en E/S (non-préemptif).
+ */
 #include "lottery_scheduling.h"
 
+
+/**
+ * @brief Simule l'ordonnancement des processus selon l'algorithme de la loterie.
+ *
+ * @param liste La liste des processus à ordonnancer (chargée depuis CSV).
+ * @param taille Le nombre total de processus dans la simulation.
+ * @return ExecutionTimeline* La structure contenant l'historique de l'exécution (Gantt).
+ */
 ExecutionTimeline* lottery_scheduling(ListeTQ liste, int taille) {
 	int temps_courant = 0;
 	int nbProcessusTraiter = 0;
@@ -68,7 +85,7 @@ ExecutionTimeline* lottery_scheduling(ListeTQ liste, int taille) {
  * plus il a de chances d'être élu.
  *
  * @param f Pointeur vers la file des processus prêts (Ready Queue).
- * @return ProcessusIterator* Le processus gagnant qui est extrait de la file.
+ * @return ProcessusIterator* Le gagnant extrait de la file, ou NULL si file vide.
  */
 ProcessusIterator* tirageGagnant(const File *f) {
     if ( estVideFile(*f) ) return NULL;
