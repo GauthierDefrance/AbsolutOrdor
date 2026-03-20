@@ -165,3 +165,58 @@ bool testAlgoControllerSJRF() {
 
     return true;
 }
+
+
+bool testAlgoControllerLotteryScheduling() {
+
+    const char* filename = "lottery_scheduling_test.csv";
+
+    // Création d'un fichier CSV de test
+    FILE* f = fopen(filename, "w");
+    if (!f) {
+        std::cerr << "Erreur lors de la création du fichier CSV" << std::endl;
+        return false;
+    }
+
+    // Nombre de processus
+    fprintf(f,"8\n");
+
+    // Format: nom;temps_arrivee;UC1;ES1;UC2;ES2;...
+    fprintf(f,"P1;0;5;3;4\n");
+    fprintf(f,"P2;0;2\n");
+    fprintf(f,"P3;1;8\n");
+    fprintf(f,"P4;2;1\n");
+    fprintf(f,"P5;4;3;2;2\n");
+    fprintf(f,"P6;6;4\n");
+    fprintf(f,"P7;10;2;2;3\n");
+    fprintf(f,"P8;35;5\n");
+
+
+    fclose(f);
+
+    // On initialise l'algorithme avec le CSV
+    AlgoController& controller = AlgoController::getInstance();
+
+    controller.setCSV((char*)filename);
+
+    // Appel de SJF
+    ExecutionTimeline* tl = AlgoController::selectAlgorithm(LOTTERY);
+
+    if (!tl) {
+        std::cerr << "Erreur: Timeline Lottery Scheduling n'a pas pu être générée" << std::endl;
+        remove(filename);
+        return false;
+    }
+
+    LOG_STEP("Affichage de la timeline Lottery Scheduling");
+    afficherTimeline(tl);
+    afficherTimelineAvecDecalage(tl);
+
+    // Libération de la timeline
+    destroyTimeline(tl);
+
+    // Suppression du fichier CSV temporaire
+    remove(filename);
+
+    return true;
+}

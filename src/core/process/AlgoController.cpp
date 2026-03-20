@@ -118,6 +118,9 @@ ExecutionTimeline* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm
             std::cerr << "[AlgoController] RR non encore implémenté." << std::endl;
             return nullptr;
         }
+        case LOTTERY : {
+            return lottery_scheduling(listeProcessus, tailleListe(listeProcessus->tete));
+        }
         default: {
             std::cerr << "[AlgoController] Algorithme inconnu." << std::endl;
             return nullptr;

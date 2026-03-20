@@ -20,6 +20,7 @@ extern "C" {
     #include "process/Algo/fifo.h"
     #include "process/Algo/sjf.h"
     #include "process/Algo/sjrf.h"
+    #include "process/Algo/lottery_scheduling.h"
 }
 
 
@@ -31,7 +32,8 @@ enum SchedulingAlgorithm {
     FIFO,
     SJF,
     SJRF,
-    RR
+    RR,
+    LOTTERY
     // ADVICE : Ajouter vos autres algorithmes ici
 };
 

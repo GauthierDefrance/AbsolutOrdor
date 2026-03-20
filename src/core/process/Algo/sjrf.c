@@ -65,7 +65,7 @@ ExecutionTimeline* sjrf(ListeTQ liste, int taille) {
 			if (!estVideFile(fileAttente)) {
 				ProcessusIterator* best = retirerMinTempsUC(&fileAttente);
 				if (best->tempsRestant < surLeCPU->tempsRestant) {
-					printf("[TICK %d] PREEMPTION: %s prend la place de %s\n", temps_courant, best->processus->name, surLeCPU->processus->name);
+					//printf("[TICK %d] PREEMPTION: %s prend la place de %s\n", temps_courant, best->processus->name, surLeCPU->processus->name);
 					enfilerFile(fileAttente, surLeCPU);
 					surLeCPU = best;
 				} else {
@@ -74,7 +74,7 @@ ExecutionTimeline* sjrf(ListeTQ liste, int taille) {
 			}
 		} else if (!estVideFile(fileAttente)) {
 			surLeCPU = retirerMinTempsUC(&fileAttente);
-			printf("[TICK %d] ELECTION: %s\n", temps_courant, surLeCPU->processus->name);
+			//printf("[TICK %d] ELECTION: %s\n", temps_courant, surLeCPU->processus->name);
 		}
 
 		// 5. COMPTER L'ATTENTE (Tous ceux qui n'ont pas été élus)
