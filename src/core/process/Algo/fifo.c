@@ -23,7 +23,7 @@
  * @param timeline Structure de résultats où l'activité UC est enregistrée.
  */
 void executerTeteFile(File file, const ExecutionTimeline *timeline) {
-//void executerTeteFile(File file, const ExecutionTimeline *timeline,int *nb)
+//void executerTeteFile(File file, const ExecutionTimeline *timeline,int *nb) {
     //Si la tete de file est NULL on ne fait rien
     if (estVideFile(file)) return;
 
@@ -35,15 +35,15 @@ void executerTeteFile(File file, const ExecutionTimeline *timeline) {
     avancerIterator(it);
     pushOrMergeOperationProcessus(pTimeline->listeTQ, UC, 1);
 
-    //*nb--
+    //*nb = *nb-1;
 
     // Si le processus passe à ES ou est fini, on defile.
     // On laisse alors un autre processus potentiellement
     if (etatIterator(it) == ES || iteratorEstFini(it)) {
-  //if (etatIterator(it) == ES || iteratorEstFini(it) || *nb == 0 )
+  //if (etatIterator(it) == ES || iteratorEstFini(it) || *nb == 0 ) {
         it->enAttente = false;
         defilerFile(file);
-        //*nb = 0
+        //*nb = 0;
     }
 }
 
@@ -106,13 +106,13 @@ void traiterES_FIFO(ProcessusIterator *it, const Processus *pTimeline) {
  * - Une phase de mise à jour où elle identifie les nouveaux arrivants et fait
  * progresser les processus en E/S.
  * - Une phase d'exécution où seule la tête de file est autorisée à consommer du CPU.
- * La simulation s'arrête lorsqu'aucun processus n'est plus "vivant" dans le système.
+ * La simulation s'arrête Quand il n'y a plus de processus "vivant" dans le système.
  *
  * @param liste_tq La liste initiale des processus (et leurs cycles) à traiter.
  * @return Un pointeur vers la chronologie complète (Gantt) de l'exécution.
  */
 ExecutionTimeline *fifo(ListeTQ liste_tq) {
-//ExecutionTimeline *RRN(ListeTQ liste_tq, int nb)
+//ExecutionTimeline *RRN(ListeTQ liste_tq, int nb) {
 
     ExecutionTimeline *timeline = allocTimeline();
     if (!timeline) return NULL;
