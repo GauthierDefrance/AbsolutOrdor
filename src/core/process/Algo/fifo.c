@@ -122,9 +122,10 @@ ExecutionTimeline *fifo(ListeTQ liste_tq) {
     File file = allocFile();
     initFile(file);
 
-    while (true) {
+    bool flag = true;
+    while (flag) {
 
-        if (countAlive(tab, n) == 0) break;
+        if (countAlive(tab, n) == 0) flag = false;
 
         // Passe 1 : enregistrer les arrivants UC et avancer les ES
         for (int i = 0; i < n; i++) {
@@ -136,9 +137,9 @@ ExecutionTimeline *fifo(ListeTQ liste_tq) {
             Processus *pTimeline = getTimelineProcessus(timeline, &tab[i]);
 
             switch (etatIterator(&tab[i])) {
-                case UC: traiterUC_FIFO(&tab[i], pTimeline, file); break;
-                case ES: traiterES_FIFO(&tab[i], pTimeline); break;
-                default: avancerIterator(&tab[i]); break;
+                case UC: traiterUC_FIFO(&tab[i], pTimeline, file); flag = false;
+                case ES: traiterES_FIFO(&tab[i], pTimeline); flag = false;
+                default: avancerIterator(&tab[i]); flag = false;
             }
         }
 

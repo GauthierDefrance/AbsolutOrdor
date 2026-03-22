@@ -50,8 +50,10 @@ ListeTQ createListeProcessusFromCSV(char *fileName) {
     char processName[NBMAXCHAR];
     int spawnDate;
     int quantum;
-
-    for (int i = 0; i < size; i++) {
+    int i = 0;
+    bool flag = true;
+    while (i < size && flag) {
+        i++;
         skipAllIgnoredLines(f);
 
         Processus *p = allocMemProcessus();
@@ -61,7 +63,7 @@ ListeTQ createListeProcessusFromCSV(char *fileName) {
         if (fscanf(f, "%[^;];%d;", processName, &spawnDate) != 2) {
             fprintf(stderr, "Erreur CSV ligne %d\n", i);
             free(p);
-            break;
+            flag = false;
         }
 
         strncpy(p->name, processName, NBMAXCHAR - 1);
@@ -69,7 +71,8 @@ ListeTQ createListeProcessusFromCSV(char *fileName) {
 
         // Lecture UC/ES
         int index = 0;
-        while (fscanf(f, "%d", &quantum) == 1) {
+        bool flag2 = true;
+        while (fscanf(f, "%d", &quantum) == 1 && flag2) {
             Quantum *q = malloc(sizeof(Quantum));
             q->nbQuantum = quantum;
             q->type = (index % 2 == 0 ? UC : ES);
@@ -80,7 +83,7 @@ ListeTQ createListeProcessusFromCSV(char *fileName) {
 
             int c = fgetc(f);
             if (c == '\n' || c == EOF)
-                break;
+                flag2 = false;
         }
 
         inserQueueLTQ(liste, p);
