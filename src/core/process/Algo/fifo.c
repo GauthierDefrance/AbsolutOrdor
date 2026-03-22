@@ -137,9 +137,9 @@ ExecutionTimeline *fifo(ListeTQ liste_tq) {
             Processus *pTimeline = getTimelineProcessus(timeline, &tab[i]);
 
             switch (etatIterator(&tab[i])) {
-                case UC: traiterUC_FIFO(&tab[i], pTimeline, file); flag = false;
-                case ES: traiterES_FIFO(&tab[i], pTimeline); flag = false;
-                default: avancerIterator(&tab[i]); flag = false;
+                case UC: traiterUC_FIFO(&tab[i], pTimeline, file); break;
+                case ES: traiterES_FIFO(&tab[i], pTimeline); break;
+                default: avancerIterator(&tab[i]); break;
             }
         }
 
