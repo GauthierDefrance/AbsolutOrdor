@@ -23,6 +23,7 @@
  * @param timeline Structure de résultats où l'activité UC est enregistrée.
  */
 void executerTeteFile(File file, const ExecutionTimeline *timeline) {
+//void executerTeteFile(File file, const ExecutionTimeline *timeline,int *nb)
     //Si la tete de file est NULL on ne fait rien
     if (estVideFile(file)) return;
 
@@ -34,12 +35,15 @@ void executerTeteFile(File file, const ExecutionTimeline *timeline) {
     avancerIterator(it);
     pushOrMergeOperationProcessus(pTimeline->listeTQ, UC, 1);
 
+    //*nb--
 
     // Si le processus passe à ES ou est fini, on defile.
     // On laisse alors un autre processus potentiellement
     if (etatIterator(it) == ES || iteratorEstFini(it)) {
+  //if (etatIterator(it) == ES || iteratorEstFini(it) || *nb == 0 )
         it->enAttente = false;
         defilerFile(file);
+        //*nb = 0
     }
 }
 
@@ -108,6 +112,7 @@ void traiterES_FIFO(ProcessusIterator *it, const Processus *pTimeline) {
  * @return Un pointeur vers la chronologie complète (Gantt) de l'exécution.
  */
 ExecutionTimeline *fifo(ListeTQ liste_tq) {
+//ExecutionTimeline *RRN(ListeTQ liste_tq, int nb)
 
     ExecutionTimeline *timeline = allocTimeline();
     if (!timeline) return NULL;
@@ -121,6 +126,8 @@ ExecutionTimeline *fifo(ListeTQ liste_tq) {
     int time = 0;
     File file = allocFile();
     initFile(file);
+
+    //int restNb = nb;
 
     bool flag = true;
     while (flag) {
@@ -145,6 +152,11 @@ ExecutionTimeline *fifo(ListeTQ liste_tq) {
 
         // Passe 2 : UN SEUL processus utilise l'UC ce tick (la tête de file)
         executerTeteFile(file, timeline);
+
+        //executerTeteFile(file, timeline, &restNb);
+        // if (restNb == 0) {
+        //     restNb = nb;
+        // }
 
         time++;
     }
