@@ -97,7 +97,7 @@ void AlgoController::setCSV(char *sourcepath) {
  * @param algorithm Type d'algorithme souhaité.
  * @return ExecutionTimeline* Pointeur vers l'historique d'exécution généré.
  */
-ExecutionTimeline* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm) {
+ExecutionTimeline* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm, AlgoConfig config) {
     if (AlgoController::listeProcessus == nullptr) {
         std::cerr << "[AlgoController] Aucun CSV chargé, impossible de lancer un algorithme." << std::endl;
         return nullptr;
@@ -114,8 +114,7 @@ ExecutionTimeline* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm
             return sjrf(listeProcessus, tailleListe(listeProcessus->tete));
         }
         case RR: {
-            // TODO: implémenter nb
-            return rrn(listeProcessus,2);
+            return rrn(listeProcessus, config.quantumRR);
         }
         case LOTTERY : {
             return lottery_scheduling(listeProcessus, tailleListe(listeProcessus->tete));

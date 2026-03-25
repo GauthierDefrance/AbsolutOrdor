@@ -49,11 +49,10 @@ double restitutionMoyProcessus(ExecutionTimeline *timeline) {
 int tempsRepProcessus(Processus *processus) {
     Liste liste = processus->listeTQ->tete;
     int n = 0;
-    bool flag = true;
-    while (!(estVideListe(liste) && flag)) {
+    while (!estVideListe(liste)) {
         Quantum *q = (Quantum *) liste->data;
-        if (q->type != W) flag = false;
-        n++;
+        if (q->type != W) break;
+        n += q->nbQuantum;
         liste = suivantListe(liste);
     }
     return n;

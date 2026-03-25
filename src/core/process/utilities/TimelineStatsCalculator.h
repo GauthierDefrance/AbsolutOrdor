@@ -61,9 +61,6 @@ double tempRepMoyProcessus(ExecutionTimeline *timeline);
 double tauxOccupationCPU(ExecutionTimeline *timeline);
 
 int getTimelineMax(const ExecutionTimeline *timeline);
-
 int getTimelineDebut(const ExecutionTimeline *timeline);
-
 int getTimelineNbProcessus(const ExecutionTimeline *timeline);
-
 int getTimelineTicksType(const ExecutionTimeline *timeline, enum OperationProcessus type);

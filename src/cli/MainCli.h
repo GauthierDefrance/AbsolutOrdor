@@ -41,8 +41,8 @@ class MainCli {
         //Méthodes utilitaire
         void loadFile(char *filepath);
         void printCurrentFileName();
-        void selectAlgorithm(SchedulingAlgorithm algorithm);
-        void loadFileAndSelectAlgorithm(char *filepath, SchedulingAlgorithm algorithm);
+        void selectAlgorithm(SchedulingAlgorithm algorithm, AlgoConfig config = {});
+        void loadFileAndSelectAlgorithm(char *filepath, SchedulingAlgorithm algorithm, AlgoConfig config = {});
 
 
     private:

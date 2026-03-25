@@ -39,6 +39,13 @@ enum SchedulingAlgorithm {
 };
 
 
+struct AlgoConfig {
+    int quantumRR = 2;
+    // futurs paramètres ici
+};
+
+
+
 /**
  * @class AlgoController
  * @brief Contrôleur central (Singleton) gérant le cycle de vie de la simulation.
@@ -80,7 +87,7 @@ public:
      * @param algorithm L'algorithme choisi via l'énumération SchedulingAlgorithm.
      * @return ExecutionTimeline* Pointeur vers les résultats (timeline) ou nullptr en cas d'erreur.
      */
-    static ExecutionTimeline* selectAlgorithm(SchedulingAlgorithm algorithm);
+    static ExecutionTimeline* selectAlgorithm(SchedulingAlgorithm algorithm, AlgoConfig config = {});
 
     /** @return Le chemin complet du fichier CSV actuellement chargé. */
     std::string getCurrentCSVPath();

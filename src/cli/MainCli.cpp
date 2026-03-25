@@ -26,6 +26,7 @@ void MainCli::showHelp() {
         "OPTIONS\n"
         "  -f, -filepath <path>    Fichier CSV des processus\n"
         "  -s, -select   <algo>    Algorithme a utiliser  (ex: FIFO, SJF, * pour tous)\n"
+        "  -n <quantum>            Quantum pour RR (defaut: 2)\n"
         "  -h, -help               Affiche ce message\n"
         "\n"
         "EXEMPLES\n"
@@ -55,8 +56,8 @@ void MainCli::printCurrentFileName() {
               << "Chemin fichier courant : " << AlgoController::getInstance().getCurrentCSVPath() << "\n";
 }
 
-void MainCli::selectAlgorithm(SchedulingAlgorithm algorithm) {
-    ExecutionTimeline *tl = AlgoController::selectAlgorithm(algorithm);
+void MainCli::selectAlgorithm(SchedulingAlgorithm algorithm, AlgoConfig config) {
+    ExecutionTimeline *tl = AlgoController::selectAlgorithm(algorithm, config);
     if (!tl) {
         std::cerr << "Erreur critique, erreur d'allocation memoire.\n";
         return;
@@ -66,9 +67,9 @@ void MainCli::selectAlgorithm(SchedulingAlgorithm algorithm) {
     destroyTimeline(tl);
 }
 
-void MainCli::loadFileAndSelectAlgorithm(char *filepath, SchedulingAlgorithm algorithm) {
+void MainCli::loadFileAndSelectAlgorithm(char *filepath, SchedulingAlgorithm algorithm, AlgoConfig config) {
     loadFile(filepath);
-    selectAlgorithm(algorithm);
+    selectAlgorithm(algorithm, config);
 }
 
 int MainCli::run(int argc, char** argv) {
@@ -83,6 +84,7 @@ int MainCli::run(int argc, char** argv) {
     bool runAll = false;
     SchedulingAlgorithm selectedAlgo = {};
     bool algoSelected = false;
+    AlgoConfig config; // valeurs par défaut
 
     for (int i = 1; i < argc; i++) {
 
@@ -97,6 +99,18 @@ int MainCli::run(int argc, char** argv) {
                 filepath = argv[++i];
             } else {
                 std::cerr << "Erreur : Chemin de fichier manquant.\n";
+                return 1;
+            }
+        }
+        else if (arg == "-n") {
+            if (i + 1 < argc) {
+                config.quantumRR = std::stoi(argv[++i]);
+                if (config.quantumRR <= 0) {
+                    std::cerr << "Erreur : Le quantum RR doit etre > 0.\n";
+                    return 1;
+                }
+            } else {
+                std::cerr << "Erreur : Valeur du quantum RR manquante.\n";
                 return 1;
             }
         }
@@ -149,16 +163,16 @@ int MainCli::run(int argc, char** argv) {
 
     if (runAll) {
         std::cout << "\nExecution de tous les algorithmes...\n";
-        std::vector<SchedulingAlgorithm> algos = {FIFO, SJF, SJRF};
-        const char* noms[] = {"FIFO", "SJF", "SJRF"};
+        std::vector<SchedulingAlgorithm> algos = {FIFO, SJF, SJRF, RR};
+        const char* noms[] = {"FIFO", "SJF", "SJRF", "RR"};
         int i = 0;
         for (auto algo : algos) {
             std::cout << "\n=== Algorithme : " << noms[i] << " ===\n";
-            selectAlgorithm(algo);
+            selectAlgorithm(algo, config);
             i++;
         }
     } else if (algoSelected) {
-        selectAlgorithm(selectedAlgo);
+        selectAlgorithm(selectedAlgo, config);
     } else {
         std::cerr << "Erreur : Aucun algorithme selectionne.\n\n";
         printBuiltinAlgorithm();
