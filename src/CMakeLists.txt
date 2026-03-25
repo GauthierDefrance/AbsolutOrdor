@@ -1,27 +1,23 @@
 cmake_minimum_required(VERSION 3.20)
 project(AbsolutOrdor)
 
+# --- 1. CONFIGURATION STANDARD ---
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 1. Gestion des dépendances universelles
+# --- 2. DÉPENDANCES EXTERNES ---
 find_package(OpenGL REQUIRED)
 
-# Téléchargement automatique de GLFW (pour que ça marche partout sans rien installer)
 include(FetchContent)
-FetchContent_Declare(glfw
-        URL https://github.com/glfw/glfw/releases/download/3.3.8/glfw-3.3.8.zip
-)
+FetchContent_Declare(glfw URL https://github.com/glfw/glfw/releases/download/3.3.8/glfw-3.3.8.zip)
 FetchContent_MakeAvailable(glfw)
 
-# 2. Configuration ImGui
 set(IMGUI_DIR "libs/imgui")
 add_subdirectory(${IMGUI_DIR})
 
-# 3. Chemins d'inclusion
-include_directories(core Tests cli libs ${IMGUI_DIR} ${IMGUI_DIR}/backends)
+# --- 3. DÉFINITION DES SOURCES ---
 
-# 4. Sources communes (Logique métier)
+# Logique métier pure (C et C++)
 set(CORE_SOURCES
         core/data/struct/liste.c
         core/data/struct/liste_tq.c
@@ -37,16 +33,43 @@ set(CORE_SOURCES
         core/process/Algo/algo_commun.c
         core/process/Algo/lottery_scheduling.c
         core/process/Algo/rrn.c
+        core/process/utilities/TimelineStatsCalculator.c
 )
 
-# 5. Cibles
-add_executable(CLI ${CORE_SOURCES} cli/main.cpp)
+# Utilitaires partagés entre CLI et Tests
+set(UTILS_SOURCES
+        cli/ConsoleStructPrinter.cpp
+)
 
+# Fichiers de tests
+set(TEST_FILES
+        Tests/Test_Core.cpp
+        Tests/Test_Liste.cpp
+        Tests/Test_ListeTQ.cpp
+        Tests/Test_Processus.cpp
+        Tests/Test_CSV.cpp
+        Tests/Test_Timeline.cpp
+        Tests/Test_Algo.cpp
+)
+
+# --- 4. INCLUSIONS ---
+include_directories(core Tests cli libs ${IMGUI_DIR} ${IMGUI_DIR}/backends)
+
+# --- 5. CIBLES (EXECUTABLES) ---
+
+# Cible CLI
+add_executable(CLI ${CORE_SOURCES} ${UTILS_SOURCES} cli/main.cpp cli/MainCli.cpp)
+target_compile_options(CLI PRIVATE -Wall -Wextra -Werror) # <--- ICI
+
+# Cible GUI
 add_executable(GUI ${CORE_SOURCES} gui/main.cpp)
-# On lie ImGui, GLFW et OpenGL
 target_link_libraries(GUI imgui glfw OpenGL::GL)
+target_compile_options(GUI PRIVATE -Wall -Wextra -Werror) # <--- ICI
 
-# 6. Tests
+# Cible TESTS
+add_executable(Tests ${CORE_SOURCES} ${UTILS_SOURCES} ${TEST_FILES})
+target_compile_options(Tests PRIVATE -Wall -Wextra -Werror)
+
+# --- 6. CONFIGURATION DES TESTS ---
 enable_testing()
-add_executable(Tests ${CORE_SOURCES} Tests/Test_Core.cpp) # Ajoute tes autres fichiers tests ici
 add_test(NAME CoreTests COMMAND Tests)
