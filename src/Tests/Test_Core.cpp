@@ -9,14 +9,20 @@ bool testProcessus();
 bool testCSVReader();
 bool testExecutionTimeline();
 bool testAlgoControllerFIFO();
-bool testAlgoControllerRRN();
+bool testAlgoControllerRRN(int nb);
 bool testAlgoControllerSJF();
 bool testAlgoControllerSJRF();
 bool testAlgoControllerLotteryScheduling();
 
+bool testAlgoControllerRRNWrapper() {
+    return testAlgoControllerRRN(2);
+}
+
 static void print_test(const char* name, bool ok) {
     std::cout << (ok ? "[OK]   " : "[FAIL] ") << name << "\n";
 }
+
+
 
 int main() {
     // --- INITIALISATION DE L'ALÉATOIRE ---
@@ -32,7 +38,7 @@ int main() {
         {"ExecutionTimeline depuis CSV",   testExecutionTimeline},
 
         {"AlgoController FIFO",            testAlgoControllerFIFO},
-        {"AlgoController RRN",            testAlgoControllerRRN},
+        {"AlgoController RRN",            testAlgoControllerRRNWrapper},
         {"AlgoController SJF",             testAlgoControllerSJF},
         {"AlgoController SJRF",            testAlgoControllerSJRF},
         {"AlgoController LOTTERY",         testAlgoControllerLotteryScheduling}

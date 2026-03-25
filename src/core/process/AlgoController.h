@@ -40,8 +40,8 @@ enum SchedulingAlgorithm {
 
 
 struct AlgoConfig {
-    int quantumRR = 2;
-    // futurs paramètres ici
+    int quantumRR;
+    // Autres params éventuels
 };
 
 

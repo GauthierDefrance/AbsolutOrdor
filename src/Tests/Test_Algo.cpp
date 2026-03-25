@@ -48,9 +48,11 @@ bool testAlgoControllerFIFO() {
     return true;
 }
 
-bool testAlgoControllerRRN() {
+bool testAlgoControllerRRN(int quantumRR = 2) {
 
     const char* filename = "rrn_test.csv";
+    AlgoConfig config;
+    config.quantumRR = quantumRR;
 
     FILE* f = fopen(filename,"w");
 
@@ -71,7 +73,7 @@ bool testAlgoControllerRRN() {
 
     controller.setCSV((char*)filename);
 
-    ExecutionTimeline* tl = AlgoController::selectAlgorithm(RR);
+    ExecutionTimeline* tl = AlgoController::selectAlgorithm(RR, config);
 
     if(!tl)
         return false;

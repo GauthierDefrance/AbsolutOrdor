@@ -1,25 +1,27 @@
 cmake_minimum_required(VERSION 3.20)
 project(AbsolutOrdor)
 
-# -----------------------
-# C++ Standard
-# -----------------------
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# -----------------------
-# Inclure les dossiers
-# -----------------------
-include_directories(core Tests cli)
+# 1. Gestion des dépendances universelles
+find_package(OpenGL REQUIRED)
 
-# -----------------------
-# Options de compilation
-# -----------------------
-add_compile_options(-Wall -Wextra -Werror)
+# Téléchargement automatique de GLFW (pour que ça marche partout sans rien installer)
+include(FetchContent)
+FetchContent_Declare(glfw
+        URL https://github.com/glfw/glfw/releases/download/3.3.8/glfw-3.3.8.zip
+)
+FetchContent_MakeAvailable(glfw)
 
-# -----------------------
-# Sources Core
-# -----------------------
+# 2. Configuration ImGui
+set(IMGUI_DIR "libs/imgui")
+add_subdirectory(${IMGUI_DIR})
+
+# 3. Chemins d'inclusion
+include_directories(core Tests cli libs ${IMGUI_DIR} ${IMGUI_DIR}/backends)
+
+# 4. Sources communes (Logique métier)
 set(CORE_SOURCES
         core/data/struct/liste.c
         core/data/struct/liste_tq.c
@@ -37,45 +39,14 @@ set(CORE_SOURCES
         core/process/Algo/rrn.c
 )
 
-# -----------------------
-# Executable Tests CLI
-# -----------------------
-add_executable(Tests
-        ${CORE_SOURCES}
-        Tests/Test_Core.cpp
-        Tests/Test_Liste.cpp
-        Tests/Test_ListeTQ.cpp
-        Tests/Test_Processus.cpp
-        Tests/Test_CSV.cpp
-        Tests/Test_Timeline.cpp
-        Tests/Test_Algo.cpp
-        cli/ConsoleStructPrinter.cpp
-        core/process/utilities/TimelineStatsCalculator.c
-        core/process/utilities/TimelineStatsCalculator.h
-)
+# 5. Cibles
+add_executable(CLI ${CORE_SOURCES} cli/main.cpp)
 
-add_executable(CLI
-        ${CORE_SOURCES}
-        cli/main.cpp
-        cli/MainCli.cpp
-        cli/ConsoleStructPrinter.cpp
-        core/process/utilities/TimelineStatsCalculator.c
-        core/process/utilities/TimelineStatsCalculator.h
-)
+add_executable(GUI ${CORE_SOURCES} gui/main.cpp)
+# On lie ImGui, GLFW et OpenGL
+target_link_libraries(GUI imgui glfw OpenGL::GL)
 
-# -----------------------
-# DLLs MinGW pour CLI (Windows)
-# -----------------------
-if(WIN32)
-    target_link_options(CLI PRIVATE
-            -static
-            -static-libgcc
-            -static-libstdc++
-    )
-endif()
-
-# -----------------------
-# Tests CTest
-# -----------------------
+# 6. Tests
 enable_testing()
+add_executable(Tests ${CORE_SOURCES} Tests/Test_Core.cpp) # Ajoute tes autres fichiers tests ici
 add_test(NAME CoreTests COMMAND Tests)
