@@ -1,6 +1,9 @@
-# Ignorer les bibliothèques externes dans les statistiques de langage
-/libs/* linguist-vendored
-/libs/imgui/* linguist-vendored
+# Masquer les bibliothèques externes des statistiques de langage
+src/libs/** linguist-vendored
 
-# Si tu as d'autres dossiers de dépendances
-_deps/* linguist-vendored
+# Si tu veux être plus précis
+src/libs/imgui/** linguist-vendored
+
+# Ignorer aussi les dépendances téléchargées par CMake (FetchContent)
+build/_deps/** linguist-vendored
+_deps/** linguist-vendored
