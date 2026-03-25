@@ -18,7 +18,7 @@
  * @param liste_tq Liste des processus à ordonnancer.
  * @return ExecutionTimeline* Chronologie complète de l'exécution (à libérer).
  */
-ExecutionTimeline* fifo(ListeTQ liste_tq);
+ExecutionTimeline* rrn(ListeTQ liste_tq,int nb);
 
 
 /**
@@ -27,4 +27,4 @@ ExecutionTimeline* fifo(ListeTQ liste_tq);
  * @param file La file d'attente des processus prêts (Ready Queue).
  * @param timeline Structure de résultats pour enregistrer l'activité CPU.
  */
-void executerTeteFile_FIFO(File file, const ExecutionTimeline *timeline);
+void executerTeteFile_RRN(File file, const ExecutionTimeline *timeline,int *nb);

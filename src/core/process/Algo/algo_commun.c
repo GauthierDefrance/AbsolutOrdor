@@ -130,3 +130,53 @@ void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, const Execution
         *surLeCPU = NULL;
     }
 }
+
+
+/**
+ * @brief Gère l'admission et la mise en attente des processus candidats au CPU.
+ *
+ * Pour chaque processus en phase de calcul, cette fonction vérifie s'il est déjà
+ * présent dans la file d'attente. Si ce n'est pas le cas, il y est inséré.
+ * Elle comptabilise également le temps d'attente (Wait) si le processus est bloqué
+ * derrière un autre occupant déjà la tête de file.
+ *
+ * @param it L'itérateur représentant l'état actuel du processus.
+ * @param pTimeline Référence du processus dans la chronologie pour l'enregistrement.
+ * @param file La file d'attente (Ready Queue) où le processus doit patienter.
+ */
+void traiterUC_FIFO_RRN(ProcessusIterator *it, const Processus *pTimeline, File file) {
+
+    //Si le processus était déjà en attente avant, on le laisse
+    if (enAttenteIterator(it)) {
+        pushOrMergeOperationProcessus(pTimeline->listeTQ, W, 1);
+        return;
+    }
+
+    bool estVide = estVideFile(file); // ← vérifier AVANT d'enfiler
+    enfilerFile(file, it);
+    it->enAttente = true;
+
+    if (!estVide) {
+        // Quelqu'un devant → on attend ce tick
+        pushOrMergeOperationProcessus(pTimeline->listeTQ, W, 1);
+    }
+    // Si file était vide : pas de W ici,
+}
+
+
+/**
+ * @brief Simule la progression d'une opération d'Entrée/Sortie (E/S).
+ * Fait progresser l'itérateur du processus pour ses cycles d'E/S. Contrairement
+ * à l'UC, les E/S peuvent être traitées de manière concurrente pour tous les
+ * processus concernés. Les résultats sont fusionnés dans la timeline pour
+ * optimiser la lecture du diagramme final.
+ *
+ * @param it L'itérateur du processus actuellement bloqué en E/S.
+ * @param pTimeline Référence du processus pour l'enregistrement de l'opération ES.
+ */
+void traiterES_FIFO_RRN(ProcessusIterator *it, const Processus *pTimeline) {
+    Quantum *completed = avancerIterator(it);
+    if (completed) {
+        pushOrMergeOperationProcessus(pTimeline->listeTQ, ES, completed->nbQuantum);
+    }
+}

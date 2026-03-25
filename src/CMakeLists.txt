@@ -74,6 +74,7 @@ set(CORE_SOURCES
         core/process/Algo/sjrf.c
         core/process/Algo/algo_commun.c
         core/process/Algo/lottery_scheduling.c
+        core/process/Algo/rrn.c
 )
 
 # -----------------------

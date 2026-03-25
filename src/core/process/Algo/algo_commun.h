@@ -41,3 +41,20 @@ ProcessusIterator* retirerMinTempsUC(const File* f);
  * @param[in,out] nbProcessusTraiter Compteur global de processus terminés.
  */
 void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, const ExecutionTimeline *resultat, int *nbProcessusTraiter);
+
+
+/**
+ * @brief Gère l'insertion et l'attente des processus en phase de calcul (UC).
+ * @param it Iterateur du processus à traiter.
+ * @param pTimeline Pointeur vers le processus dans la chronologie.
+ * @param file File d'attente où insérer le processus.
+ */
+void traiterUC_FIFO_RRN(ProcessusIterator *it, const Processus *pTimeline, File file);
+
+
+/**
+ * @brief Gère la progression des processus en phase d'Entrées/Sorties.
+ * @param it Iterateur du processus effectuant l'E/S.
+ * @param pTimeline Pointeur vers le processus dans la chronologie.
+ */
+void traiterES_FIFO_RRN(ProcessusIterator *it, const Processus *pTimeline);
