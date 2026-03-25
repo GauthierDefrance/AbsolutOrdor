@@ -9,6 +9,7 @@ bool testProcessus();
 bool testCSVReader();
 bool testExecutionTimeline();
 bool testAlgoControllerFIFO();
+bool testAlgoControllerRRN();
 bool testAlgoControllerSJF();
 bool testAlgoControllerSJRF();
 bool testAlgoControllerLotteryScheduling();
@@ -31,6 +32,7 @@ int main() {
         {"ExecutionTimeline depuis CSV",   testExecutionTimeline},
 
         {"AlgoController FIFO",            testAlgoControllerFIFO},
+        {"AlgoController RRN",            testAlgoControllerRRN},
         {"AlgoController SJF",             testAlgoControllerSJF},
         {"AlgoController SJRF",            testAlgoControllerSJRF},
         {"AlgoController LOTTERY",         testAlgoControllerLotteryScheduling}

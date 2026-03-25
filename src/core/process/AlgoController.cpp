@@ -114,9 +114,8 @@ ExecutionTimeline* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm
             return sjrf(listeProcessus, tailleListe(listeProcessus->tete));
         }
         case RR: {
-            // TODO: implémenter RR(listeProcessus)
-            std::cerr << "[AlgoController] RR non encore implémenté." << std::endl;
-            return nullptr;
+            // TODO: implémenter nb
+            return rrn(listeProcessus,2);
         }
         case LOTTERY : {
             return lottery_scheduling(listeProcessus, tailleListe(listeProcessus->tete));

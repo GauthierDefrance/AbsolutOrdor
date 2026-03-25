@@ -18,6 +18,7 @@ extern "C" {
     #include "process/utilities/csv_reader.h"
     #include "data/struct/ExecutionTimeline.h"
     #include "process/Algo/fifo.h"
+    #include "process/Algo/rrn.h"
     #include "process/Algo/sjf.h"
     #include "process/Algo/sjrf.h"
     #include "process/Algo/lottery_scheduling.h"
