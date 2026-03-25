@@ -1,0 +1,6 @@
+# Ignorer les bibliothèques externes dans les statistiques de langage
+/libs/* linguist-vendored
+/libs/imgui/* linguist-vendored
+
+# Si tu as d'autres dossiers de dépendances
+_deps/* linguist-vendored
