@@ -4,53 +4,52 @@
 #include "ConsoleStructPrinter.h"
 
 extern "C" {
-    #include "data/struct/liste.h"
-    #include "data/struct/liste_tq.h"
-    #include "data/struct/processus.h"
-    #include "data/struct/ExecutionTimeline.h"
-    #include "process/utilities/csv_reader.h"
-
+#include "data/struct/liste.h"
+#include "data/struct/liste_tq.h"
+#include "data/struct/processus.h"
+#include "data/struct/ExecutionTimeline.h"
+#include "process/utilities/csv_reader.h"
+#include "process/utilities/TimelineStatsCalculator.h"
 }
 
-
+#include <string>
 
 struct Fichier {
-    FILE *fp; // Le contenu du fichier
-    char *path; //Son chemin
+    FILE *fp;
+    char *path;
 };
-
-
 
 class MainCli {
 
-    public:
-        //Constructeur et destructeur
-        static MainCli& getInstance();
-        ~MainCli();
+public:
+    static MainCli& getInstance();
+    ~MainCli();
 
+    int run(int argc, char** argv);
 
-        // Etat du CLI
-        int run(int argc, char** argv); // The reading of the input from the user loop and reacting to it
+    static void showHelp();
+    static void printBuiltinAlgorithm();
 
+    void loadFile(char *filepath);
+    void loadInline(const std::string& csvContent);  // ← nouveau
+    void printCurrentFileName();
+    void selectAlgorithm(SchedulingAlgorithm algorithm,
+                         AlgoConfig config = {},
+                         const std::string& outputPath = "");  // ← outputPath ajouté
+    void loadFileAndSelectAlgorithm(char *filepath,
+                                    SchedulingAlgorithm algorithm,
+                                    AlgoConfig config = {});
 
-        //Fonctions d'affichages
-        static void showHelp();
-        static void printBuiltinAlgorithm();
-        //static void printAlgorithmResultat(Resultat resultat);
+    // Export CSV tableur-friendly
+    void exportStatsCSV(const ExecutionTimeline *tl,
+                        SchedulingAlgorithm algo,
+                        AlgoConfig config,
+                        const std::string& outputPath,
+                        bool append = false);  // ← nouveau
 
-        //Méthodes utilitaire
-        void loadFile(char *filepath);
-        void printCurrentFileName();
-        void selectAlgorithm(SchedulingAlgorithm algorithm, AlgoConfig config = {});
-        void loadFileAndSelectAlgorithm(char *filepath, SchedulingAlgorithm algorithm, AlgoConfig config = {});
+private:
+    MainCli();
 
-
-    private:
-        MainCli();
-
-        Fichier *f = nullptr;
-        //Resultat resultat;
-        static MainCli* INSTANCE;
-
+    Fichier *f = nullptr;
+    static MainCli* INSTANCE;
 };
-
