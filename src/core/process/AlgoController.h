@@ -25,20 +25,6 @@ extern "C" {
 }
 
 
-/**
- * @enum SchedulingAlgorithm
- * @brief Énumération des algorithmes d'ordonnancement supportés par le contrôleur.
- */
-enum SchedulingAlgorithm {
-    FIFO,
-    SJF,
-    SJRF,
-    RR,
-    LOTTERY
-    // ADVICE : Ajouter vos autres algorithmes ici
-};
-
-
 struct AlgoConfig {
     int quantumRR;
     // Autres params éventuels
@@ -87,7 +73,7 @@ public:
      * @param algorithm L'algorithme choisi via l'énumération SchedulingAlgorithm.
      * @return ExecutionTimeline* Pointeur vers les résultats (timeline) ou nullptr en cas d'erreur.
      */
-    static ExecutionTimeline* selectAlgorithm(SchedulingAlgorithm algorithm, AlgoConfig config = {});
+    static ExecutionTimeline* selectAlgorithm(const char* algorithm, AlgoConfig config = {});
 
     /** @return Le chemin complet du fichier CSV actuellement chargé. */
     std::string getCurrentCSVPath();

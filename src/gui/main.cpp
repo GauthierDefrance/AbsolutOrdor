@@ -1,4 +1,6 @@
 #include <charconv>
+#include <iomanip>
+#include <ios>
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -6,16 +8,49 @@
 #include <GLFW/glfw3.h>
 #include <string>
 
+#include "process/AlgoController.h"
+
+extern "C" {
+#include "process/AlgoController.h"
+#include "data/struct/liste.h"
+#include "data/struct/liste_tq.h"
+#include "data/struct/processus.h"
+#include "data/struct/ExecutionTimeline.h"
+#include "process/utilities/csv_reader.h"
+#include "process/utilities/TimelineStatsCalculator.h"
+}
 
 enum class Screen { Select, Transition, Results };
 
 constexpr double transition_duration = 10.0;
 
+static char buffer[1024] = "";
+
 struct AppState {
     Screen screen = Screen::Select;
-    std::string csv_path;
+    std::string algorithm = "FIFO";
+    AlgoConfig algorithm_config = AlgoConfig(4) ;
+    ExecutionTimeline *res = nullptr;
+    AlgoConfig algo_config = AlgoConfig(2);
     double transition_start = 0.0;
 };
+std::string statsTimeline(const ExecutionTimeline *tl) {
+    if (!tl) return "";
+
+    double attenteMoy          = attenteMoyProcessus((ExecutionTimeline*)tl);
+    double tempsRestitutionMoy = restitutionMoyProcessus((ExecutionTimeline*)tl);
+    double reponseMoy          = tempRepMoyProcessus((ExecutionTimeline*)tl);
+    double cpuUtil             = tauxOccupationCPU((ExecutionTimeline*)tl);
+
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(2);
+    ss << std::left << std::setw(25) << "Temps d'attente moyen"   << ": " << attenteMoy          << "\n";
+    ss << std::left << std::setw(25) << "Temps restitution moyen" << ": " << tempsRestitutionMoy << "\n";
+    ss << std::left << std::setw(25) << "Temps de reponse moyen"  << ": " << reponseMoy          << "\n";
+    ss << std::left << std::setw(25) << "Taux d'occupation CPU"   << ": " << cpuUtil             << " %\n";
+
+    return ss.str();
+}
 
 static void DrawGui(AppState& s) {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -25,25 +60,64 @@ static void DrawGui(AppState& s) {
         case Screen::Select: {
             ImGui::Text("Select");
             if (ImGui::Button("Choix de processus")) {
+                ImGui::OpenPopup("Choix de processus");
             }
+
             if (ImGui::Button("Choix d'algorithmes")) {
+                ImGui::OpenPopup("Choix d'algorithmes");
             }
+
             if (ImGui::Button("Lancer la Simulation")) {
                 s.transition_start = glfwGetTime();
                 s.screen = Screen::Transition;
+                s.res = AlgoController::selectAlgorithm(s.algorithm.c_str(), s.algorithm_config);
             }
+
+            if (ImGui::BeginPopup("Choix de processus")) {
+                ImGui::Text("Choix de processus");
+                if (ImGui::Button("Ouvrir un CSV")) {
+                    AlgoController::getInstance().setCSV((char*)"C:\\Users\\tartinax\\Desktop\\ecole\\GitHub\\AbsolutOrdor\\src\\Tests\\input.csv");
+                    ImGui::CloseCurrentPopup();
+                };
+                if (ImGui::Button("manuellement")) {
+                    ImGui::OpenPopup("Choix d'algorithmes");
+                };
+                ImGui::EndPopup();
+            }
+
+            if (ImGui::BeginPopup("Choix de processus Manuel")) {
+                ImGui::Text("processus Manuel");
+                ImGui::InputText("processus Manuel", buffer, IM_ARRAYSIZE(buffer));
+                if (ImGui::Button("Terminé")) {
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::EndPopup();
+            }
+
+            if (ImGui::BeginPopup("Choix d'algorithmes")) {
+                ImGui::Text("Choix d'algorithmes");
+                if (ImGui::Button("algo 1")) {ImGui::CloseCurrentPopup();};
+                if (ImGui::Button("algo 2")) {ImGui::CloseCurrentPopup();};
+                if (ImGui::Button("algo 3")) {ImGui::CloseCurrentPopup();};
+                ImGui::EndPopup();
+            }
+
         }
             break;
+
         case Screen::Transition:
             ImGui::Text("Transition");
             ImGui::Text("time : %f",glfwGetTime()-s.transition_start);
-            if (ImGui::Button("Debug")) s.screen = Screen::Select;
+            if (ImGui::Button("Skip")) s.screen = Screen::Results;
             if (glfwGetTime()-s.transition_start >= transition_duration) {
                 s.screen = Screen::Results;
             }
             break;
+
         case Screen::Results:
             ImGui::Text("Results");
+            ImGui::Text(statsTimeline(s.res).c_str());
+            if (ImGui::Button("Sauvegardez")) {}
             if (ImGui::Button("Retour")) s.screen = Screen::Select;
             break;
     default: ;

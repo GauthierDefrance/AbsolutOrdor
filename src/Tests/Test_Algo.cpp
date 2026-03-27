@@ -33,7 +33,7 @@ bool testAlgoControllerFIFO() {
 
     controller.setCSV((char*)filename);
 
-    ExecutionTimeline* tl = AlgoController::selectAlgorithm(FIFO);
+    ExecutionTimeline* tl = AlgoController::selectAlgorithm("FIFO");
 
     if(!tl)
         return false;
@@ -73,7 +73,7 @@ bool testAlgoControllerRRN(int quantumRR = 2) {
 
     controller.setCSV((char*)filename);
 
-    ExecutionTimeline* tl = AlgoController::selectAlgorithm(RR, config);
+    ExecutionTimeline* tl = AlgoController::selectAlgorithm("RR", config);
 
     if(!tl)
         return false;
@@ -123,7 +123,7 @@ bool testAlgoControllerSJF() {
     controller.setCSV((char*)filename);
 
     // Appel de SJF
-    ExecutionTimeline* tl = AlgoController::selectAlgorithm(SJF);
+    ExecutionTimeline* tl = AlgoController::selectAlgorithm("SJF");
 
     if (!tl) {
         std::cerr << "Erreur: Timeline SJF n'a pas pu être générée" << std::endl;
@@ -185,7 +185,7 @@ bool testAlgoControllerSJRF() {
     controller.setCSV((char*)filename);
 
     // Appel de SJF
-    ExecutionTimeline* tl = AlgoController::selectAlgorithm(SJRF);
+    ExecutionTimeline* tl = AlgoController::selectAlgorithm("SJRF");
 
     if (!tl) {
         std::cerr << "Erreur: Timeline SJRF n'a pas pu être générée" << std::endl;
@@ -240,7 +240,7 @@ bool testAlgoControllerLotteryScheduling() {
     controller.setCSV((char*)filename);
 
     // Appel de SJF
-    ExecutionTimeline* tl = AlgoController::selectAlgorithm(LOTTERY);
+    ExecutionTimeline* tl = AlgoController::selectAlgorithm("LOTTERY");
 
     if (!tl) {
         std::cerr << "Erreur: Timeline Lottery Scheduling n'a pas pu être générée" << std::endl;

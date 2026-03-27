@@ -9,13 +9,16 @@
 
 
 #include "AlgoController.h"
+
+#include <array>
 #include <iostream>
 
 
 // Initialisation des membres statiques (obligatoire hors de la classe)
-ListeTQ     AlgoController::listeProcessus = nullptr;
+ListeTQ AlgoController::listeProcessus = nullptr;
 std::string AlgoController::currentCSVPath = "";
 std::string AlgoController::currentCSVName = "";
+std::array<std::string,5> a = {"FIFO","SJF","SJRF","RR","LOTTERY"};
 
 
 /**
@@ -97,32 +100,20 @@ void AlgoController::setCSV(char *sourcepath) {
  * @param algorithm Type d'algorithme souhaité.
  * @return ExecutionTimeline* Pointeur vers l'historique d'exécution généré.
  */
-ExecutionTimeline* AlgoController::selectAlgorithm(SchedulingAlgorithm algorithm, AlgoConfig config) {
+ExecutionTimeline* AlgoController::selectAlgorithm(const char* algorithm, AlgoConfig config) {
     if (AlgoController::listeProcessus == nullptr) {
         std::cerr << "[AlgoController] Aucun CSV chargé, impossible de lancer un algorithme." << std::endl;
         return nullptr;
     }
 
-    switch (algorithm) {
-        case FIFO: {
-            return fifo(listeProcessus);
-        }
-        case SJF: {
-            return sjf(listeProcessus, tailleListe(listeProcessus->tete));
-        }
-        case SJRF: {
-            return sjrf(listeProcessus, tailleListe(listeProcessus->tete));
-        }
-        case RR: {
-            return rrn(listeProcessus, config.quantumRR);
-        }
-        case LOTTERY : {
-            return lottery_scheduling(listeProcessus, tailleListe(listeProcessus->tete));
-        }
-        default: {
-            std::cerr << "[AlgoController] Algorithme inconnu." << std::endl;
-            return nullptr;
-        }
+    if (strcmp("FIFO", algorithm)==0){return fifo(listeProcessus);}
+    else if (strcmp("SJF", algorithm)==0) {return sjf(listeProcessus, tailleListe(listeProcessus->tete));}
+    else if (strcmp("SJRF", algorithm)==0) {return sjrf(listeProcessus, tailleListe(listeProcessus->tete));}
+    else if (strcmp("RR", algorithm)==0) {return rrn(listeProcessus, config.quantumRR);}
+    else if (strcmp("LOTTERY", algorithm)==0) {return lottery_scheduling(listeProcessus, tailleListe(listeProcessus->tete));}
+    else {
+        std::cerr << "[AlgoController] Algorithme inconnu." << std::endl;
+        return nullptr;
     }
 }
 
