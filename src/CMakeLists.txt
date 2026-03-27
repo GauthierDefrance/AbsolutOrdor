@@ -71,7 +71,7 @@ target_compile_options(GUI PRIVATE -Wall -Wextra -Werror) # <--- ICI
 
 # Cible TESTS
 add_executable(Tests ${CORE_SOURCES} ${UTILS_SOURCES} ${TEST_FILES})
-target_compile_options(Tests PRIVATE -Wall -Wextra)
+target_compile_options(Tests PRIVATE -Wall -Wextra -Werror)
 
 # --- 6. CONFIGURATION DES TESTS ---
 enable_testing()
