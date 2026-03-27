@@ -116,7 +116,7 @@ static void DrawGui(AppState& s) {
 
         case Screen::Results:
             ImGui::Text("Results");
-            ImGui::Text(statsTimeline(s.res).c_str());
+            ImGui::Text("%s", statsTimeline(s.res).c_str());
             if (ImGui::Button("Sauvegardez")) {}
             if (ImGui::Button("Retour")) s.screen = Screen::Select;
             break;
