@@ -1,16 +1,19 @@
+#include <charconv>
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include <GLFW/glfw3.h> // Universel (Windows, Mac, Linux)
-#include <vector>
+#include <GLFW/glfw3.h>
 #include <string>
 
-// --- Ta logique métier reste la même ---
+
 enum class Screen { Select, Transition, Results };
+
+constexpr double transition_duration = 10.0;
+
 struct AppState {
     Screen screen = Screen::Select;
-    char csv_path[512] = "";
-    float transition_duration = 2.0f;
+    std::string csv_path;
     double transition_start = 0.0;
 };
 
@@ -18,15 +21,32 @@ static void DrawGui(AppState& s) {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
     ImGui::Begin("AbsolutOrdor", nullptr, ImGuiWindowFlags_NoDecoration);
-
-    if (s.screen == Screen::Select) {
-        ImGui::Text("Version Universelle (GLFW/OpenGL)");
-        if (ImGui::Button("Lancer", ImVec2(200, 50))) {
-            s.transition_start = glfwGetTime();
-            s.screen = Screen::Transition;
+    switch (s.screen) {
+        case Screen::Select: {
+            ImGui::Text("Select");
+            if (ImGui::Button("Choix de processus")) {
+            }
+            if (ImGui::Button("Choix d'algorithmes")) {
+            }
+            if (ImGui::Button("Lancer la Simulation")) {
+                s.transition_start = glfwGetTime();
+                s.screen = Screen::Transition;
+            }
         }
-    } else {
-        if (ImGui::Button("Retour")) s.screen = Screen::Select;
+            break;
+        case Screen::Transition:
+            ImGui::Text("Transition");
+            ImGui::Text("time : %f",glfwGetTime()-s.transition_start);
+            if (ImGui::Button("Debug")) s.screen = Screen::Select;
+            if (glfwGetTime()-s.transition_start >= transition_duration) {
+                s.screen = Screen::Results;
+            }
+            break;
+        case Screen::Results:
+            ImGui::Text("Results");
+            if (ImGui::Button("Retour")) s.screen = Screen::Select;
+            break;
+    default: ;
     }
     ImGui::End();
 }
@@ -38,7 +58,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "AbsolutOrdor", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "AbsolutOrdor", nullptr, nullptr);
     if (!window) return 1;
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
