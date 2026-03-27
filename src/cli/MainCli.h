@@ -31,25 +31,23 @@ public:
     static void printBuiltinAlgorithm();
 
     void loadFile(char *filepath);
-    void loadInline(const std::string& csvContent);  // ← nouveau
     void printCurrentFileName();
-    void selectAlgorithm(SchedulingAlgorithm algorithm,
+
+    void selectAlgorithm(const char* algorithm,
                          AlgoConfig config = {},
-                         const std::string& outputPath = "");  // ← outputPath ajouté
+                         const std::string& outputPath = "");
+
     void loadFileAndSelectAlgorithm(char *filepath,
-                                    SchedulingAlgorithm algorithm,
+                                    const char* algorithm,
                                     AlgoConfig config = {});
 
-    // Export CSV tableur-friendly
     void exportStatsCSV(const ExecutionTimeline *tl,
-                        SchedulingAlgorithm algo,
+                        const char* algo,
                         AlgoConfig config,
                         const std::string& outputPath,
-                        bool append = false);  // ← nouveau
+                        bool append = false);
 
 private:
     MainCli();
-
     Fichier *f = nullptr;
-    static MainCli* INSTANCE;
 };

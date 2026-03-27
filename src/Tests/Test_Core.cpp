@@ -13,6 +13,7 @@ bool testAlgoControllerRRN(int nb);
 bool testAlgoControllerSJF();
 bool testAlgoControllerSJRF();
 bool testAlgoControllerLotteryScheduling();
+bool testInlineCSV();
 
 bool testAlgoControllerRRNWrapper() {
     return testAlgoControllerRRN(2);
@@ -41,7 +42,8 @@ int main() {
         {"AlgoController RRN",            testAlgoControllerRRNWrapper},
         {"AlgoController SJF",             testAlgoControllerSJF},
         {"AlgoController SJRF",            testAlgoControllerSJRF},
-        {"AlgoController LOTTERY",         testAlgoControllerLotteryScheduling}
+        {"AlgoController LOTTERY",         testAlgoControllerLotteryScheduling},
+        {"Inline CSV test", testInlineCSV}
     };
 
     int passed = 0;

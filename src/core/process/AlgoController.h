@@ -66,6 +66,7 @@ public:
      * @param sourcepath Chemin complet vers le fichier CSV.
      */
     void setCSV(char *sourcepath);
+    void setCSV(const std::string& csvContent);
 
     /**
      * @brief Point d'entrée pour l'exécution d'un algorithme.

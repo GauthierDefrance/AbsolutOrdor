@@ -39,6 +39,8 @@ set(CORE_SOURCES
 # Utilitaires partagés entre CLI et Tests
 set(UTILS_SOURCES
         cli/ConsoleStructPrinter.cpp
+        core/process/utilities/string_parser.cpp
+        core/process/utilities/string_parser.h
 )
 
 # Fichiers de tests
@@ -50,6 +52,7 @@ set(TEST_FILES
         Tests/Test_CSV.cpp
         Tests/Test_Timeline.cpp
         Tests/Test_Algo.cpp
+        Tests/Test_Inline.cpp
 )
 
 # --- 4. INCLUSIONS ---

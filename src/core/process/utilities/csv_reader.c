@@ -158,3 +158,4 @@ static void skipLine(FILE *f) {
 static void skipAllIgnoredLines(FILE *f) {
     while (isCommentLine(f)) skipLine(f);
 }
+

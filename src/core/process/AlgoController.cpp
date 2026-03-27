@@ -13,6 +13,8 @@
 #include <array>
 #include <iostream>
 
+#include "utilities/string_parser.h"
+
 
 // Initialisation des membres statiques (obligatoire hors de la classe)
 ListeTQ AlgoController::listeProcessus = nullptr;
@@ -88,6 +90,26 @@ void AlgoController::setCSV(char *sourcepath) {
     } else {
         currentCSVName = pathStr;
     }
+}
+
+void AlgoController::setCSV(const std::string& csvContent) {
+    if (listeProcessus != nullptr) {
+        destroyLTQ(listeProcessus, (void (*)(void *)) libMemProcessus);
+        listeProcessus = nullptr;
+    }
+
+    listeProcessus = createListeProcessusFromString(csvContent);
+
+    if (!isListeProcessusValid(listeProcessus)) {
+        std::cerr << "[AlgoController] Erreur : liste de processus invalide." << std::endl;
+        listeProcessus = nullptr;
+        currentCSVPath = "";
+        currentCSVName = "";
+        return;
+    }
+
+    currentCSVPath = "";
+    currentCSVName = "";
 }
 
 
