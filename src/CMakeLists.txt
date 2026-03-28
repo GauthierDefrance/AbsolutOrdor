@@ -65,7 +65,7 @@ add_executable(CLI ${CORE_SOURCES} ${UTILS_SOURCES} cli/main.cpp cli/MainCli.cpp
 target_compile_options(CLI PRIVATE -Wall -Wextra -Werror) # <--- ICI
 
 # Cible GUI
-add_executable(GUI ${CORE_SOURCES} gui/main.cpp)
+add_executable(GUI ${CORE_SOURCES} ${UTILS_SOURCES} gui/main.cpp)
 target_link_libraries(GUI imgui glfw OpenGL::GL)
 target_compile_options(GUI PRIVATE -Wall -Wextra -Werror) # <--- ICI
 
