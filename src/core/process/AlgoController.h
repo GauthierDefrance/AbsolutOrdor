@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <array>
 
 
 /**
@@ -49,6 +50,7 @@ public:
      * @return AlgoController& Référence vers l'instance unique globale.
      */
     static AlgoController& getInstance();
+    static constexpr std::array<std::string,5> ALGO = {"FIFO","SJF","SJRF","RR","LOTTERY"};
 
     /**
      * @brief Destructeur de classe.
@@ -66,7 +68,7 @@ public:
      * @param sourcepath Chemin complet vers le fichier CSV.
      */
     void setCSV(char *sourcepath);
-    void setCSV(const std::string& csvContent);
+    void setContentCSV(const std::string& csvContent);
 
     /**
      * @brief Point d'entrée pour l'exécution d'un algorithme.
@@ -74,13 +76,21 @@ public:
      * @param algorithm L'algorithme choisi via l'énumération SchedulingAlgorithm.
      * @return ExecutionTimeline* Pointeur vers les résultats (timeline) ou nullptr en cas d'erreur.
      */
-    static ExecutionTimeline* selectAlgorithm(const char* algorithm, AlgoConfig config = {});
+    static void selectAlgorithm(const char* algorithm, AlgoConfig config = {4});
+
+    static void runAlgorithm();
+
+    static bool canRunAlgorithm();
 
     /** @return Le chemin complet du fichier CSV actuellement chargé. */
-    std::string getCurrentCSVPath();
+    static std::string getCurrentCSVPath();
 
     /** @return Le nom seul du fichier (sans le dossier) pour l'affichage. */
-    std::string getCurrentCSVName();
+    static std::string getCurrentCSVName();
+
+    static std::string getCurrentAlgorithmName();
+
+    static ExecutionTimeline *getExecutionTimeline();
 
 private:
 

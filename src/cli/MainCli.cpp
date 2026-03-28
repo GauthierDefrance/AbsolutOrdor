@@ -61,8 +61,8 @@ void MainCli::loadFile(char *filepath) {
 }
 
 void MainCli::printCurrentFileName() {
-    std::string name = AlgoController::getInstance().getCurrentCSVName();
-    std::string path = AlgoController::getInstance().getCurrentCSVPath();
+    std::string name = AlgoController::getCurrentCSVName();
+    std::string path = AlgoController::getCurrentCSVPath();
 
     if (!name.empty())
         std::cout << "Nom fichier courant : "    << name << "\n"
@@ -72,7 +72,9 @@ void MainCli::printCurrentFileName() {
 }
 
 void MainCli::selectAlgorithm(const char* algorithm, AlgoConfig config, const std::string& outputPath) {
-    ExecutionTimeline *tl = AlgoController::selectAlgorithm(algorithm, config);
+    AlgoController::selectAlgorithm(algorithm, config);
+    AlgoController::runAlgorithm();
+    ExecutionTimeline *tl = AlgoController::getExecutionTimeline();
     if (!tl) {
         std::cerr << "Erreur : impossible de generer la timeline pour " << algorithm << "\n";
         return;
@@ -230,12 +232,13 @@ int MainCli::run(int argc, char** argv) {
                 }
 
                 // Validation de l'algo
-                if (algo == "FIFO" || algo == "SJF"  ||
-                    algo == "SJRF" || algo == "RR"   ||
-                    algo == "LOTTERY") {
-                    selectedAlgoStr = algo;
-                    algoSelected    = true;
-                } else {
+                for (std::string_view name : AlgoController::ALGO) {
+                    if (name == algo) {
+                        selectedAlgoStr = algo;
+                        algoSelected = true;
+                    }
+                }
+                if (!algoSelected) {
                     std::cerr << "Erreur : Algorithme inconnu : " << algo << "\n\n";
                     printBuiltinAlgorithm();
                     return 1;
@@ -264,7 +267,7 @@ int MainCli::run(int argc, char** argv) {
 
     // Chargement
     if (hasInline) {
-        AlgoController::getInstance().setCSV(inlineCSV);
+        AlgoController::getInstance().setContentCSV(inlineCSV);
     } else {
         loadFile(filepath);
     }
@@ -278,17 +281,18 @@ int MainCli::run(int argc, char** argv) {
 
     if (runAll) {
         std::cout << "\nExecution de tous les algorithmes...\n";
-        const char* noms[] = {"FIFO", "SJF", "SJRF", "RR", "LOTTERY"};
-        int nbAlgos = sizeof(noms) / sizeof(noms[0]);
 
-        for (int i = 0; i < nbAlgos; i++) {
-            std::cout << "\n=== Algorithme : " << noms[i] << " ===\n";
-            ExecutionTimeline *tl = AlgoController::selectAlgorithm(noms[i], config);
-            if (!tl) { std::cerr << "Erreur allocation pour " << noms[i] << "\n"; continue; }
+        for (std::size_t i = 0; i < AlgoController::ALGO.size(); ++i) {
+            std::cout << "\n=== Algorithme : " << AlgoController::ALGO[i] << " ===\n";
+            AlgoController::selectAlgorithm(AlgoController::ALGO[i].c_str(), config);
+            AlgoController::runAlgorithm();
+            ExecutionTimeline *tl = AlgoController::getExecutionTimeline();
+            if (!tl) { std::cerr << "Erreur allocation pour " << AlgoController::ALGO[i] << "\n"; continue; }
             afficherTimelineAvecDecalage(tl);
             afficherStatsTimeline(tl);
-            if (!outputPath.empty())
-                exportStatsCSV(tl, noms[i], config, outputPath, i > 0);
+            if (!outputPath.empty()) {
+                exportStatsCSV(tl, AlgoController::ALGO[i].c_str(), config, outputPath, i > 0);
+            }
             destroyTimeline(tl);
         }
 

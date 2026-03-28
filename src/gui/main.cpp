@@ -28,10 +28,6 @@ static char buffer[1024] = "";
 
 struct AppState {
     Screen screen = Screen::Select;
-    std::string algorithm = "FIFO";
-    AlgoConfig algorithm_config = AlgoConfig(4) ;
-    ExecutionTimeline *res = nullptr;
-    AlgoConfig algo_config = AlgoConfig(2);
     double transition_start = 0.0;
 };
 std::string statsTimeline(const ExecutionTimeline *tl) {
@@ -67,10 +63,10 @@ static void DrawGui(AppState& s) {
                 ImGui::OpenPopup("Choix d'algorithmes");
             }
 
-            if (ImGui::Button("Lancer la Simulation")) {
+            if (ImGui::Button("Lancer la Simulation")&&AlgoController::canRunAlgorithm()) {
                 s.transition_start = glfwGetTime();
                 s.screen = Screen::Transition;
-                s.res = AlgoController::selectAlgorithm(s.algorithm.c_str(), s.algorithm_config);
+                AlgoController::runAlgorithm();
             }
 
             if (ImGui::BeginPopup("Choix de processus")) {
@@ -96,9 +92,12 @@ static void DrawGui(AppState& s) {
 
             if (ImGui::BeginPopup("Choix d'algorithmes")) {
                 ImGui::Text("Choix d'algorithmes");
-                if (ImGui::Button("algo 1")) {ImGui::CloseCurrentPopup();};
-                if (ImGui::Button("algo 2")) {ImGui::CloseCurrentPopup();};
-                if (ImGui::Button("algo 3")) {ImGui::CloseCurrentPopup();};
+                for (std::string name : AlgoController::ALGO) {
+                    if (ImGui::Button(name.data())) {
+                        AlgoController::selectAlgorithm(name.c_str());
+                        ImGui::CloseCurrentPopup();
+                    }
+                }
                 ImGui::EndPopup();
             }
 
@@ -116,7 +115,8 @@ static void DrawGui(AppState& s) {
 
         case Screen::Results:
             ImGui::Text("Results");
-            ImGui::Text("%s", statsTimeline(s.res).c_str());
+            ImGui::Text(AlgoController::getCurrentAlgorithmName().c_str());
+            ImGui::Text("%s", statsTimeline(AlgoController::getExecutionTimeline()).c_str());
             if (ImGui::Button("Sauvegardez")) {}
             if (ImGui::Button("Retour")) s.screen = Screen::Select;
             break;

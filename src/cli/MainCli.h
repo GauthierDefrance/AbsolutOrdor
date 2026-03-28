@@ -33,19 +33,11 @@ public:
     void loadFile(char *filepath);
     void printCurrentFileName();
 
-    void selectAlgorithm(const char* algorithm,
-                         AlgoConfig config = {},
-                         const std::string& outputPath = "");
+    void selectAlgorithm(const char* algorithm,AlgoConfig config = {},const std::string& outputPath = "");
 
-    void loadFileAndSelectAlgorithm(char *filepath,
-                                    const char* algorithm,
-                                    AlgoConfig config = {});
+    void loadFileAndSelectAlgorithm(char *filepath,const char* algorithm,AlgoConfig config = {});
 
-    void exportStatsCSV(const ExecutionTimeline *tl,
-                        const char* algo,
-                        AlgoConfig config,
-                        const std::string& outputPath,
-                        bool append = false);
+    void exportStatsCSV(const ExecutionTimeline *tl,const char* algo,AlgoConfig config,const std::string& outputPath,bool append = false);
 
 private:
     MainCli();

@@ -20,7 +20,9 @@
 ListeTQ AlgoController::listeProcessus = nullptr;
 std::string AlgoController::currentCSVPath = "";
 std::string AlgoController::currentCSVName = "";
-std::array<std::string,5> a = {"FIFO","SJF","SJRF","RR","LOTTERY"};
+std::string algorithm_choice;
+AlgoConfig algorithm_config = AlgoConfig(4);
+ExecutionTimeline* execution_timeline = nullptr;
 
 
 /**
@@ -92,7 +94,7 @@ void AlgoController::setCSV(char *sourcepath) {
     }
 }
 
-void AlgoController::setCSV(const std::string& csvContent) {
+void AlgoController::setContentCSV(const std::string& csvContent) {
     if (listeProcessus != nullptr) {
         destroyLTQ(listeProcessus, (void (*)(void *)) libMemProcessus);
         listeProcessus = nullptr;
@@ -114,31 +116,43 @@ void AlgoController::setCSV(const std::string& csvContent) {
 
 
 /**
+ * Enregistre les choix de l'utilisateur
+ *
+ * @param algorithm Type d'algorithme souhaité.
+ * @return ExecutionTimeline* Pointeur vers l'historique d'exécution généré.
+ */
+void AlgoController::selectAlgorithm(const char *algorithm, AlgoConfig config) {
+    for (std::string_view name : ALGO){
+        if (name == algorithm) {
+            algorithm_choice = algorithm;
+        }
+    }
+    if (config.quantumRR > 0)algorithm_config.quantumRR = config.quantumRR;
+    else algorithm_config.quantumRR = 1;
+}
+
+/**
  * @brief Dispatcher d'algorithme.
  *
  * Agit comme une fabrique (factory) qui choisit l'algorithme à exécuter en fonction
  * du choix utilisateur. Elle transmet la liste de processus actuelle aux fonctions C.
  *
- * @param algorithm Type d'algorithme souhaité.
  * @return ExecutionTimeline* Pointeur vers l'historique d'exécution généré.
  */
-ExecutionTimeline* AlgoController::selectAlgorithm(const char* algorithm, AlgoConfig config) {
-    if (AlgoController::listeProcessus == nullptr) {
-        std::cerr << "[AlgoController] Aucun CSV chargé, impossible de lancer un algorithme." << std::endl;
-        return nullptr;
-    }
-
-    if (strcmp("FIFO", algorithm)==0){return fifo(listeProcessus);}
-    else if (strcmp("SJF", algorithm)==0) {return sjf(listeProcessus, tailleListe(listeProcessus->tete));}
-    else if (strcmp("SJRF", algorithm)==0) {return sjrf(listeProcessus, tailleListe(listeProcessus->tete));}
-    else if (strcmp("RR", algorithm)==0) {return rrn(listeProcessus, config.quantumRR);}
-    else if (strcmp("LOTTERY", algorithm)==0) {return lottery_scheduling(listeProcessus, tailleListe(listeProcessus->tete));}
-    else {
-        std::cerr << "[AlgoController] Algorithme inconnu." << std::endl;
-        return nullptr;
-    }
+void AlgoController::runAlgorithm() {
+    execution_timeline = nullptr;
+    if ("FIFO" == algorithm_choice){execution_timeline = fifo(listeProcessus);}
+    if ("FIFO" == algorithm_choice) {execution_timeline = sjf(listeProcessus, tailleListe(listeProcessus->tete));}
+    if ("FIFO" == algorithm_choice) {execution_timeline = sjrf(listeProcessus, tailleListe(listeProcessus->tete));}
+    if ("FIFO" == algorithm_choice) {execution_timeline = rrn(listeProcessus, algorithm_config.quantumRR);}
+    if ("FIFO" == algorithm_choice) {execution_timeline = lottery_scheduling(listeProcessus, tailleListe(listeProcessus->tete));}
 }
-
+bool AlgoController::canRunAlgorithm() {
+    if (listeProcessus == nullptr || algorithm_choice.empty()) {
+        return false;
+    }
+    return true;
+}
 
 /**
  * @brief Récupère le chemin complet du fichier source.
@@ -153,4 +167,12 @@ std::string AlgoController::getCurrentCSVPath() {
  */
 std::string AlgoController::getCurrentCSVName() {
     return currentCSVName;
+}
+
+std::string AlgoController::getCurrentAlgorithmName() {
+    return algorithm_choice;
+}
+
+ExecutionTimeline* AlgoController::getExecutionTimeline() {
+    return execution_timeline;
 }
