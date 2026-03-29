@@ -37,8 +37,11 @@ bool testAlgoControllerFIFO() {
     AlgoController::runAlgorithm();
     ExecutionTimeline* tl = AlgoController::getExecutionTimeline();
 
-    if(!tl)
+    if(!tl){
+        std::cerr << "Erreur: Timeline FIFO n'a pas pu être générée" << std::endl;
+        remove(filename);
         return false;
+    }
 
     afficherTimeline(tl);
     afficherTimelineAvecDecalage(tl);
@@ -51,7 +54,6 @@ bool testAlgoControllerFIFO() {
 }
 
 bool testAlgoControllerRRN(int quantumRR = 2) {
-
     const char* filename = "rrn_test.csv";
     AlgoConfig config;
     config.quantumRR = quantumRR;
@@ -79,8 +81,11 @@ bool testAlgoControllerRRN(int quantumRR = 2) {
     AlgoController::runAlgorithm();
     ExecutionTimeline* tl = AlgoController::getExecutionTimeline();
 
-    if(!tl)
+    if(!tl){
+        std::cerr << "Erreur: Timeline RR n'a pas pu être générée" << std::endl;
+        remove(filename);
         return false;
+    }
 
     afficherTimeline(tl);
     afficherTimelineAvecDecalage(tl);
@@ -100,6 +105,7 @@ bool testAlgoControllerSJF() {
     FILE* f = fopen(filename, "w");
     if (!f) {
         std::cerr << "Erreur lors de la création du fichier CSV" << std::endl;
+        remove(filename);
         return false;
     }
 
@@ -158,6 +164,7 @@ bool testAlgoControllerSJRF() {
     FILE* f = fopen(filename, "w");
     if (!f) {
         std::cerr << "Erreur lors de la création du fichier CSV" << std::endl;
+        remove(filename);
         return false;
     }
 
@@ -223,6 +230,7 @@ bool testAlgoControllerLotteryScheduling() {
     FILE* f = fopen(filename, "w");
     if (!f) {
         std::cerr << "Erreur lors de la création du fichier CSV" << std::endl;
+        remove(filename);
         return false;
     }
 

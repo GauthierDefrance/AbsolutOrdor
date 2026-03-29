@@ -53,6 +53,23 @@ AlgoController::~AlgoController() {
 }
 
 /**
+ * @brief Dispatcher d'algorithme.
+ *
+ * Agit comme une fabrique (factory) qui choisit l'algorithme à exécuter en fonction
+ * du choix utilisateur. Elle transmet la liste de processus actuelle aux fonctions C.
+ *
+ * @return ExecutionTimeline* Pointeur vers l'historique d'exécution généré.
+ */
+void AlgoController::runAlgorithm() {
+    execution_timeline = nullptr;
+    if ("FIFO" == algorithm_choice){execution_timeline = fifo(listeProcessus);}
+    if ("SJF" == algorithm_choice) {execution_timeline = sjf(listeProcessus, tailleListe(listeProcessus->tete));}
+    if ("SJRF" == algorithm_choice) {execution_timeline = sjrf(listeProcessus, tailleListe(listeProcessus->tete));}
+    if ("RR" == algorithm_choice) {execution_timeline = rrn(listeProcessus, algorithm_config.quantumRR);}
+    if ("LOTTERY" == algorithm_choice) {execution_timeline = lottery_scheduling(listeProcessus, tailleListe(listeProcessus->tete));}
+}
+
+/**
  * @brief Charge un CSV et traite les métadonnées associées.
  *
  * En plus de créer la liste de processus via le `csv_reader`, cette méthode
@@ -131,22 +148,7 @@ void AlgoController::selectAlgorithm(const char *algorithm, AlgoConfig config) {
     else algorithm_config.quantumRR = 1;
 }
 
-/**
- * @brief Dispatcher d'algorithme.
- *
- * Agit comme une fabrique (factory) qui choisit l'algorithme à exécuter en fonction
- * du choix utilisateur. Elle transmet la liste de processus actuelle aux fonctions C.
- *
- * @return ExecutionTimeline* Pointeur vers l'historique d'exécution généré.
- */
-void AlgoController::runAlgorithm() {
-    execution_timeline = nullptr;
-    if ("FIFO" == algorithm_choice){execution_timeline = fifo(listeProcessus);}
-    if ("FIFO" == algorithm_choice) {execution_timeline = sjf(listeProcessus, tailleListe(listeProcessus->tete));}
-    if ("FIFO" == algorithm_choice) {execution_timeline = sjrf(listeProcessus, tailleListe(listeProcessus->tete));}
-    if ("FIFO" == algorithm_choice) {execution_timeline = rrn(listeProcessus, algorithm_config.quantumRR);}
-    if ("FIFO" == algorithm_choice) {execution_timeline = lottery_scheduling(listeProcessus, tailleListe(listeProcessus->tete));}
-}
+
 bool AlgoController::canRunAlgorithm() {
     if (listeProcessus == nullptr || algorithm_choice.empty()) {
         return false;
