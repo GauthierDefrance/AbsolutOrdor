@@ -47,6 +47,42 @@ void executerTeteFile_RRN(File file, const ExecutionTimeline *timeline,int *nb) 
     }
 }
 
+void enfilerFilePrio(File f, ProcessusIterator *it2) {
+    if (!f || !f->ltq) return;
+
+    if (f->ltq->tete == NULL) {
+        inserQueueLTQ(f->ltq, it2);
+        return;
+    }
+
+    Liste *pp = &f->ltq->tete->suivant;
+
+    bool flag = true;
+    while (flag && *pp) {
+        ProcessusIterator *it = (*pp)->data;
+        if (!(it->quantumCourant == it->processus->listeTQ->tete &&it->tempsRestant ==((Quantum*)it->processus->listeTQ->tete->data)->nbQuantum))flag = false;
+        else pp = &(*pp)->suivant;
+    }
+
+    if (*pp == NULL) {
+        inserQueueLTQ(f->ltq, it2);
+    } else {
+        inserTete(pp, it2);
+    }
+    return;
+}
+
+void traiterUC_prio(ProcessusIterator *it, const Processus *pTimeline, File file) {
+    bool estVide = estVideFile(file); // ← vérifier AVANT d'enfiler
+    enfilerFilePrio(file, it);//On place le processus en priorité Devant les processus et ayant déjà effectué un temps d'UC ou une partie
+    it->enAttente = true;
+
+    if (!estVide) {
+        // Quelqu'un devant → on attend ce tick
+        pushOrMergeOperationProcessus(pTimeline->listeTQ, W, 1);
+    }
+}
+
 
 /**
  * @brief Pilote la boucle de simulation principale de l'algorithme RRN.
@@ -94,7 +130,10 @@ ExecutionTimeline *rrn(ListeTQ liste_tq, const int nb) {
             Processus *pTimeline = getTimelineProcessus(timeline, &tab[i]);
 
             switch (etatIterator(&tab[i])) {
-                case UC: traiterUC_FIFO_RRN(&tab[i], pTimeline, file); break;
+                case UC:
+                    if (tab[i].processus->timeArrival == time) traiterUC_prio(&tab[i], pTimeline, file);
+                    else traiterUC_FIFO_RRN(&tab[i], pTimeline, file);
+                    break;
                 case ES: traiterES_FIFO_RRN(&tab[i], pTimeline); break;
                 default: avancerIterator(&tab[i]); break;
             }

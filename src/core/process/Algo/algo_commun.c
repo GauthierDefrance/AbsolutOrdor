@@ -145,7 +145,6 @@ void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, const Execution
  * @param file La file d'attente (Ready Queue) où le processus doit patienter.
  */
 void traiterUC_FIFO_RRN(ProcessusIterator *it, const Processus *pTimeline, File file) {
-
     //Si le processus était déjà en attente avant, on le laisse
     if (enAttenteIterator(it)) {
         pushOrMergeOperationProcessus(pTimeline->listeTQ, W, 1);

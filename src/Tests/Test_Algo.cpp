@@ -63,8 +63,8 @@ bool testAlgoControllerRRN(int quantumRR = 2) {
     fprintf(f,"8\n");
 
     fprintf(f,"P1;0;5;3;4\n");
-    fprintf(f,"P2;0;2\n");
-    fprintf(f,"P3;1;8\n");
+    fprintf(f,"P2;1;2\n");
+    fprintf(f,"P3;2;8\n");
     fprintf(f,"P4;2;1\n");
     fprintf(f,"P5;4;3;2;2\n");
     fprintf(f,"P6;6;4\n");

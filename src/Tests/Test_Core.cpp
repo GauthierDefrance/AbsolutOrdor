@@ -16,7 +16,7 @@ bool testAlgoControllerLotteryScheduling();
 bool testInlineCSV();
 
 bool testAlgoControllerRRNWrapper() {
-    return testAlgoControllerRRN(2);
+    return testAlgoControllerRRN(1);
 }
 
 static void print_test(const char* name, bool ok) {
