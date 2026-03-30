@@ -10,11 +10,9 @@ MainCli& MainCli::getInstance() {
     return instance;
 }
 
-MainCli::MainCli() {}
+MainCli::MainCli() = default;
 
-MainCli::~MainCli() {
-    delete f;
-}
+MainCli::~MainCli() = default;
 
 void MainCli::showHelp() {
     std::cout <<
@@ -56,10 +54,6 @@ void MainCli::printBuiltinAlgorithm() {
         "\n";
 }
 
-void MainCli::loadFile(char *filepath) {
-    AlgoController::getInstance().setCSV(filepath);
-}
-
 void MainCli::printCurrentFileName() {
     std::string name = AlgoController::getCurrentCSVName();
     std::string path = AlgoController::getCurrentCSVPath();
@@ -69,28 +63,6 @@ void MainCli::printCurrentFileName() {
                   << "Chemin fichier courant : " << path << "\n";
     else
         std::cout << "Source : inline CSV\n";
-}
-
-void MainCli::selectAlgorithm(const char* algorithm, AlgoConfig config, const std::string& outputPath) {
-    AlgoController::selectAlgorithm(algorithm, config);
-    AlgoController::runAlgorithm();
-    ExecutionTimeline *tl = AlgoController::getExecutionTimeline();
-    if (!tl) {
-        std::cerr << "Erreur : impossible de generer la timeline pour " << algorithm << "\n";
-        return;
-    }
-    afficherTimelineAvecDecalage(tl);
-    afficherStatsTimeline(tl);
-
-    if (!outputPath.empty())
-        exportStatsCSV(tl, algorithm, config, outputPath, false);
-
-    destroyTimeline(tl);
-}
-
-void MainCli::loadFileAndSelectAlgorithm(char *filepath, const char* algorithm, AlgoConfig config) {
-    loadFile(filepath);
-    selectAlgorithm(algorithm, config);
 }
 
 void MainCli::exportStatsCSV(const ExecutionTimeline *tl, const char* algo, AlgoConfig config, const std::string& outputPath, bool append) {
@@ -269,7 +241,7 @@ int MainCli::run(int argc, char** argv) {
     if (hasInline) {
         AlgoController::getInstance().setContentCSV(inlineCSV);
     } else {
-        loadFile(filepath);
+        AlgoController::getInstance().setCSV(filepath);
     }
     printCurrentFileName();
 
@@ -297,8 +269,15 @@ int MainCli::run(int argc, char** argv) {
         }
 
     } else if (algoSelected) {
-        selectAlgorithm(selectedAlgoStr.c_str(), config, outputPath);
-
+        AlgoController::selectAlgorithm(selectedAlgoStr.c_str(), config);
+        AlgoController::runAlgorithm();
+        ExecutionTimeline *tl =  AlgoController::getExecutionTimeline();
+        afficherTimelineAvecDecalage(tl);
+        afficherStatsTimeline(tl);
+        if (!outputPath.empty()) {
+            exportStatsCSV(tl, selectedAlgoStr.c_str(), config, outputPath, false);
+        }
+        destroyTimeline(tl);
     } else {
         std::cerr << "Erreur : Aucun algorithme selectionne.\n\n";
         printBuiltinAlgorithm();
