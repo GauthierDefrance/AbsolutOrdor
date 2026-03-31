@@ -1,11 +1,11 @@
 /**
  * @file rrn.c
- * @brief ImplÃ©mentation de l'ordonnanceur Round-robin (RR).
+ * @brief Implémentation de l'ordonnanceur Round-robin (RR).
  * * Ce module simule un ordonnancement de type "tourniquet".
  * La gestion des processus repose sur une file (Ready Queue) oÃ¹ le processus
- * en tÃªte dispose de l'usage exclusif du processeur jusqu'Ã  ce qu'il se bloque
+ * en tête dispose de l'usage exclusif du processeur jusqu'à  ce qu'il se bloque
  * (E/S) ou qu'il se termine ou Qu'il utilise ses N Quantum.
- * Aucun mÃ©canisme de prÃ©emption n'est appliquÃ© ici.
+ * Aucun mécanisme de préemption n'est appliqué ici.
  */
 
 #include "rrn.h"
@@ -14,11 +14,11 @@
 /**
  * @brief Orchestre l'exÃ©cution du processus dÃ©tenteur du CPU.
  *
- * Cette fonction identifie le processus en tÃªte de la file d'attente et lui
- * alloue une unitÃ© de temps (tick). Elle assure la mise Ã  jour de la chronologie
- * et gÃ¨re la sortie du processus de la Ready Queue si celui-ci entame une phase
- * d'E/S ou s'achÃ¨ve ou Ã  utiliser ces N Quantums,
- * permettant ainsi au processus suivant de devenir la nouvelle tÃªte.
+ * Cette fonction identifie le processus en tête de la file d'attente et lui
+ * alloue une unité de temps (tick). Elle assure la mise à jour de la chronologie
+ * et gère la sortie du processus de la Ready Queue si celui-ci entame une phase
+ * d'E/S ou s'achève ou à utiliser ces N Quantums,
+ * permettant ainsi au processus suivant de devenir la nouvelle tête.
  *
  * @param file La file d'attente contenant les processus prÃªts (Ready Queue).
  * @param timeline Structure de rÃ©sultats oÃ¹ l'activitÃ© UC est enregistrÃ©e.
@@ -28,17 +28,17 @@ void executerTeteFile_RRN(File file, const ExecutionTimeline *timeline,int *nb) 
     //Si la tete de file est NULL on ne fait rien
     if (estVideFile(file)) return;
 
-    //On obtient le Processus associÃ© Ã  notre iterator
+    //On obtient le Processus associé à notre iterator
     ProcessusIterator *it = (ProcessusIterator *)teteFile(file);
     Processus *pTimeline = getTimelineProcessus(timeline, it);
 
-    //On Ã©xÃ©cute le processus en tÃªte
+    //On éxécute le processus en tête
     avancerIterator(it);
     pushOrMergeOperationProcessus(pTimeline->listeTQ, UC, 1);
 
     *nb = *nb-1;
 
-    // Si le processus passe Ã  ES ou est fini, on defile.
+    // Si le processus passe à ES ou est fini, on defile.
     // On laisse alors un autre processus potentiellement
   if (etatIterator(it) == ES || iteratorEstFini(it) || *nb == 0 ) {
         it->enAttente = false;
@@ -96,16 +96,16 @@ void traiterUC_prio(ProcessusIterator *it, const Processus *pTimeline, File file
 /**
  * @brief Pilote la boucle de simulation principale de l'algorithme RRN.
  *
- * Cette fonction initialise l'environnement de simulation et itÃ¨re tick par tick.
- * Elle opÃ¨re en deux phases :
- * - Une phase de mise Ã  jour oÃ¹ elle identifie les nouveaux arrivants et fait
+ * Cette fonction initialise l'environnement de simulation et itère tick par tick.
+ * Elle opère en deux phases :
+ * - Une phase de mise à jour où elle identifie les nouveaux arrivants et fait
  * progresser les processus en E/S.
- * - Une phase d'exÃ©cution oÃ¹ la tÃªte de file est autorisÃ©e Ã  consommer N Quantum du CPU puis laisse sa place.
- * La simulation s'arrÃªte Quand il n'y a plus de processus "vivant" dans le systÃ¨me.
+ * - Une phase d'exécution où la tête de file est autorisée à consommer N Quantum du CPU puis laisse sa place.
+ * La simulation s'arrête Quand il n'y a plus de processus "vivant" dans le système.
  *
- * @param liste_tq La liste initiale des processus (et leurs cycles) Ã  traiter.
- * @param nb Nombre de Quantums autorisÃ©s Avant de laisser sa place.
- * @return Un pointeur vers la chronologie complÃ¨te (Gantt) de l'exÃ©cution.
+ * @param liste_tq La liste initiale des processus (et leurs cycles) à traiter.
+ * @param nb Nombre de Quantums autorisés Avant de laisser sa place.
+ * @return Un pointeur vers la chronologie complète (Gantt) de l'exécution.
  */
 ExecutionTimeline *rrn(ListeTQ liste_tq, const int nb) {
 
@@ -149,7 +149,7 @@ ExecutionTimeline *rrn(ListeTQ liste_tq, const int nb) {
             }
         }
 
-        // Passe 2 : UN SEUL processus utilise l'UC ce tick (la tÃªte de file)
+        // Passe 2 : UN SEUL processus utilise l'UC ce tick (la tête de file)
 
         executerTeteFile_RRN(file, timeline, &restNb);
          if (restNb == 0) {
