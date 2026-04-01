@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdio>
 #include "process/AlgoController.h"
 #include "ConsoleStructPrinter.h"
 #include <string>
