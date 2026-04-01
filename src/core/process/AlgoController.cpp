@@ -156,7 +156,7 @@ void AlgoController::setContentCSV(const std::string& csvContent) {
  * @param algorithm Type d'algorithme souhaité.
  * @return ExecutionTimeline* Pointeur vers l'historique d'exécution généré.
  */
-void AlgoController::selectAlgorithm(const char *algorithm, AlgoConfig config) {
+void AlgoController::selectAlgorithm(std::string algorithm, AlgoConfig config) {
     for (std::string_view name : ALGO){
         if (name == algorithm) {
             algorithm_choice = algorithm;
@@ -168,10 +168,20 @@ void AlgoController::selectAlgorithm(const char *algorithm, AlgoConfig config) {
 
 
 bool AlgoController::canRunAlgorithm() {
-    if (listeProcessus == nullptr || algorithm_choice.empty()) {
+     if (listeProcessus == nullptr  || listeProcessus->tete == nullptr || algorithm_choice.empty()) {
         return false;
     }
     return true;
+}
+
+bool AlgoController::CurrentAlgorithmNeedConfigChoice() {
+    for (std::size_t i = 0; i < ALGO.size(); ++i) {
+        if (ALGO[i] == algorithm_choice) {
+            if (ALGO_NEED_CONFIG_CHOICE[i]) return true;
+            return false;
+        }
+    }
+    return false;
 }
 
 /**
@@ -191,6 +201,9 @@ std::string AlgoController::getCurrentCSVName() {
 
 std::string AlgoController::getCurrentAlgorithmName() {
     return algorithm_choice;
+}
+AlgoConfig AlgoController::getCurrentAlgorithmConfig() {
+    return algorithm_config;
 }
 
 ExecutionTimeline* AlgoController::getExecutionTimeline() {

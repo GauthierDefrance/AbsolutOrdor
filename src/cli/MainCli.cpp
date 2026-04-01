@@ -256,7 +256,7 @@ int MainCli::run(int argc, char** argv) {
 
         for (std::size_t i = 0; i < AlgoController::ALGO.size(); ++i) {
             std::cout << "\n=== Algorithme : " << AlgoController::ALGO[i] << " ===\n";
-            AlgoController::selectAlgorithm(AlgoController::ALGO[i].c_str(), config);
+            AlgoController::selectAlgorithm(AlgoController::ALGO[i], config);
             AlgoController::runAlgorithm();
             ExecutionTimeline *tl = AlgoController::getExecutionTimeline();
             if (!tl) { std::cerr << "Erreur allocation pour " << AlgoController::ALGO[i] << "\n"; continue; }
@@ -269,7 +269,7 @@ int MainCli::run(int argc, char** argv) {
         }
 
     } else if (algoSelected) {
-        AlgoController::selectAlgorithm(selectedAlgoStr.c_str(), config);
+        AlgoController::selectAlgorithm(selectedAlgoStr, config);
         AlgoController::runAlgorithm();
         ExecutionTimeline *tl =  AlgoController::getExecutionTimeline();
         afficherTimelineAvecDecalage(tl);

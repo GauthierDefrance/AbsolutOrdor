@@ -55,7 +55,7 @@ bool testAlgoControllerFIFO() {
 
 bool testAlgoControllerRRN(int quantumRR = 2) {
     const char* filename = "rrn_test.csv";
-    AlgoConfig config;
+    AlgoConfig config{};
     config.quantumRR = quantumRR;
 
     FILE* f = fopen(filename,"w");

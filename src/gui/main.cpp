@@ -24,7 +24,8 @@ enum class Screen { Select, Transition, Results };
 
 constexpr double transition_duration = 10.0;
 
-static char buffer[1024] = "";
+static char bufferCSVManuel[1024] = "";
+static int test = 2;
 
 struct AppState {
     Screen screen = Screen::Select;
@@ -63,29 +64,38 @@ static void DrawGui(AppState& s) {
                 ImGui::OpenPopup("Choix d'algorithmes");
             }
 
+            if (AlgoController::CurrentAlgorithmNeedConfigChoice() && ImGui::Button("ConfigChoice")) {
+                ImGui::OpenPopup("ConfigChoice");
+            }
+
             if (ImGui::Button("Lancer la Simulation")&&AlgoController::canRunAlgorithm()) {
                 s.transition_start = glfwGetTime();
                 s.screen = Screen::Transition;
                 AlgoController::runAlgorithm();
             }
 
+
             if (ImGui::BeginPopup("Choix de processus")) {
+                bool flag_manuellement = false;
                 ImGui::Text("Choix de processus");
                 if (ImGui::Button("Ouvrir un CSV")) {
-                    AlgoController::getInstance().setCSV((char*)"C:\\Users\\tartinax\\Desktop\\ecole\\GitHub\\AbsolutOrdor\\src\\Tests\\input.csv");
+                    AlgoController::getInstance().setCSV(const_cast<char *>("../Tests/input.csv"));
                     ImGui::CloseCurrentPopup();
                 };
                 if (ImGui::Button("manuellement")) {
-                    ImGui::OpenPopup("Choix d'algorithmes");
-                };
+                    ImGui::CloseCurrentPopup();
+                    flag_manuellement = true;
+                }
                 ImGui::EndPopup();
+                if (flag_manuellement)ImGui::OpenPopup("Choix de processus manuel");
             }
 
-            if (ImGui::BeginPopup("Choix de processus Manuel")) {
-                ImGui::Text("processus Manuel");
-                ImGui::InputText("processus Manuel", buffer, IM_ARRAYSIZE(buffer));
-                if (ImGui::Button("Terminé")) {
+            if (ImGui::BeginPopup("Choix de processus manuel")) {
+                ImGui::Text("processus manuel");
+                ImGui::InputText(" ", bufferCSVManuel, IM_ARRAYSIZE(bufferCSVManuel));
+                if (ImGui::Button("Enregistrer")) {
                     ImGui::CloseCurrentPopup();
+                    AlgoController::getInstance().setContentCSV(bufferCSVManuel);
                 }
                 ImGui::EndPopup();
             }
@@ -94,9 +104,19 @@ static void DrawGui(AppState& s) {
                 ImGui::Text("Choix d'algorithmes");
                 for (std::string name : AlgoController::ALGO) {
                     if (ImGui::Button(name.data())) {
-                        AlgoController::selectAlgorithm(name.c_str());
+                        AlgoController::selectAlgorithm(name);
                         ImGui::CloseCurrentPopup();
                     }
+                }
+                ImGui::EndPopup();
+            }
+
+            if (ImGui::BeginPopup("ConfigChoice")) {
+                ImGui::InputInt(" ", &test);
+                if (test<1)test=1;
+                if (ImGui::Button("Enregistrer")) {
+                    ImGui::CloseCurrentPopup();
+                    AlgoController::selectAlgorithm(AlgoController::getCurrentAlgorithmName(),{test});
                 }
                 ImGui::EndPopup();
             }
@@ -115,7 +135,8 @@ static void DrawGui(AppState& s) {
 
         case Screen::Results:
             ImGui::Text("Results");
-            ImGui::Text(AlgoController::getCurrentAlgorithmName().c_str());
+            if (AlgoController::CurrentAlgorithmNeedConfigChoice())ImGui::Text("%s%d",AlgoController::getCurrentAlgorithmName().c_str(),AlgoController::getCurrentAlgorithmConfig().quantumRR);
+            else ImGui::Text("%s",AlgoController::getCurrentAlgorithmName().c_str());
             ImGui::Text("%s", statsTimeline(AlgoController::getExecutionTimeline()).c_str());
             if (ImGui::Button("Sauvegardez")) {}
             if (ImGui::Button("Retour")) s.screen = Screen::Select;

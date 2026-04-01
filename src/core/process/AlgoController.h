@@ -51,6 +51,7 @@ public:
      */
     static AlgoController& getInstance();
     static constexpr std::array<std::string,5> ALGO = {"FIFO","SJF","SJRF","RR","LOTTERY"};
+    static constexpr std::array<bool,5> ALGO_NEED_CONFIG_CHOICE = {false,false,false,true,false};
 
     /**
      * @brief Destructeur de classe.
@@ -76,11 +77,13 @@ public:
      * @param algorithm L'algorithme choisi via l'énumération SchedulingAlgorithm.
      * @return ExecutionTimeline* Pointeur vers les résultats (timeline) ou nullptr en cas d'erreur.
      */
-    static void selectAlgorithm(const char* algorithm, AlgoConfig config = {4});
+    static void selectAlgorithm(std::string algorithm, AlgoConfig config = {4});
 
     static void runAlgorithm();
 
     static bool canRunAlgorithm();
+
+    static bool CurrentAlgorithmNeedConfigChoice();
 
     /** @return Le chemin complet du fichier CSV actuellement chargé. */
     static std::string getCurrentCSVPath();
@@ -89,6 +92,8 @@ public:
     static std::string getCurrentCSVName();
 
     static std::string getCurrentAlgorithmName();
+
+    static AlgoConfig getCurrentAlgorithmConfig();
 
     static ExecutionTimeline *getExecutionTimeline();
 
