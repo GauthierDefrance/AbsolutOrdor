@@ -9,10 +9,7 @@
  */
 
 #include "string_parser.h"
-#include <sstream>
-#include <string>
-#include <cctype>
-#include <iostream>
+
 
 /**
  * @brief Parse un flux mémoire pour créer une liste de processus.
@@ -96,3 +93,81 @@ ListeTQ createListeProcessusFromString(const std::string &content) {
     }
     return liste;
 }
+
+
+
+
+bool isValidInlineCSV(const std::string& input) {
+    std::string converted;
+    for (size_t i = 0; i < input.size(); i++) {
+        if (input[i] == '\\' && i + 1 < input.size() && input[i+1] == 'n') {
+            converted += '\n';
+            i++;
+        } else {
+            converted += input[i];
+        }
+    }
+
+    std::istringstream in(converted);
+    std::string line;
+
+    auto readNextLine = [&]() -> bool {
+        while (std::getline(in, line)) {
+            size_t start = line.find_first_not_of(" \t\r\n");
+            if (start == std::string::npos || line[start] == '#') continue;
+            line = line.substr(start);
+            return true;
+        }
+        return false;
+    };
+
+    if (!readNextLine()) return false;
+    int nbProcessus = 0;
+    try { nbProcessus = std::stoi(line); }
+    catch (...) { return false; }
+    if (nbProcessus <= 0) return false;
+
+    int found = 0;
+    while (readNextLine()) {
+        std::istringstream iss(line);
+        std::string token;
+
+        if (!std::getline(iss, token, ';') || token.empty()) return false;
+
+        if (!std::getline(iss, token, ';')) return false;
+        int arrival = 0;
+        try { arrival = std::stoi(token); }
+        catch (...) { return false; }
+        if (arrival < 0) return false;
+
+        if (!std::getline(iss, token, ';')) return false;
+        try { if (std::stoi(token) <= 0) return false; }
+        catch (...) { return false; }
+
+        while (std::getline(iss, token, ';')) {
+            try { if (std::stoi(token) <= 0) return false; }
+            catch (...) { return false; }
+        }
+
+        ++found;
+    }
+
+    return found == nbProcessus;
+}
+
+
+bool isValidCSVFile(const char* filepath) {
+    std::ifstream file(filepath);
+    if (!file.is_open()) {
+        std::cerr << "Erreur : impossible d'ouvrir " << filepath << "\n";
+        return false;
+    }
+
+    std::ostringstream oss;
+    oss << file.rdbuf();
+
+    return isValidInlineCSV(oss.str());
+}
+
+
+

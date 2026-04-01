@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <array>
-
+#include "process/utilities/string_parser.h"
 
 /**
  * @brief Inclusion des structures C dans un environnement C++.

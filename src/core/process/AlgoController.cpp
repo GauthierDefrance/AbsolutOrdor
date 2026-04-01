@@ -79,10 +79,19 @@ void AlgoController::runAlgorithm() {
  * @param sourcepath Chemin du fichier à charger.
  */
 void AlgoController::setCSV(char *sourcepath) {
+
     // Libération de l'ancienne liste si elle existe
     if (AlgoController::listeProcessus != nullptr) {
         destroyLTQ(AlgoController::listeProcessus, (void (*)(void *)) libMemProcessus);
         AlgoController::listeProcessus = nullptr;
+    }
+
+    if (! isValidCSVFile(sourcepath)) {
+        std::cerr << "Erreur : fichier CSV invalide.\n";
+        AlgoController::listeProcessus = nullptr;
+        currentCSVPath = "";
+        currentCSVName = "";
+        return;
     }
 
     // Importation des nouvelles données
@@ -112,9 +121,18 @@ void AlgoController::setCSV(char *sourcepath) {
 }
 
 void AlgoController::setContentCSV(const std::string& csvContent) {
+
     if (listeProcessus != nullptr) {
         destroyLTQ(listeProcessus, (void (*)(void *)) libMemProcessus);
         listeProcessus = nullptr;
+    }
+
+    if (! isValidInlineCSV(csvContent)) {
+        std::cerr << "[AlgoController] Erreur : String passe incorrect." << std::endl;
+        listeProcessus = nullptr;
+        currentCSVPath = "";
+        currentCSVName = "";
+        return;
     }
 
     listeProcessus = createListeProcessusFromString(csvContent);
