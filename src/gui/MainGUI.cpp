@@ -32,6 +32,23 @@ std::string statsTimeline(const ExecutionTimeline *tl) {
     return ss.str();
 }
 
+void DisplayWindowSize(float size) {
+    ImVec2 display = ImGui::GetIO().DisplaySize;
+    ImVec2 win(display.x * size, display.y * size);
+    ImGui::SetNextWindowSize(win, ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2((display.x - win.x) * 0.5f, (display.y - win.y) * 0.5f),ImGuiCond_Once);
+}
+
+
+void DisplayPopupSize(float size){
+    ImVec2 display = ImGui::GetIO().DisplaySize;
+    ImVec2 win(display.x * size, display.y * size);
+
+    ImGui::SetNextWindowSize(win);
+    ImGui::SetNextWindowPos(ImVec2((display.x - win.x) * 0.5f,(display.y - win.y) * 0.5f));
+}
+
+
 void DrawGui(AppState& s) {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
@@ -58,22 +75,33 @@ void DrawGui(AppState& s) {
             }
 
 
+            DisplayPopupSize(0.7);
             if (ImGui::BeginPopup("Choix de processus")) {
+                ImGui::Text("Choix de processus");
+                ImGui::Separator();
                 bool flag_manuellement = false;
                 bool flag_OpenCSV = false;
-                ImGui::Text("Choix de processus");
-                if (ImGui::Button("Ouvrir un CSV")) {
+
+                ImVec2 popupSize = ImGui::GetWindowSize();
+                float w = ( popupSize.x * 0.5f ) - 12.0f;
+                float h = popupSize.y - 40.f;
+
+                if (ImGui::Button("Ouvrir un CSV", ImVec2(w, h))) {
                     AlgoController::getInstance().setCSV(const_cast<char *>("../Tests/input.csv"));
                     ImGui::CloseCurrentPopup();
                     flag_OpenCSV = true;
                 }
-                if (ImGui::Button("manuellement")) {
+
+                ImGui::SameLine();
+
+                if (ImGui::Button("Manuellement", ImVec2(w, h))) {
                     ImGui::CloseCurrentPopup();
                     flag_manuellement = true;
                 }
-                ImGui::EndPopup();
-                if (flag_manuellement)ImGui::OpenPopup("Choix de processus manuel");
 
+                ImGui::EndPopup();
+
+                if (flag_manuellement)ImGui::OpenPopup("Choix de processus manuel");
                 if (flag_OpenCSV) {
                     IGFD::FileDialogConfig config;
                     config.path = ".";
@@ -85,19 +113,9 @@ void DrawGui(AppState& s) {
                         config
                     );
                 }
-
             }
 
-            ImGui::SetNextWindowSize(ImVec2(700, 450), ImGuiCond_Once);
-            if (ImGuiFileDialog::Instance()->Display("OpenCSV")) {
-                if (ImGuiFileDialog::Instance()->IsOk()) {
-                    std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
-                    AlgoController::getInstance().setCSV(const_cast<char*>(path.c_str()));
-                }
-                ImGuiFileDialog::Instance()->Close();
-            }
-
-
+            DisplayPopupSize(0.7);
             if (ImGui::BeginPopup("Choix de processus manuel")) {
                 ImGui::Text("processus manuel");
                 ImGui::InputText(" ", bufferCSVManuel, IM_ARRAYSIZE(bufferCSVManuel));
@@ -108,17 +126,51 @@ void DrawGui(AppState& s) {
                 ImGui::EndPopup();
             }
 
-            if (ImGui::BeginPopup("Choix d'algorithmes")) {
+
+
+            DisplayPopupSize(0.7f);
+            if (ImGui::BeginPopup("Choix d'algorithmes")){
                 ImGui::Text("Choix d'algorithmes");
-                for (std::string name : AlgoController::ALGO) {
-                    if (ImGui::Button(name.data())) {
-                        AlgoController::selectAlgorithm(name);
-                        ImGui::CloseCurrentPopup();
+                ImGui::Separator();
+
+                int N = AlgoController::ALGO.size();
+                int maxCols = 4;
+
+                ImVec2 popup = ImGui::GetWindowSize();
+
+                float minH = popup.y * 0.10f;
+                float targetH = popup.y * 0.30;
+
+                int columns = 1;
+
+                while (columns < maxCols){
+                    int rows = (N + columns - 1) / columns;
+                    float availableH = popup.y / rows;
+                    if (availableH < targetH) columns++;
+                    else break;
+                }
+
+                int rowsFinal = (N + columns - 1) / columns;
+                float finalH = popup.y / rowsFinal;
+                if (finalH < minH) finalH = minH;
+                if (finalH > targetH) finalH = targetH;
+                if (ImGui::BeginTable("AlgoTable", columns,ImGuiTableFlags_SizingStretchSame)){
+                    for (std::string_view name : AlgoController::ALGO){
+                        ImGui::TableNextColumn();
+                        if (ImGui::Button(name.data(), ImVec2(-FLT_MIN, finalH))){
+                            AlgoController::selectAlgorithm(name.data());
+                            ImGui::CloseCurrentPopup();
+                        }
                     }
+                    ImGui::EndTable();
                 }
                 ImGui::EndPopup();
             }
 
+
+
+
+            DisplayPopupSize(0.7);
             if (ImGui::BeginPopup("ConfigChoice")) {
                 ImGui::InputInt(" ", &quantumRR);
                 if (quantumRR<1)quantumRR=1;
@@ -127,6 +179,15 @@ void DrawGui(AppState& s) {
                     AlgoController::selectAlgorithm(AlgoController::getCurrentAlgorithmName(),{quantumRR});
                 }
                 ImGui::EndPopup();
+            }
+
+            DisplayWindowSize(0.9);
+            if (ImGuiFileDialog::Instance()->Display("OpenCSV")) {
+                if (ImGuiFileDialog::Instance()->IsOk()) {
+                    std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
+                    AlgoController::getInstance().setCSV(const_cast<char*>(path.c_str()));
+                }
+                ImGuiFileDialog::Instance()->Close();
             }
 
         }
@@ -158,7 +219,7 @@ void DrawGui(AppState& s) {
             if (ImGui::Button("Retour")) s.screen = Screen::Select;
 
 
-            ImGui::SetNextWindowSize(ImVec2(700, 450), ImGuiCond_Once);
+            DisplayWindowSize(0.9);
             if (ImGuiFileDialog::Instance()->Display("SaveCSV")){
                 if (ImGuiFileDialog::Instance()->IsOk()){
                     std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
@@ -168,7 +229,6 @@ void DrawGui(AppState& s) {
                 }
                 ImGuiFileDialog::Instance()->Close();
             }
-
             break;
     default: ;
     }
