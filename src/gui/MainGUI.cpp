@@ -55,63 +55,81 @@ void DrawGui(AppState& s) {
     ImGui::Begin("AbsolutOrdor", nullptr, ImGuiWindowFlags_NoDecoration);
     switch (s.screen) {
         case Screen::Select: {
-            ImGui::Text("Select");
-            if (ImGui::Button("Choix de processus")) {
-                ImGui::OpenPopup("Choix de processus");
+
+            if (ImGui::BeginTable("MenuPrincipal", 3, ImGuiTableFlags_SizingStretchSame)) {
+
+                bool openChoixProcessusPopup = false;
+                bool openChoixAlgoPopup = false;
+                bool openConfigPopup = false;
+
+                float fullHeight = ImGui::GetContentRegionAvail().y;
+
+                ImGui::TableNextColumn();
+                if (ImGui::Button("Choix de processus", ImVec2(-FLT_MIN, fullHeight))) {openChoixProcessusPopup = true;}
+
+                ImGui::TableNextColumn();
+                if (AlgoController::CurrentAlgorithmNeedConfigChoice()) {
+                    if (ImGui::Button("Choix d'algorithmes", ImVec2(-FLT_MIN, (fullHeight * 0.5f)-2))) {
+                        openChoixAlgoPopup = true;
+                    }
+                    if (ImGui::Button("Choix de configuration", ImVec2(-FLT_MIN, (fullHeight * 0.5f)-2))) {
+                        openConfigPopup = true;
+                    }
+                }
+                else if (ImGui::Button("Choix d'algorithmes", ImVec2(-FLT_MIN, fullHeight))) {openChoixAlgoPopup = true;}
+
+                ImGui::TableNextColumn();
+                if (ImGui::Button("Lancer la Simulation", ImVec2(-FLT_MIN, fullHeight)) && AlgoController::canRunAlgorithm()){
+                    s.transition_start = glfwGetTime();
+                    s.screen = Screen::Transition;
+                    AlgoController::runAlgorithm();
+                }
+
+                ImGui::EndTable();
+
+                if (openChoixProcessusPopup) ImGui::OpenPopup("Choix de processus");
+                if (openChoixAlgoPopup) ImGui::OpenPopup("Choix d'algorithmes");
+                if (openConfigPopup) ImGui::OpenPopup("Choix de configuration");
             }
 
-            if (ImGui::Button("Choix d'algorithmes")) {
-                ImGui::OpenPopup("Choix d'algorithmes");
-            }
 
-            if (AlgoController::CurrentAlgorithmNeedConfigChoice() && ImGui::Button("ConfigChoice")) {
-                ImGui::OpenPopup("ConfigChoice");
-            }
-
-            if (ImGui::Button("Lancer la Simulation")&&AlgoController::canRunAlgorithm()) {
-                s.transition_start = glfwGetTime();
-                s.screen = Screen::Transition;
-                AlgoController::runAlgorithm();
-            }
-
-
-            DisplayPopupSize(0.7);
+            DisplayPopupSize(0.7f);
             if (ImGui::BeginPopup("Choix de processus")) {
+
                 ImGui::Text("Choix de processus");
                 ImGui::Separator();
+
                 bool flag_manuellement = false;
                 bool flag_OpenCSV = false;
 
-                ImVec2 popupSize = ImGui::GetWindowSize();
-                float w = ( popupSize.x * 0.5f ) - 12.0f;
-                float h = popupSize.y - 40.f;
+                float fullH = ImGui::GetContentRegionAvail().y-4;
 
-                if (ImGui::Button("Ouvrir un CSV", ImVec2(w, h))) {
-                    AlgoController::getInstance().setCSV(const_cast<char *>("../Tests/input.csv"));
-                    ImGui::CloseCurrentPopup();
-                    flag_OpenCSV = true;
-                }
+                if (ImGui::BeginTable("ChoixProcessusTable", 2, ImGuiTableFlags_SizingStretchSame)){
 
-                ImGui::SameLine();
+                    ImGui::TableNextColumn();
+                    if (ImGui::Button("Ouvrir un CSV", ImVec2(-FLT_MIN, fullH))) {
+                        ImGui::CloseCurrentPopup();
+                        flag_OpenCSV = true;
+                    }
 
-                if (ImGui::Button("Manuellement", ImVec2(w, h))) {
-                    ImGui::CloseCurrentPopup();
-                    flag_manuellement = true;
+                    ImGui::TableNextColumn();
+                    if (ImGui::Button("Manuellement", ImVec2(-FLT_MIN, fullH))) {
+                        ImGui::CloseCurrentPopup();
+                        flag_manuellement = true;
+                    }
+
+                    ImGui::EndTable();
                 }
 
                 ImGui::EndPopup();
 
                 if (flag_manuellement)ImGui::OpenPopup("Choix de processus manuel");
+
                 if (flag_OpenCSV) {
                     IGFD::FileDialogConfig config;
                     config.path = ".";
                     config.flags = ImGuiFileDialogFlags_Modal;
-                    ImGuiFileDialog::Instance()->OpenDialog(
-                        "OpenCSV",
-                        "Choisir un fichier CSV",
-                        ".csv",
-                        config
-                    );
+                    ImGuiFileDialog::Instance()->OpenDialog("OpenCSV","Choisir un fichier CSV",".csv",config);
                 }
             }
 
@@ -168,11 +186,12 @@ void DrawGui(AppState& s) {
             }
 
 
+            ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+            ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-
-            DisplayPopupSize(0.7);
-            if (ImGui::BeginPopup("ConfigChoice")) {
-                ImGui::InputInt(" ", &quantumRR);
+            if (ImGui::BeginPopup("Choix de configuration")) {
+                ImGui::InputInt(" /", &quantumRR);
+                ImGui::SameLine();
                 if (quantumRR<1)quantumRR=1;
                 if (ImGui::Button("Enregistrer")) {
                     ImGui::CloseCurrentPopup();
@@ -189,7 +208,6 @@ void DrawGui(AppState& s) {
                 }
                 ImGuiFileDialog::Instance()->Close();
             }
-
         }
             break;
 
