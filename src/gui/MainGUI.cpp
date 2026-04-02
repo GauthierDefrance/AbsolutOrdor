@@ -135,14 +135,25 @@ void DrawGui(AppState& s) {
 
             DisplayPopupSize(0.7);
             if (ImGui::BeginPopup("Choix de processus manuel")) {
-                ImGui::Text("processus manuel");
-                ImGui::InputText(" ", bufferCSVManuel, IM_ARRAYSIZE(bufferCSVManuel));
-                if (ImGui::Button("Enregistrer")) {
+
+                ImGui::Text("Processus manuel : Meme convention que pour un fichier input CSV");
+                ImGui::Separator();
+
+                ImVec2 avail = ImGui::GetContentRegionAvail();
+                ImVec2 popupSize = ImGui::GetWindowSize();
+                float buttonHeight = popupSize.y * 0.07f;
+                avail.y -= buttonHeight + 4.0f;
+
+                ImGui::InputTextMultiline("##manuel",bufferCSVManuel,IM_ARRAYSIZE(bufferCSVManuel),avail);
+
+                if (ImGui::Button("Enregistrer", ImVec2(-FLT_MIN, buttonHeight))) {
                     ImGui::CloseCurrentPopup();
                     AlgoController::getInstance().setContentCSV(bufferCSVManuel);
                 }
+
                 ImGui::EndPopup();
             }
+
 
 
 
