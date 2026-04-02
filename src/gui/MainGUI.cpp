@@ -2,7 +2,7 @@
 
 double transition_duration = 10.0;
 char bufferCSVManuel[1024] = "";
-int test = 2;
+int quantumRR = 2;
 
 MainGUI& MainGUI::getInstance() {
     static MainGUI instance;
@@ -60,18 +60,43 @@ void DrawGui(AppState& s) {
 
             if (ImGui::BeginPopup("Choix de processus")) {
                 bool flag_manuellement = false;
+                bool flag_OpenCSV = false;
                 ImGui::Text("Choix de processus");
                 if (ImGui::Button("Ouvrir un CSV")) {
                     AlgoController::getInstance().setCSV(const_cast<char *>("../Tests/input.csv"));
                     ImGui::CloseCurrentPopup();
-                };
+                    flag_OpenCSV = true;
+                }
                 if (ImGui::Button("manuellement")) {
                     ImGui::CloseCurrentPopup();
                     flag_manuellement = true;
                 }
                 ImGui::EndPopup();
                 if (flag_manuellement)ImGui::OpenPopup("Choix de processus manuel");
+
+                if (flag_OpenCSV) {
+                    IGFD::FileDialogConfig config;
+                    config.path = ".";
+                    config.flags = ImGuiFileDialogFlags_Modal;
+                    ImGuiFileDialog::Instance()->OpenDialog(
+                        "OpenCSV",
+                        "Choisir un fichier CSV",
+                        ".csv",
+                        config
+                    );
+                }
+
             }
+
+            ImGui::SetNextWindowSize(ImVec2(700, 450), ImGuiCond_Once);
+            if (ImGuiFileDialog::Instance()->Display("OpenCSV")) {
+                if (ImGuiFileDialog::Instance()->IsOk()) {
+                    std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
+                    AlgoController::getInstance().setCSV(const_cast<char*>(path.c_str()));
+                }
+                ImGuiFileDialog::Instance()->Close();
+            }
+
 
             if (ImGui::BeginPopup("Choix de processus manuel")) {
                 ImGui::Text("processus manuel");
@@ -95,11 +120,11 @@ void DrawGui(AppState& s) {
             }
 
             if (ImGui::BeginPopup("ConfigChoice")) {
-                ImGui::InputInt(" ", &test);
-                if (test<1)test=1;
+                ImGui::InputInt(" ", &quantumRR);
+                if (quantumRR<1)quantumRR=1;
                 if (ImGui::Button("Enregistrer")) {
                     ImGui::CloseCurrentPopup();
-                    AlgoController::selectAlgorithm(AlgoController::getCurrentAlgorithmName(),{test});
+                    AlgoController::selectAlgorithm(AlgoController::getCurrentAlgorithmName(),{quantumRR});
                 }
                 ImGui::EndPopup();
             }
@@ -121,8 +146,29 @@ void DrawGui(AppState& s) {
             if (AlgoController::CurrentAlgorithmNeedConfigChoice())ImGui::Text("%s%d",AlgoController::getCurrentAlgorithmName().c_str(),AlgoController::getCurrentAlgorithmConfig().quantumRR);
             else ImGui::Text("%s",AlgoController::getCurrentAlgorithmName().c_str());
             ImGui::Text("%s", statsTimeline(AlgoController::getExecutionTimeline()).c_str());
-            if (ImGui::Button("Sauvegardez")) {}
+
+            if (ImGui::Button("Sauvegardez")) {
+                IGFD::FileDialogConfig config;
+                config.path = ".";
+                config.fileName = "resultats.csv";
+                config.flags = ImGuiFileDialogFlags_Modal;
+                ImGuiFileDialog::Instance()->OpenDialog("SaveCSV","Enregistrer le fichier CSV",".csv",config);
+            }
+
             if (ImGui::Button("Retour")) s.screen = Screen::Select;
+
+
+            ImGui::SetNextWindowSize(ImVec2(700, 450), ImGuiCond_Once);
+            if (ImGuiFileDialog::Instance()->Display("SaveCSV")){
+                if (ImGuiFileDialog::Instance()->IsOk()){
+                    std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
+
+                    if (!path.ends_with(".csv"))path += ".csv";
+                    exportStatsCSV(AlgoController::getExecutionTimeline(),AlgoController::getCurrentCSVName().c_str(),AlgoController::getCurrentAlgorithmConfig(),path,false);
+                }
+                ImGuiFileDialog::Instance()->Close();
+            }
+
             break;
     default: ;
     }

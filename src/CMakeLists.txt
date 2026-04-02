@@ -33,7 +33,6 @@ set(CORE_SOURCES
         core/process/Algo/algo_commun.c
         core/process/Algo/lottery_scheduling.c
         core/process/Algo/rrn.c
-        core/process/utilities/TimelineStatsCalculator.c
 )
 
 # Utilitaires partagés entre CLI et Tests
@@ -41,6 +40,10 @@ set(UTILS_SOURCES
         cli/ConsoleStructPrinter.cpp
         core/process/utilities/string_parser.cpp
         core/process/utilities/string_parser.h
+        core/process/utilities/csv_writer.cpp
+        core/process/utilities/csv_writer.h
+        core/process/utilities/TimelineStatsCalculator.c
+        core/process/utilities/TimelineStatsCalculator.c
 )
 
 # Fichiers de tests
