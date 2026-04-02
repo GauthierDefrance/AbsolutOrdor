@@ -164,7 +164,7 @@ void DrawGui(AppState& s) {
                     std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
 
                     if (!path.ends_with(".csv"))path += ".csv";
-                    exportStatsCSV(AlgoController::getExecutionTimeline(),AlgoController::getCurrentCSVName().c_str(),AlgoController::getCurrentAlgorithmConfig(),path,false);
+                    exportStatsCSV(AlgoController::getExecutionTimeline(),AlgoController::getCurrentAlgorithmName().c_str(),AlgoController::getCurrentAlgorithmConfig(),path,false);
                 }
                 ImGuiFileDialog::Instance()->Close();
             }
