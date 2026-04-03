@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <cstdio>
 
 extern "C" {
 #include "data/struct/processus.h"
@@ -14,7 +15,7 @@ bool testProcessus() {
     Processus *p = allocMemProcessus();
     initProcessus(p);
 
-    strncpy(p->name, "TestProc", NBMAXCHAR - 1);
+    std::snprintf(p->name, NBMAXCHAR, "%s", "TestProc");
     p->timeArrival = 5;
 
     Quantum *q1 = (Quantum*)malloc(sizeof(Quantum));

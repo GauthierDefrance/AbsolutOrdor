@@ -53,8 +53,7 @@ ListeTQ createListeProcessusFromStream(std::istream &in) {
 
         // Nom
         if (!std::getline(iss, token, ';')) { libMemProcessus(p); continue; }
-        strncpy(p->name, token.c_str(), NBMAXCHAR - 1);
-        p->name[NBMAXCHAR - 1] = '\0';
+        std::snprintf(p->name, NBMAXCHAR, "%s", token.c_str());
 
         // Date d'arrivée
         if (!std::getline(iss, token, ';')) { libMemProcessus(p); continue; }

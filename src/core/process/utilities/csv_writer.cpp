@@ -1,23 +1,26 @@
 #include "csv_writer.h"
+#include <fstream>
+#include <iomanip>
 
 void exportStatsCSV(const ExecutionTimeline *tl,const char* algo, AlgoConfig config, const std::string& outputPath, bool append) {
 
     bool fileExists = false;
     {
-        FILE* check = fopen(outputPath.c_str(), "r");
-        if (check) { fileExists = true; fclose(check); }
+        std::ifstream check(outputPath);
+        fileExists = check.good();
     }
 
-    FILE* out = fopen(outputPath.c_str(), append ? "a" : "w");
+    std::ofstream out(outputPath, append ? std::ios::app : std::ios::trunc);
     if (!out) {
         std::cerr << "Erreur : impossible d'ecrire dans " << outputPath << "\n";
         return;
     }
 
     if (!append || !fileExists) {
-        fprintf(out, "Algorithme;QuantumRR;NbProcessus;Debut;Fin;DureeTotale;"
-                     "TicksUC;TicksES;TicksWait;"
-                     "AttenteMoy;RestitutionMoy;ReponseMoy;TauxCPU\n");
+        out << "Algorithme;QuantumRR;NbProcessus;Debut;Fin;DureeTotale;"
+               "TicksUC;TicksES;TicksWait;"
+               "AttenteMoy;RestitutionMoy;ReponseMoy;TauxCPU\n";
+
     }
 
     double attenteMoy     = attenteMoyProcessus((ExecutionTimeline*)tl);
@@ -31,15 +34,18 @@ void exportStatsCSV(const ExecutionTimeline *tl,const char* algo, AlgoConfig con
     int ticksES = getTimelineTicksType(tl, ES);
     int ticksW  = getTimelineTicksType(tl, W);
 
-    fprintf(out, "%s;%d;%d;%d;%d;%d;%d;%d;%d;%.2f;%.2f;%.2f;%.2f\n",
-            algo,
-            config.quantumRR,
-            nbProc, tDebut, tMax, tMax - tDebut,
-            ticksUC, ticksES, ticksW,
-            attenteMoy, restitutionMoy, reponseMoy, cpuUtil);
 
-    fprintf(out, "\n");
-    fprintf(out, "Algorithme;Processus;Arrivee;TicksUC;TicksES;TicksWait;Restitution;Reponse\n");
+    out << algo << ';'
+        << config.quantumRR << ';'
+        << nbProc << ';' << tDebut << ';' << tMax << ';' << (tMax - tDebut) << ';'
+        << ticksUC << ';' << ticksES << ';' << ticksW << ';'
+        << std::fixed << std::setprecision(2)
+        << attenteMoy << ';' << restitutionMoy << ';' << reponseMoy << ';' << cpuUtil
+        << '\n';
+
+    out << "\n";
+    out << "Algorithme;Processus;Arrivee;TicksUC;TicksES;TicksWait;Restitution;Reponse\n";
+
 
     for (Liste cell = tl->processus->tete; cell; cell = cell->suivant) {
         Processus *p = (Processus *) cell->data;
@@ -55,14 +61,13 @@ void exportStatsCSV(const ExecutionTimeline *tl,const char* algo, AlgoConfig con
         int restitution = tempsRestitutionProcessus(p);
         int reponse     = tempsRepProcessus(p);
 
-        fprintf(out, "%s;%s;%d;%d;%d;%d;%d;%d\n",
-                algo,
-                p->name, p->timeArrival,
-                pUC, pES, pW,
-                restitution, reponse);
+        out << algo << ';'
+            << p->name << ';' << p->timeArrival << ';'
+            << pUC << ';' << pES << ';' << pW << ';'
+            << restitution << ';' << reponse << '\n';
+
     }
 
-    fprintf(out, "\n");
-    fclose(out);
+    out << "\n";
     std::cout << "Resultats exportes dans : " << outputPath << "\n";
 }

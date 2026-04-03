@@ -1,6 +1,6 @@
 #include <iostream>
-#include <cstdio>
-#include <cstring>
+#include <fstream>
+
 
 #include "process/utilities/string_parser.h"
 
@@ -10,14 +10,13 @@ bool testCSVReader() {
 
     const char* filename = "input_test.csv";
 
-    FILE *f = fopen(filename,"w");
 
-    fprintf(f,"3\n");
-    fprintf(f,"P1;0;5;10\n");
-    fprintf(f,"P2;2;8\n");
-    fprintf(f,"P3;4;3;4;2\n");
-
-    fclose(f);
+    std::ofstream f(filename, std::ios::trunc);
+    f << "3\n";
+    f << "P1;0;5;10\n";
+    f << "P2;2;8\n";
+    f << "P3;4;3;4;2\n";
+    
     std::ifstream file(filename);
     if (!file.is_open()) {
         return false;

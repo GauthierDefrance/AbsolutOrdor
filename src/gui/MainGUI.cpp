@@ -3,7 +3,7 @@
 #include "ExecutionTimelineSequencer.h"
 
 bool dejaClique = false;
-double transition_duration = 10.0;
+double transition_duration = 10.0f;
 char bufferCSVManuel[1024] = "";
 int quantumRR = 2;
 
@@ -264,7 +264,7 @@ void DrawGui(AppState& s) {
                 }
             }
 
-            DisplayPopupSize(0.7);
+            DisplayPopupSize(0.7f);
             if (ImGui::BeginPopup("Choix de processus manuel")) {
 
                 ImGui::Text("Processus manuel : Meme convention que pour un fichier input CSV");
@@ -291,13 +291,13 @@ void DrawGui(AppState& s) {
                 ImGui::Text("Choix d'algorithmes");
                 ImGui::Separator();
 
-                int N = AlgoController::ALGO.size();
+                int N = static_cast<int>(AlgoController::ALGO.size());
                 int maxCols = 4;
 
                 ImVec2 popup = ImGui::GetWindowSize();
 
                 float minH = popup.y * 0.10f;
-                float targetH = popup.y * 0.30;
+                float targetH = popup.y * 0.30f;
 
                 int columns = 1;
 
@@ -347,7 +347,7 @@ void DrawGui(AppState& s) {
                 ImGui::EndPopup();
             }
 
-            DisplayWindowSize(0.9);
+            DisplayWindowSize(0.9f);
             if (ImGuiFileDialog::Instance()->Display("OpenCSV")) {
                 if (ImGuiFileDialog::Instance()->IsOk()) {
                     std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
@@ -370,8 +370,8 @@ void DrawGui(AppState& s) {
             static float speedMul = 1.0f;
 
             // Temps virtuel (celui qui pilote l'animation)
-            static double animTime = 0.0;
-            static double lastNow  = 0.0;
+            static double animTime = 0.0f;
+            static double lastNow  = 0.0f;
             static bool   started  = false;
 
             const double now = glfwGetTime();
@@ -382,7 +382,7 @@ void DrawGui(AppState& s) {
                     sequencer.SetTimeline(tl);
                     lastTL = tl;
                 }
-                animTime = 0.0;
+                animTime = 0.0f;
                 lastNow  = now;
                 started  = true;
                 sequencer.SetRevealFrame(sequencer.GetFrameMin());
@@ -414,7 +414,7 @@ void DrawGui(AppState& s) {
             // Mise à jour du temps virtuel (dt * speed)
             const double dt = now - lastNow;
             lastNow = now;
-            if (dt > 0.0)animTime += dt * speedMul;
+            if (dt > 0.0f)animTime += dt * speedMul;
 
             // Progression 0..1 basée sur le temps virtuel
             float progress = 0.0f;
@@ -504,7 +504,7 @@ void DrawGui(AppState& s) {
             }
 
 
-            DisplayWindowSize(0.9);
+            DisplayWindowSize(0.9f);
             if (ImGuiFileDialog::Instance()->Display("SaveCSV")){
                 if (ImGuiFileDialog::Instance()->IsOk()){
                     std::string path = ImGuiFileDialog::Instance()->GetFilePathName();

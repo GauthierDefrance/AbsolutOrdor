@@ -175,8 +175,7 @@ int MainCli::run(int argc, char** argv) {
 
     // Effacer le fichier de sortie avant le mode "all"
     if (!outputPath.empty() && runAll) {
-        FILE* clr = fopen(outputPath.c_str(), "w");
-        if (clr) fclose(clr);
+        std::ofstream clr(outputPath, std::ios::trunc);
     }
 
     if (runAll) {

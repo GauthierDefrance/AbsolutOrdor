@@ -27,7 +27,7 @@ static void print_test(const char* name, bool ok) {
 
 int main() {
     // --- INITIALISATION DE L'ALÉATOIRE ---
-    std::srand(std::time(nullptr));
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     std::vector<std::pair<const char*, bool(*)()>> tests = {
         //Liste des algos lancé

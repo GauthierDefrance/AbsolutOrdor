@@ -44,7 +44,7 @@ void libMemProcessus(Processus *p) {
 void initProcessus(Processus *processus) {
     if (processus==NULL) return;
 
-    strncpy(processus->name, "", NBMAXCHAR - 1);
+    processus->name[0] = '\0';
     processus->timeArrival = 0;
 
     processus->listeTQ = allocMemLTQ();
@@ -111,8 +111,7 @@ Processus *deepCopyProcessus(Processus *src) {
     if (!copy) return NULL;
     initProcessus(copy);
 
-    strncpy(copy->name, src->name, NBMAXCHAR - 1);
-    copy->name[NBMAXCHAR - 1] = '\0';
+    snprintf(copy->name, NBMAXCHAR, "%s", src->name);
     copy->timeArrival = src->timeArrival;
 
     for (Liste c = src->listeTQ->tete; c != NULL; c = c->suivant) {
@@ -152,8 +151,7 @@ Processus *deepCopyProcessusWithoutQuantums(Processus *src) {
     if (!copy) return NULL;
     initProcessus(copy);
 
-    strncpy(copy->name, src->name, NBMAXCHAR - 1);
-    copy->name[NBMAXCHAR - 1] = '\0';
+    snprintf(copy->name, NBMAXCHAR, "%s", src->name);
     copy->timeArrival = src->timeArrival;
 
     return copy;

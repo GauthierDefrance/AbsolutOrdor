@@ -106,7 +106,7 @@ void afficherTimelineAvecDecalage(const ExecutionTimeline *tl) {
         std::cout << marker;
 
         int nextPos = (t + 5) * TICK_WIDTH;
-        int printed = marker.size();
+        int printed = static_cast<int>(marker.size());
         int spaces  = nextPos - pos - printed;
 
         if (spaces > 0)
