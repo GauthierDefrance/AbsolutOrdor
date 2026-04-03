@@ -152,6 +152,6 @@ cd ./build
 #### Installation sur MAC
 
 La portabilité sur Mac n'a pas était testé.
-Mais en utilisant les dépendances demandé par cmake et en installant correctement Cmake,
+Mais en installant Cmake et les dépendances qu'il demande,
 il vous suffira de suivre des procédures relativement similaire à celui de l'installation sur Ubuntu.
 
