@@ -221,8 +221,6 @@ void DrawGui(AppState& s) {
             }
 
 
-
-
             DisplayPopupSize(0.7f);
             if (ImGui::BeginPopup("Choix d'algorithmes")){
                 ImGui::Text("Choix d'algorithmes");
@@ -295,13 +293,97 @@ void DrawGui(AppState& s) {
         }
             break;
 
-        case Screen::Transition:
-            ImGui::Text("Transition");
-            ImGui::Text("time : %f",glfwGetTime()-s.transition_start);
-            if (ImGui::Button("Skip")) s.screen = Screen::Results;
-            if (glfwGetTime()-s.transition_start >= transition_duration) {
+        case Screen::Transition:{
+            // Timeline
+            const ExecutionTimeline* tl = AlgoController::getExecutionTimeline();
+
+            // Sequencer persistant
+            static ExecutionTimelineSequencer sequencer;
+            static const ExecutionTimeline* lastTL = nullptr;
+
+            // Vitesse persistante
+            static float speedMul = 1.0f;
+
+            // Temps virtuel (celui qui pilote l'animation)
+            static double animTime = 0.0;
+            static double lastNow  = 0.0;
+            static bool   started  = false;
+
+            const double now = glfwGetTime();
+
+            // Init (au premier frame de transition) ou si la timeline change
+            if (!started || (tl && tl != lastTL)){
+                if (tl) {
+                    sequencer.SetTimeline(tl);
+                    lastTL = tl;
+                }
+                animTime = 0.0;
+                lastNow  = now;
+                started  = true;
+                sequencer.SetRevealFrame(sequencer.GetFrameMin());
+            }
+
+            // UI info
+            ImGui::SeparatorText("Execution Timeline (animation)");
+
+            // Boutons vitesse
+            auto SpeedButton = [&](const char* label, float v)
+            {
+                const bool active = (speedMul == v);
+                if (active) {
+                    ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.20f, 0.60f, 0.25f, 0.80f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.70f, 0.30f, 0.90f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.20f, 0.60f, 0.25f, 1.00f));
+                }
+                if (ImGui::Button(label)) speedMul = v;
+                if (active) ImGui::PopStyleColor(3);
+            };
+
+            ImGui::TextUnformatted("Vitesse :");
+            ImGui::SameLine();
+            SpeedButton("x0.5", 0.5f); ImGui::SameLine();
+            SpeedButton("x1",   1.0f); ImGui::SameLine();
+            SpeedButton("x2",   2.0f); ImGui::SameLine();
+            SpeedButton("x4",   4.0f);
+
+            // Mise à jour du temps virtuel (dt * speed)
+            const double dt = now - lastNow;
+            lastNow = now;
+            if (dt > 0.0)animTime += dt * speedMul;
+
+            // Progression 0..1 basée sur le temps virtuel
+            float progress = 0.0f;
+            if (transition_duration > 0.0)progress = (float)(animTime / transition_duration);
+
+            if (progress < 0.0f) progress = 0.0f;
+            if (progress > 1.0f) progress = 1.0f;
+
+            // n = frame jusqu'où afficher
+            const int frameMin = sequencer.GetFrameMin();
+            const int frameMax = sequencer.GetFrameMax();
+            const int n = frameMin + (int)((frameMax - frameMin) * progress);
+
+            // Taille du widget
+            float maxH = ImGui::GetIO().DisplaySize.y * 0.70f;
+            float availY = ImGui::GetContentRegionAvail().y;
+            float timelineHeight = (maxH < availY) ? maxH : availY;
+
+            ImGui::BeginChild("TimelineAnimChild", ImVec2(0, timelineHeight), true, ImGuiWindowFlags_HorizontalScrollbar);
+
+            sequencer.DrawUntil(ImSequencer::SEQUENCER_CHANGE_FRAME, n);
+
+            ImGui::EndChild();
+
+            if (ImGui::Button("Skip")) {
+                started = false;
                 s.screen = Screen::Results;
             }
+
+            if (animTime >= transition_duration) {
+                started = false;
+                s.screen = Screen::Results;
+            }
+        }
             break;
 
         case Screen::Results:{
@@ -343,6 +425,11 @@ void DrawGui(AppState& s) {
 
             ImGui::Text("%s", statsTimeline(tl).c_str());
 
+
+            if (ImGui::Button("Retour")) s.screen = Screen::Select;
+
+            ImGui::SameLine();
+
             if (ImGui::Button("Sauvegardez")) {
                 IGFD::FileDialogConfig config;
                 config.path = ".";
@@ -350,8 +437,6 @@ void DrawGui(AppState& s) {
                 config.flags = ImGuiFileDialogFlags_Modal;
                 ImGuiFileDialog::Instance()->OpenDialog("SaveCSV","Enregistrer le fichier CSV",".csv",config);
             }
-
-            if (ImGui::Button("Retour")) s.screen = Screen::Select;
 
 
             DisplayWindowSize(0.9);
