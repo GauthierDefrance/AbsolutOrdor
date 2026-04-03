@@ -31,8 +31,6 @@ struct AlgoConfig {
     // Autres params éventuels
 };
 
-
-
 /**
  * @class AlgoController
  * @brief Contrôleur central (Singleton) gérant le cycle de vie de la simulation.
@@ -79,6 +77,12 @@ public:
      */
     static void selectAlgorithm(std::string algorithm, AlgoConfig config = {4});
 
+
+    /**
+     * @brief Lance l'algorithme sélectionné et produit une timeline d'exécution.
+     *
+     * Agit comme un dispatcher qui choisit l'algorithme à exécuter en fonction du choix utilisateur.
+     */
     static void runAlgorithm();
 
     static bool canRunAlgorithm();

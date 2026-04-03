@@ -12,13 +12,10 @@ struct ImRect;
 
 extern "C" {
     #include "data/struct/ExecutionTimeline.h"
-    #include "data/struct/liste_tq.h"
-    #include "data/struct/liste.h"
     #include "data/struct/processus.h"
 }
 
-class ExecutionTimelineSequencer : public ImSequencer::SequenceInterface
-{
+class ExecutionTimelineSequencer : public ImSequencer::SequenceInterface{
 public:
     ExecutionTimelineSequencer() = default;
 
