@@ -30,7 +30,7 @@ ExecutionTimeline *allocTimeline() {
 /**
  * @brief Libération de la Timeline.
  *
- * @warinig Cette fonction ne libère pas les données (Processus*)
+ * @waring Cette fonction ne libère pas les données (Processus*)
  * pour tout libérer, il faut passer `libMemProcessus` à `destroyLTQ`.
  *
  * @param tl La timeline à détruire.

@@ -1,0 +1,16 @@
+PROJECT_NAME           = "@PROJECT_NAME@"
+OUTPUT_DIRECTORY       = "@CMAKE_CURRENT_BINARY_DIR@/docs"
+
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+INPUT = "@CMAKE_CURRENT_SOURCE_DIR@/core" \
+        "@CMAKE_CURRENT_SOURCE_DIR@/cli" \
+        "@CMAKE_CURRENT_SOURCE_DIR@/gui" \
+        "@CMAKE_CURRENT_SOURCE_DIR@/Tests"
+
+RECURSIVE              = YES
+EXTRACT_ALL            = YES
+QUIET                  = YES
+HAVE_DOT               = NO
+DOT_NUM_THREADS        = 0

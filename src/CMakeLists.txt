@@ -127,3 +127,24 @@ enable_strict_warnings(Tests)
 # --- Tests CTest ---
 enable_testing()
 add_test(NAME CoreTests COMMAND Tests)
+
+# --- Documentation Doxygen ---
+option(BUILD_DOCS "Générer la documentation Doxygen" ON)
+
+find_package(Doxygen QUIET)
+
+if (BUILD_DOCS AND DOXYGEN_FOUND)
+    set(DOXYGEN_IN  ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in)
+    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+
+    add_custom_target(docs
+            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMENT "Génération de la documentation Doxygen"
+            VERBATIM
+    )
+else()
+    message(STATUS "Doxygen non trouvé ou BUILD_DOCS=OFF : cible 'docs' non générée")
+endif()
