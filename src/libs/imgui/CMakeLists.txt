@@ -7,12 +7,14 @@ add_library(imgui STATIC
         backends/imgui_impl_opengl3.cpp
         ../imGuiFileDialog/ImGuiFileDialog.cpp
         ../imGuiFileDialog/dirent/dirent.h
+        ../imSequencer/ImSequencer.cpp
 )
 
 target_include_directories(imgui PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/backends
-        ${CMAKE_CURRENT_SOURCE_DIR}/../ImGuiFileDialog
+        ${CMAKE_CURRENT_SOURCE_DIR}/../imGuiFileDialog
+        ${CMAKE_CURRENT_SOURCE_DIR}/../imSequencer
 )
 
 # On lie GLFW et OpenGL à la lib imgui
