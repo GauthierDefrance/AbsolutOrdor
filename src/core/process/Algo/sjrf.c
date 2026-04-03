@@ -18,7 +18,7 @@
  * Cette fonction gère le cycle de vie complet : arrivées, exécution CPU (UC),
  * attentes en file d'E/S et mécanisme de préemption basé sur le temps restant.
  *
- * @param liste  ListeTQ des processus à ordonnancer.
+ * @param liste ListeTQ des processus à ordonnancer.
  * @param taille Nombre total de processus (condition d'arrêt).
  * @return ExecutionTimeline* Historique complet des états pour chaque tick.
  */

@@ -28,11 +28,11 @@ ExecutionTimeline* sjrf(ListeTQ liste, int taille);
  * Met à jour les compteurs de temps en E/S et réinsère les processus
  * terminés dans la file d'attente pour qu'ils soient réévalués par le CPU.
  *
- * @param fileES             Pointeur vers la file des processus bloqués en E/S.
- * @param fileAttente        File des processus prêts (UC).
- * @param resultat           Pointeur vers la structure de résultats.
+ * @param fileES Pointeur vers la file des processus bloqués en E/S.
+ * @param fileAttente File des processus prêts (UC).
+ * @param resultat Pointeur vers la structure de résultats.
  * @param nbProcessusTraiter Compteur de progression de la simulation.
- * @param temps_courant      Horloge actuelle du système.
+ * @param temps_courant Horloge actuelle du système.
  */
 void traiterES_SJRF(File *fileES, const File *fileAttente, const ExecutionTimeline *resultat, int *nbProcessusTraiter, int temps_courant);
 
@@ -45,8 +45,8 @@ void traiterES_SJRF(File *fileES, const File *fileAttente, const ExecutionTimeli
  * est inférieure ou égale au temps actuel. Cette fonction assure qu'aucun
  * processus prêt n'est oublié dans les statistiques d'attente.
  *
- * @param fileAttente   Pointeur constant vers la file des processus en état "Prêt".
- * @param resultat      Pointeur vers la structure de chronologie à mettre à jour.
+ * @param fileAttente Pointeur constant vers la file des processus en état "Prêt".
+ * @param resultat Pointeur vers la structure de chronologie à mettre à jour.
  * @param temps_courant Horloge actuelle de la simulation (unité de temps).
  */
 void traiterWait_SJFR(const File *fileAttente, const ExecutionTimeline *resultat, int temps_courant);

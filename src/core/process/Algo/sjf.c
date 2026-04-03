@@ -16,7 +16,7 @@
  * Pilote la simulation tick par tick. Gère les arrivées, le dispatching CPU (élection),
  * l'exécution des cycles UC/ES et la mise à jour de la chronologie d'exécution.
  *
- * @param liste  ListeTQ des processus à ordonnancer.
+ * @param liste ListeTQ des processus à ordonnancer.
  * @param taille Nombre total de processus dans le système.
  * @return ExecutionTimeline* Pointeur vers l'historique complet de l'exécution.
  */
@@ -83,9 +83,9 @@ ExecutionTimeline* sjf(ListeTQ liste, int taille) {
  * Décrémente le temps restant en E/S. Si l'E/S est finie, le processus
  * est replacé dans la file d'attente pour sa prochaine rafale CPU.
  *
- * @param fileES             File des processus en ES.
- * @param fileAttente        File où replacer les processus redevenus prêts.
- * @param resultat           Chronologie à mettre à jour.
+ * @param fileES File des processus en ES.
+ * @param fileAttente File où replacer les processus redevenus prêts.
+ * @param resultat Chronologie à mettre à jour.
  * @param nbProcessusTraiter Compteur de processus terminés.
  */
 void traiterES_SJF(File *fileES, const File *fileAttente, const ExecutionTimeline *resultat, int *nbProcessusTraiter) {
@@ -123,8 +123,8 @@ void traiterES_SJF(File *fileES, const File *fileAttente, const ExecutionTimelin
  * Parcourt la file d'attente et ajoute une unité de temps "Wait" (W) dans la
  * chronologie pour chaque processus prêt à être exécuté.
  *
- * @param fileAttente   File des processus prêts (Ready Queue).
- * @param resultat      Chronologie à mettre à jour.
+ * @param fileAttente File des processus prêts (Ready Queue).
+ * @param resultat Chronologie à mettre à jour.
  * @param temps_courant Tick courant de la simulation (horloge).
  */
 void traiterWait_SJF(const File *fileAttente, const ExecutionTimeline *resultat, int temps_courant) {

@@ -31,8 +31,7 @@ ExecutionTimeline *allocTimeline() {
  * @brief Libération de la Timeline.
  *
  * @warinig Cette fonction ne libère pas les données (Processus*)
- * car dans ta logique actuelle, ils peuvent appartenir à l'ordonnanceur.
- * Si tu souhaites tout libérer, il faudrait passer `libMemProcessus` à `destroyLTQ`.
+ * pour tout libérer, il faut passer `libMemProcessus` à `destroyLTQ`.
  *
  * @param tl La timeline à détruire.
  */
@@ -84,7 +83,7 @@ void initTimelineProcessus(const ExecutionTimeline *timeline, ListeTQ liste_tq) 
 /**
  * @brief Retrouve un processus de la timeline correspondant à un itérateur.
  *
- * La comparaison s'effectue sur le nom du processus (`strcmp`).
+ * La comparaison s'effectue sur le nom du processus.
  * C'est ce qui permet de relier un processus "actif" dans l'ordonnanceur
  * à sa "fiche de score" dans la timeline.
  *

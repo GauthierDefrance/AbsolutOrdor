@@ -26,7 +26,7 @@ ExecutionTimeline* sjf(ListeTQ liste, int taille);
  *
  * @param[in,out] fileES File des processus bloqués en E/S.
  * @param[in,out] fileAttente File des processus prêts à revenir sur le CPU.
- * @param[in]     resultat Chronologie pour l'enregistrement des états.
+ * @param[in] resultat Chronologie pour l'enregistrement des états.
  * @param[in,out] nbProcessusTraiter Compteur de processus ayant terminé leur cycle de vie.
  */
 void traiterES_SJF(File *fileES, const File *fileAttente, const ExecutionTimeline *resultat, int *nbProcessusTraiter);

@@ -51,7 +51,7 @@ void initFile(File f);
 /**
  * @brief Ajoute un élément à la fin de la file (Enfiler / Enqueue).
  *
- * @param f    La file cible.
+ * @param f La file cible.
  * @param data Pointeur générique vers la donnée à stocker.
  */
 void enfilerFile(File f, void *data);

@@ -101,8 +101,8 @@ void suppQueue(Liste *l, void (*freeData)(void *)) {
 
 /**
  * @brief Libère récursivement l'ensemble de la liste.
- * @param liste     La tête de la liste à détruire.
- * @param freeData  Callback de libération des données. Indispensable si
+ * @param liste La tête de la liste à détruire.
+ * @param freeData Callback de libération des données. Indispensable si
  * les données ont été allouées dynamiquement.
  */
 void destroyListe(Liste liste, void (*freeData)(void *)) {
@@ -292,7 +292,7 @@ void inserQueue(Liste *l, void *data) {
  * @details Si printData n'est pas fourni, la fonction affiche l'adresse
  * mémoire brute des pointeurs pour permettre un débogage rapide.
  *
- * @param l         La tête de la liste.
+ * @param l La tête de la liste.
  * @param printData Fonction de rappel permettant d'afficher proprement
  *
  * le type de donnée stocké (ex: nom du processus).

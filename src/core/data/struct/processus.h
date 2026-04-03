@@ -25,7 +25,6 @@ enum OperationProcessus {
     UC,
     ES,
     W
-    // ADVICE : Ajouter vos autres algorithmes ici
 };
 
 
@@ -47,8 +46,8 @@ typedef struct {
  * cycle de vie sous forme d'une liste chaînée de quanta.
  */
 typedef struct {
-    char name[NBMAXCHAR];	// Le nom du processus
-    int timeArrival;		// Sa date d'arrivé
+    char name[NBMAXCHAR];
+    int timeArrival;
     ListeTQ listeTQ;
 } Processus;
 
@@ -111,8 +110,8 @@ ListeTQ getListeTQProcessus(Processus *processus);
  * Sinon, un nouveau quantum est créé et ajouté en queue.
  *
  * @param liste La liste à modifier.
- * @param type  Type d'opération (UC/ES/W).
- * @param n     Nombre de ticks à ajouter.
+ * @param type Type d'opération (UC/ES/W).
+ * @param n Nombre de ticks à ajouter.
  */
 void pushOrMergeOperationProcessus(ListeTQ liste, enum OperationProcessus type, int n);
 

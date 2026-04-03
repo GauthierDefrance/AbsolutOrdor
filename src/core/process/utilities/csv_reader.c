@@ -31,7 +31,7 @@ static void skipAllIgnoredLines(FILE *f);
  * entre chaque bloc de données.
  *
  * @param fileName Nom du fichier source.
- * @return ListeTQ   La liste peuplée de processus, prête pour l'ordonnanceur.
+ * @return ListeTQ La liste peuplée de processus, prête pour l'ordonnanceur.
  */
 ListeTQ createListeProcessusFromCSV(char *fileName) {
     FILE *f = fopen(fileName, "r");

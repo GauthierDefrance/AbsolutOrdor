@@ -110,8 +110,8 @@ void suppQueueLTQ(ListeTQ listeTQ, void (*freeData)(void *));
 /**
  * @brief Retire un noeud spécifique de la liste sans rompre le chaînage.
  *
- * @param ltq    La liste parente.
- * @param cible  Le noeud exact à extraire.
+ * @param ltq La liste parente.
+ * @param cible Le noeud exact à extraire.
  * @param freeData Optionnel : libère la donnée contenue dans le noeud.
  */
 void supprimerNoeudLTQ(ListeTQ ltq, Liste cible, void (*freeData)(void *));

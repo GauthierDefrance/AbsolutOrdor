@@ -111,16 +111,16 @@ void setCelluleData(Liste cellule, void *data);
 /**
  * @brief Accesseur vers le maillon suivant.
  *
- * @param cellule   Le maillon actuel.
- * @return Liste    Le pointeur vers le maillon suivant.
+ * @param cellule Le maillon actuel.
+ * @return Liste Le pointeur vers le maillon suivant.
  */
 Liste suivantListe(Liste cellule);
 
 /**
  * @brief Localise la dernière cellule de la liste.
  *
- * @param l         La tête de la liste.
- * @return Liste    Le pointeur vers le dernier maillon, ou NULL si la liste est vide.
+ * @param l La tête de la liste.
+ * @return Liste Le pointeur vers le dernier maillon, ou NULL si la liste est vide.
  *
  * @warning Complexité O(n).
  */

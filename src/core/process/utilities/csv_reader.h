@@ -16,7 +16,7 @@
  * d'entrées/sorties (ES).
  *
  * @param fileName Chemin vers le fichier .csv à charger.
- * @return ListeTQ   Une liste de processus (Liste de pointeurs Processus*),
+ * @return ListeTQ Une liste de processus (Liste de pointeurs Processus*),
  * ou NULL en cas d'échec d'ouverture.
  */
 ListeTQ createListeProcessusFromCSV(char *fileName);
@@ -29,7 +29,7 @@ ListeTQ createListeProcessusFromCSV(char *fileName);
  * avant d'entamer une simulation d'ordonnancement.
  *
  * @param liste La liste de processus à vérifier.
- * @return true  Si la liste est utilisable.
+ * @return true Si la liste est utilisable.
  * @return false Si la liste est NULL ou invalide.
  */
 bool isListeProcessusValid(ListeTQ liste);

@@ -75,7 +75,7 @@ ProcessusIterator* retirerMinTempsUC(const File* f) {
     int n = tailleFile(*f);
 
     for (int i = 0; i < n; i++) {
-        ProcessusIterator* p = (ProcessusIterator*) defilerFile(*f);
+        ProcessusIterator* p = defilerFile(*f);
 
         if (min == NULL || p->tempsRestant < min->tempsRestant || (p->tempsRestant == min->tempsRestant && p->tempsEntreeFile < min->tempsEntreeFile)) {
 
@@ -100,9 +100,9 @@ ProcessusIterator* retirerMinTempsUC(const File* f) {
  * Décrémente le temps restant du bloc UC actuel et gère les transitions
  * vers l'état "Terminé" ou "E/S" (ES).
  *
- * @param surLeCPU           Double pointeur vers le processus actif (mis à NULL si fini/bloqué).
- * @param fileES             File où envoyer le processus s'il entame un cycle d'ES.
- * @param resultat           Chronologie à mettre à jour pour l'enregistrement CPU.
+ * @param surLeCPU Double pointeur vers le processus actif (mis à NULL si fini/bloqué).
+ * @param fileES File où envoyer le processus s'il entame un cycle d'ES.
+ * @param resultat Chronologie à mettre à jour pour l'enregistrement CPU.
  * @param nbProcessusTraiter Compteur de processus terminés à incrémenter.
  */
 void traiterUC(ProcessusIterator** surLeCPU, const File *fileES, const ExecutionTimeline *resultat, int *nbProcessusTraiter) {

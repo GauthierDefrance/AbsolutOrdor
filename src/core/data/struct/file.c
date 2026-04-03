@@ -67,7 +67,7 @@ void initFile(File f) {
  * @details L'insertion se fait en queue de la structure ListeTQ interne
  * pour respecter la logique Premier Entré, Premier Sorti.
  *
- * @param f    La file cible.
+ * @param f La file cible.
  * @param data Pointeur générique vers la donnée à stocker.
  */
 void enfilerFile(File f, void *data) {

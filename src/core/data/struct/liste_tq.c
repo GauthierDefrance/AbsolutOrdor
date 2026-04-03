@@ -61,7 +61,7 @@ void libMemLTQ(ListeTQ *ltq) {
  * Parcourt chaque maillon, libère la donnée utilisateur via le callback freeData,
  * puis libère le maillon lui-même avant de libérer le conteneur final.
  *
- * @param listeTQ  La liste à détruire.
+ * @param listeTQ La liste à détruire.
  * @param freeData Fonction de libération de la donnée (passer NULL pour ne pas libérer data).
  */
 void destroyLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
@@ -135,7 +135,7 @@ Liste queueLTQ(ListeTQ listeTQ) {
  * Gère la mise à jour automatique du pointeur de queue si la liste était vide.
  *
  * @param listeTQ La liste cible.
- * @param data    La donnée à stocker dans le nouveau maillon.
+ * @param data La donnée à stocker dans le nouveau maillon.
  */
 void inserTeteLTQ(ListeTQ listeTQ, void *data) {
     if (!listeTQ) return;
@@ -213,7 +213,7 @@ void suppTeteLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
  * Nécessite un parcours de la liste pour trouver l'avant-dernier élément afin
  * de mettre à jour le pointeur de queue.
  *
- * @param listeTQ  La liste cible.
+ * @param listeTQ La liste cible.
  * @param freeData Callback de libération de la donnée.
  */
 void suppQueueLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
@@ -244,13 +244,13 @@ void suppQueueLTQ(ListeTQ listeTQ, void (*freeData)(void *)) {
 }
 
 /**
- * @brief Extraction chirurgicale d'un noeud spécifique.
+ * @brief Extraction d'un noeud spécifique.
  * Cette fonction permet de retirer un processus du milieu d'une file (par exemple
  * pour un algorithme de priorité ou SJF). Elle gère les transitions de tête,
  * de queue et le recollage des maillons adjacents.
  *
- * @param ltq      La liste dont on veut extraire le maillon.
- * @param cible    Le maillon exact à retirer.
+ * @param ltq La liste dont on veut extraire le maillon.
+ * @param cible Le maillon exact à retirer.
  * @param freeData Callback pour libérer la donnée (passer NULL pour garder la donnée).
  */
 void supprimerNoeudLTQ(ListeTQ ltq, Liste cible, void (*freeData)(void *)) {

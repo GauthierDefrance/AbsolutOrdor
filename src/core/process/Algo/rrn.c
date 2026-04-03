@@ -2,7 +2,7 @@
  * @file rrn.c
  * @brief Implémentation de l'ordonnanceur Round-robin (RR).
  * * Ce module simule un ordonnancement de type "tourniquet".
- * La gestion des processus repose sur une file (Ready Queue) oÃ¹ le processus
+ * La gestion des processus repose sur une file (Ready Queue), le processus
  * en tête dispose de l'usage exclusif du processeur jusqu'à  ce qu'il se bloque
  * (E/S) ou qu'il se termine ou Qu'il utilise ses N Quantum.
  * Aucun mécanisme de préemption n'est appliqué ici.
@@ -20,9 +20,9 @@
  * d'E/S ou s'achève ou à utiliser ces N Quantums,
  * permettant ainsi au processus suivant de devenir la nouvelle tête.
  *
- * @param file La file d'attente contenant les processus prÃªts (Ready Queue).
- * @param timeline Structure de rÃ©sultats oÃ¹ l'activitÃ© UC est enregistrÃ©e.
- * @param nb Nombre de Quantums restant autorisÃ©s Avant de laisser sa place.
+ * @param file La file d'attente contenant les processus prêts (Ready Queue).
+ * @param timeline Structure de resultats oÃ¹ l'activité UC est enregistré.
+ * @param nb Nombre de Quantums restant autorisé Avant de laisser sa place.
  */
 void executerTeteFile_RRN(File file, const ExecutionTimeline *timeline,int *nb) {
     //Si la tete de file est NULL on ne fait rien
@@ -47,6 +47,16 @@ void executerTeteFile_RRN(File file, const ExecutionTimeline *timeline,int *nb) 
     }
 }
 
+/**
+ * @brief Effectuer une insertion prioritaire pour les nouveaux arrivants.
+ *
+ * @details Essaye d'insérer en tête de file ou têtes de file-1 si la tête de fil a déjà commencé son exécution
+ * si un ou des  nouveaux arrivants se trouve déjà à l'endroit on insère après ceci.
+ *
+ * @param f La file.
+ * @param processus Le processus à enfiler.
+ * @param haveNotConsumQuantum Savoir si le premier de la file a commencé son exécution.
+ */
 bool enfilerFilePrio(File f, ProcessusIterator *processus,bool haveNotConsumQuantum) {
     if (!f || !f->ltq) return true;
 
@@ -82,6 +92,18 @@ bool enfilerFilePrio(File f, ProcessusIterator *processus,bool haveNotConsumQuan
     return true;
 }
 
+/**
+ * @brief Gère l'admission et la mise en attente des nouveaux processus arrivant
+ *
+ * Pour chaque processus en phase de calcul, cette fonction Insère dans la file d'attente les nouveaux processus.
+ * Elle comptabilise également le temps d'attente (Wait) si le processus est bloqué
+ * derrière un autre occupant déjà la tête de file.
+ *
+ * @param it L'itérateur représentant l'état actuel du processus.
+ * @param pTimeline Référence du processus dans la chronologie pour l'enregistrement.
+ * @param file La file d'attente (Ready Queue) où le processus doit patienter.
+ * @param haveNotConsumQuantum Savoir si le premier de la file a commencé son exécution.
+ */
 void traiterUC_prio(ProcessusIterator *it, const Processus *pTimeline, File file,bool haveNotConsumQuantum ) {
     bool estVide = estVideFile(file);
     it->enAttente = enfilerFilePrio(file, it,haveNotConsumQuantum);
@@ -102,6 +124,7 @@ void traiterUC_prio(ProcessusIterator *it, const Processus *pTimeline, File file
  * progresser les processus en E/S.
  * - Une phase d'exécution où la tête de file est autorisée à consommer N Quantum du CPU puis laisse sa place.
  * La simulation s'arrête Quand il n'y a plus de processus "vivant" dans le système.
+ * - les nouveaux arrivants ont une insertion prioritaire dans la file
  *
  * @param liste_tq La liste initiale des processus (et leurs cycles) à traiter.
  * @param nb Nombre de Quantums autorisés Avant de laisser sa place.
