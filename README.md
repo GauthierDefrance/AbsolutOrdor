@@ -71,7 +71,7 @@ Process6;5;2;6;3
 
 
 
-### Installation (Ubuntu)
+## Installation (Ubuntu)
 
 Afin de compiler ce projet, vous aurez besoin de Cmake, openGL, 
 
