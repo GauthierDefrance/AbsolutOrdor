@@ -2,6 +2,6 @@
 
 
 int main() {
-    MainGUI gui = MainGUI::getInstance();
+     MainGUI gui = MainGUI::getInstance();
     return gui.run();
 }
