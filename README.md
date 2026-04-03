@@ -3,7 +3,7 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
 
-Un projet en C d'ordonnacement algorithmique et de simulation du comportement d'un processeur.
+Un projet en C/C++ d'ordonnacement algorithmique et de simulation du comportement d'un processeur.
 
 ---
 
