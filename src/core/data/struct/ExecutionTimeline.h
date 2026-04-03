@@ -13,7 +13,9 @@
  */
 
 
-// Forward declaration pour éviter l'include circulaire
+/**
+ *Forward declaration pour éviter l'include circulaire
+ */
 typedef struct ProcessusIterator ProcessusIterator;
 
 

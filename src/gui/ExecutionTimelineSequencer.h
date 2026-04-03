@@ -7,7 +7,14 @@
 #include <cmath>
 #include "ImSequencer.h"
 
+/**
+ * Déclaration préventive de la structure ImDrawList
+ */
 struct ImDrawList;
+
+/**
+ * Déclaration préventive de la structure ImRect
+ */
 struct ImRect;
 
 extern "C" {
@@ -15,6 +22,10 @@ extern "C" {
     #include "data/struct/processus.h"
 }
 
+/**
+ * @class ExecutionTimelineSequencer
+ * @brief Classe servant à l'affiche d'une timeline et son séquencement
+ */
 class ExecutionTimelineSequencer : public ImSequencer::SequenceInterface{
 public:
     ExecutionTimelineSequencer() = default;

@@ -4,11 +4,12 @@
 #include "process/utilities/string_parser.h"
 
 /**
- * @brief Inclusion des structures C dans un environnement C++.
- *
- * L'usage de extern "C" est indispensable pour empêcher le name mangling (décoration de nom)
- * et permettre au lieur de retrouver les fonctions compilées en C.
+ * @file AlgoController.h
+ * @brief Classe servant à gérer les algorithmes et leurs entrées
  */
+
+
+
 extern "C" {
     #include "data/struct/liste_tq.h"
     #include "data/struct/liste.h"
@@ -23,7 +24,9 @@ extern "C" {
     #include "process/Algo/lottery_scheduling.h"
 }
 
-
+/**
+ * Structure servant à donner N paramètres en plus à nos algo
+ */
 struct AlgoConfig {
     int quantumRR;
     // Autres params éventuels

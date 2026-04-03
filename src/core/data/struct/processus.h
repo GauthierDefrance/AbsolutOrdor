@@ -8,7 +8,9 @@
  * @brief Définition et manipulation de la structure de données Processus.
  */
 
-
+/**
+ * Constante indiquant la longueuer maximale des noms des processus
+ */
 #define NBMAXCHAR 50
 
 
