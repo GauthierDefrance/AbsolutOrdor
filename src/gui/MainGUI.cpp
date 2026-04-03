@@ -70,6 +70,20 @@ void DisplayPopupSize(float size){
     ImGui::SetNextWindowPos(ImVec2((display.x - win.x) * 0.5f,(display.y - win.y) * 0.5f));
 }
 
+static bool CenteredButtonInCell(const char* label, ImVec2 btnSize){
+    ImVec2 avail = ImGui::GetContentRegionAvail();
+    ImVec2 cur = ImGui::GetCursorPos();
+
+    float x = cur.x + (avail.x - btnSize.x) * 0.5f;
+    float y = cur.y + (avail.y - btnSize.y) * 0.5f;
+
+    if (x < cur.x) x = cur.x;
+    if (y < cur.y) y = cur.y;
+
+    ImGui::SetCursorPos(ImVec2(x, y));
+    return ImGui::Button(label, btnSize);
+}
+
 void globalTheme () {
 
     {
@@ -109,48 +123,73 @@ void DrawGui(AppState& s) {
     switch (s.screen) {
         case Screen::Select: {
 
-            if (ImGui::BeginTable("MenuPrincipal", 3, ImGuiTableFlags_SizingStretchSame)) {
-
+            if (ImGui::BeginTable("MenuPrincipal", 3, ImGuiTableFlags_SizingStretchSame)){
                 bool openChoixProcessusPopup = false;
                 bool openChoixAlgoPopup = false;
                 bool openConfigPopup = false;
 
-                float fullHeight = ImGui::GetContentRegionAvail().y;
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 8));
 
-                ImGui::TableNextColumn();
-                if (AlgoController::listeProcessusIsEmpty())setButtonGreen();
-                if (ImGui::Button("Choix de processus", ImVec2(-FLT_MIN, fullHeight))) {openChoixProcessusPopup = true;}
-                if (AlgoController::listeProcessusIsEmpty())ImGui::PopStyleColor(3);
+                // ---------- COL 1 ----------
+                ImGui::TableNextColumn();{
+                    ImVec2 avail = ImGui::GetContentRegionAvail();
+                    ImVec2 btnSize(avail.x * 0.85f, avail.y * 0.30f);
 
-                ImGui::TableNextColumn();
-                if (AlgoController::CurrentAlgorithmNeedConfigChoice()) {
-                    setButtonGreen();
-                    if (ImGui::Button("Choix d'algorithmes", ImVec2(-FLT_MIN, (fullHeight * 0.5f)-2))) {
-                        openChoixAlgoPopup = true;
+                    if (AlgoController::listeProcessusIsEmpty()) setButtonGreen();
+                    if (CenteredButtonInCell("Choix de processus", btnSize)) openChoixProcessusPopup = true;
+                    if (AlgoController::listeProcessusIsEmpty()) ImGui::PopStyleColor(3);
+                }
+
+                // ---------- COL 2 ----------
+                ImGui::TableNextColumn();{
+                    ImVec2 avail = ImGui::GetContentRegionAvail();
+
+                    if (AlgoController::CurrentAlgorithmNeedConfigChoice()){
+                        // 2 boutons empilés, centrés
+                        float gap = 10.0f;
+                        float btnH = (avail.y - gap) * 0.25f;
+                        ImVec2 btnSize(avail.x * 0.85f, btnH);
+
+                        // On centre le "groupe" verticalement
+                        float groupH = btnH + gap + btnH;
+                        ImVec2 cur = ImGui::GetCursorPos();
+                        float startY = cur.y + (avail.y - groupH) * 0.5f;
+                        if (startY < cur.y) startY = cur.y;
+
+                        // Bouton 1
+                        ImGui::SetCursorPos(ImVec2(cur.x + (avail.x - btnSize.x) * 0.5f, startY));
+                        setButtonGreen();
+                        if (ImGui::Button("Choix d'algorithmes", btnSize)) openChoixAlgoPopup = true;
+                        if (!dejaClique) ImGui::PopStyleColor(3);
+
+                        // Bouton 2
+                        ImGui::SetCursorPos(ImVec2(cur.x + (avail.x - btnSize.x) * 0.5f, startY + btnH + gap));
+                        if (ImGui::Button("Choix de configuration", btnSize)) openConfigPopup = true;
+                        if (dejaClique) ImGui::PopStyleColor(3);
                     }
-                    if (!dejaClique)ImGui::PopStyleColor(3);
-                    if (ImGui::Button("Choix de configuration", ImVec2(-FLT_MIN, (fullHeight * 0.5f)-2))) {
-                        openConfigPopup = true;
+                    else{
+                        dejaClique = false;
+                        ImVec2 btnSize(avail.x * 0.85f, avail.y * 0.30f);
+                        if (!AlgoController::getCurrentAlgorithmName().empty()) setButtonGreen();
+                        if (CenteredButtonInCell("Choix d'algorithmes", btnSize)) openChoixAlgoPopup = true;
+                        if (!AlgoController::getCurrentAlgorithmName().empty()) ImGui::PopStyleColor(3);
                     }
-                    if (dejaClique)ImGui::PopStyleColor(3);
-                }
-                else {
-                    dejaClique = false;
-                    if (!AlgoController::getCurrentAlgorithmName().empty())setButtonGreen();
-                    if (ImGui::Button("Choix d'algorithmes", ImVec2(-FLT_MIN, fullHeight))) {openChoixAlgoPopup = true;}
-                    if (!AlgoController::getCurrentAlgorithmName().empty())ImGui::PopStyleColor(3);
                 }
 
-                ImGui::TableNextColumn();
-                if (!AlgoController::canRunAlgorithm()) setButtonRed();
-
-                if (ImGui::Button("Lancer la Simulation", ImVec2(-FLT_MIN, fullHeight)) && AlgoController::canRunAlgorithm()){
-                    s.transition_start = glfwGetTime();
-                    s.screen = Screen::Transition;
-                    AlgoController::runAlgorithm();
+                // ---------- COL 3 ----------
+                ImGui::TableNextColumn();{
+                    ImVec2 avail = ImGui::GetContentRegionAvail();
+                    ImVec2 btnSize(avail.x * 0.85f, avail.y * 0.30f);
+                    if (!AlgoController::canRunAlgorithm()) setButtonRed();
+                    if (CenteredButtonInCell("Lancer la Simulation", btnSize) && AlgoController::canRunAlgorithm()) {
+                        s.transition_start = glfwGetTime();
+                        s.screen = Screen::Transition;
+                        AlgoController::runAlgorithm();
+                    }
+                    if (!AlgoController::canRunAlgorithm()) ImGui::PopStyleColor(3);
                 }
-                if (!AlgoController::canRunAlgorithm())ImGui::PopStyleColor(3);
 
+                ImGui::PopStyleVar();
                 ImGui::EndTable();
 
                 if (openChoixProcessusPopup) ImGui::OpenPopup("Choix de processus");
