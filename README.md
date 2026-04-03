@@ -71,9 +71,13 @@ Process6;5;2;6;3
 
 
 
-### Installation
+### Installation (Ubuntu)
+
+Afin de compiler ce projet, vous aurez besoin de Cmake, openGL, 
 
 ```sh
+#!/bin/bash
+
 # D'abord on clone le github
 git clone https://github.com/GauthierDefrance/AbsolutOrdor/
 
@@ -93,3 +97,61 @@ cd ./build
 ./GUI
 ./CLI
 ```
+
+#### En cas de problèmes lors de l'installation
+
+Dans le cas ou vous rencontrez des problèmes lors de l'installation, il est probable que cela soit dû car votre machine ne possède pas certaines librairies.
+Voici un script généraliste sur Ubuntu qui devrait résoudre ces problèmes là.
+
+```sh
+#!/bin/bash
+# Script pour installer les dépendances OpenGL + GLFW sur Ubuntu
+
+echo "Mise à jour des paquets..."
+sudo apt update && sudo apt upgrade -y
+
+echo "Installation des dépendances..."
+sudo apt install -y \
+    libxi-dev \
+    libxcursor-dev \
+    libxinerama-dev \
+    libglfw3 \
+    libglfw3-dev \
+    libxrandr-dev \
+    build-essential \
+    mesa-utils \
+    libglu1-mesa-dev \
+    freeglut3-dev \
+    cmake \
+    git \
+    pkg-config
+
+echo "Installation terminée !"
+```
+
+#### Installation sur Windows
+
+La portabilité vers Windows à été testé et fonctionne pour Windows10/11.
+Cela dit vous aurez besoin d'installer certains modules comme Cmake ou un compilateur.
+
+```sh
+git clone https://github.com/GauthierDefrance/AbsolutOrdor/
+cd ./AbsolutOrdor
+
+# On utilise Ninja, il nous permet de compiler ce projet. D'autres compilateur comme GCC semble avoir du mal
+cmake -S . -B build -G Ninja
+
+cmake --build build
+
+cd ./build
+
+./GUI.exe
+./CLI.exe
+```
+
+#### Installation sur MAC
+
+La portabilité sur Mac n'a pas était testé.
+Mais en utilisant les dépendances demandé par cmake et en installant correctement Cmake,
+il vous suffira de suivre des procédures relativement similaire à celui de l'installation sur Ubuntu.
+
