@@ -12,10 +12,8 @@ include(FetchContent)
 FetchContent_Declare(glfw URL https://github.com/glfw/glfw/releases/download/3.3.8/glfw-3.3.8.zip)
 FetchContent_MakeAvailable(glfw)
 
-add_subdirectory(libs/imgui)
-add_subdirectory(libs/imGuiFileDialog)
-add_subdirectory(libs/ImSequencer)
-
+set(IMGUI_DIR "libs/imgui")
+add_subdirectory(${IMGUI_DIR})
 
 # --- 3. DÉFINITION DES SOURCES ---
 
@@ -74,13 +72,7 @@ add_executable(GUI ${CORE_SOURCES} ${UTILS_SOURCES} gui/main.cpp
         gui/MainGUI.cpp
         gui/MainGUI.h
 )
-target_link_libraries(GUI
-        imgui
-        ImGuiFileDialog
-        ImSequencer
-        glfw
-        OpenGL::GL
-)
+target_link_libraries(GUI imgui glfw OpenGL::GL)
 target_compile_options(GUI PRIVATE -Wall -Wextra -Werror) # <--- ICI
 
 # Cible TESTS
