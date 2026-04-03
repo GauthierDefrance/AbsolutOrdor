@@ -429,11 +429,18 @@ void DrawGui(AppState& s) {
             const int n = frameMin + (int)((frameMax - frameMin) * progress);
 
             // Taille du widget
-            float maxH = ImGui::GetIO().DisplaySize.y * 0.70f;
+            float customHeightsSum = 0.0f;
+            float idealHeight = sequencer.GetItemCount() * 20.0f + 70.0f + customHeightsSum;
+
+            float maxHeight = ImGui::GetIO().DisplaySize.y * 0.70f;
             float availY = ImGui::GetContentRegionAvail().y;
-            float timelineHeight = (maxH < availY) ? maxH : availY;
+
+            float timelineHeight = idealHeight;
+            if (timelineHeight > maxHeight) timelineHeight = maxHeight;
+            if (timelineHeight > availY) timelineHeight = availY;
 
             ImGui::BeginChild("TimelineAnimChild", ImVec2(0, timelineHeight), true, ImGuiWindowFlags_HorizontalScrollbar);
+
 
             sequencer.DrawUntil(ImSequencer::SEQUENCER_CHANGE_FRAME, n);
 
