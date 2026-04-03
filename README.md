@@ -155,3 +155,10 @@ La portabilité sur Mac n'a pas était testé.
 Mais en installant Cmake et les dépendances qu'il demande,
 il vous suffira de suivre des procédures relativement similaire à celui de l'installation sur Ubuntu.
 
+
+## Librairies utilisées
+
+- [ImGui](https://github.com/ocornut/imgui)  
+- [ImGuiFileDialog](https://github.com/aiekick/ImGuiFileDialog)  
+- [ImSequencer](https://github.com/CedricGuillemet/ImGuizmo/blob/master/ImSequencer.h)
+
