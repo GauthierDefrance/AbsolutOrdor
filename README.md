@@ -74,5 +74,22 @@ Process6;5;2;6;3
 ### Installation
 
 ```sh
+# D'abord on clone le github
 git clone https://github.com/GauthierDefrance/AbsolutOrdor/
+
+# Ensuite, on se rend dans le répertoire du projet
+cd ./AbsolutOrdor
+
+# Une fois dans le répertoire, on pourra utiliser cmake pour préparer à la compilation
+cmake -S . -B build
+
+# Enfin on compile réellement
 cmake --build build
+
+# Une fois tout cela fait, vous pouvez vous rendre dans le répertoire de build
+cd ./build
+
+# Dedans vous pourrez éxécuter vos programmes avec par exemples
+./GUI
+./CLI
+```
