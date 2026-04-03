@@ -92,7 +92,7 @@ void AlgoController::setCSV(char *sourcepath) {
         return;
     }
 
-    // ✅ Utilise le parseur C++ au lieu de createListeProcessusFromCSV
+    // Utilise le parseur C++ au lieu de createListeProcessusFromCSV
     std::ifstream file(sourcepath);
     if (!file.is_open()) {
         std::cerr << "[AlgoController] Erreur : impossible d'ouvrir " << sourcepath << "\n";
@@ -101,15 +101,6 @@ void AlgoController::setCSV(char *sourcepath) {
         return;
     }
     listeProcessus = createListeProcessusFromStream(file);
-
-    if (!isListeProcessusValid(listeProcessus)) {
-        std::cerr << "[AlgoController] Erreur : liste de processus invalide.\n";
-        destroyLTQ(listeProcessus, (void (*)(void *)) libMemProcessus);
-        listeProcessus = nullptr;
-        currentCSVPath = "";
-        currentCSVName = "";
-        return;
-    }
 
     currentCSVPath = sourcepath;
     std::string pathStr(sourcepath);
@@ -133,14 +124,6 @@ void AlgoController::setContentCSV(const std::string& csvContent) {
     }
 
     listeProcessus = createListeProcessusFromString(csvContent);
-
-    if (!isListeProcessusValid(listeProcessus)) {
-        std::cerr << "[AlgoController] Erreur : liste de processus invalide." << std::endl;
-        listeProcessus = nullptr;
-        currentCSVPath = "";
-        currentCSVName = "";
-        return;
-    }
 
     currentCSVPath = "";
     currentCSVName = "";

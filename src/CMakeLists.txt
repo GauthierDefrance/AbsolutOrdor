@@ -26,7 +26,6 @@ set(CORE_SOURCES
         core/data/struct/file.c
         core/data/struct/ProcessusIterator.c
         core/process/AlgoController.cpp
-        core/process/utilities/csv_reader.c
         core/process/Algo/fifo.c
         core/process/Algo/sjf.c
         core/process/Algo/sjrf.c

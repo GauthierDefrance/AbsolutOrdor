@@ -2,9 +2,7 @@
 #include <cstdio>
 #include <cstring>
 
-extern "C" {
-#include "process/utilities/csv_reader.h"
-}
+#include "process/utilities/string_parser.h"
 
 #define LOG_STEP(msg) std::cout << "  [STEP] " << msg << std::endl;
 
@@ -20,11 +18,13 @@ bool testCSVReader() {
     fprintf(f,"P3;4;3;4;2\n");
 
     fclose(f);
-
-    ListeTQ liste = createListeProcessusFromCSV((char*)filename);
-
-    if(!liste)
+    std::ifstream file(filename);
+    if (!file.is_open()) {
         return false;
+    }
+    ListeTQ liste = createListeProcessusFromStream(file);
+
+    if(!liste)return false;
 
     destroyLTQ(liste,(void(*)(void*))libMemProcessus);
 

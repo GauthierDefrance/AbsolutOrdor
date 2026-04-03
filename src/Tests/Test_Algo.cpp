@@ -1,10 +1,5 @@
 #include <iostream>
 #include <cstdio>
-
-extern "C" {
-    #include "process/utilities/csv_reader.h"
-}
-
 #include "process/AlgoController.h"
 #include "../cli/ConsoleStructPrinter.h"
 

@@ -2,7 +2,6 @@
 
 extern "C" {
 #include "data/struct/ExecutionTimeline.h"
-#include "process/utilities/csv_reader.h"
 }
 
 #include "../cli/ConsoleStructPrinter.h"
