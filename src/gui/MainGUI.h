@@ -19,7 +19,6 @@ extern "C" {
 #include "data/struct/liste_tq.h"
 #include "data/struct/processus.h"
 #include "data/struct/ExecutionTimeline.h"
-#include "process/utilities/csv_reader.h"
 #include "process/utilities/TimelineStatsCalculator.h"
 }
 enum class Screen { Select, Transition, Results };

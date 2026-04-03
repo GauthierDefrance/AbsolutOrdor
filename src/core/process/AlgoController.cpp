@@ -72,7 +72,7 @@ void AlgoController::runAlgorithm() {
 /**
  * @brief Charge un CSV et traite les métadonnées associées.
  *
- * En plus de créer la liste de processus via le `csv_reader`, cette méthode
+ * En plus de créer la liste de processus , cette méthode
  * analyse la chaîne de caractères du chemin pour extraire le nom du fichier
  * (ex: transforme "C:/data/test.csv" en "test.csv").
  *
