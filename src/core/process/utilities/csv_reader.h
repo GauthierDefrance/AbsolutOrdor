@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 
-// DEPRECATED : On utilise String Parser désormais /!\
+/* DEPRECATED : On utilise String Parser désormais /!\ */
 
 
 /**
