@@ -1,5 +1,6 @@
 #include "MainGUI.h"
 
+bool dejaClique = false;
 double transition_duration = 10.0;
 char bufferCSVManuel[1024] = "";
 int quantumRR = 2;
@@ -48,6 +49,18 @@ void DisplayPopupSize(float size){
     ImGui::SetNextWindowPos(ImVec2((display.x - win.x) * 0.5f,(display.y - win.y) * 0.5f));
 }
 
+void setButtonRed(){
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 0.35f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.0f, 0.0f, 0.45f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 0.55f));
+}
+
+void setButtonGreen(){
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 1.0f, 0.0f, 0.35f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 1.0f, 0.0f, 0.45f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 1.0f, 0.0f, 0.55f));
+}
+
 
 void DrawGui(AppState& s) {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -65,25 +78,38 @@ void DrawGui(AppState& s) {
                 float fullHeight = ImGui::GetContentRegionAvail().y;
 
                 ImGui::TableNextColumn();
+                if (AlgoController::listeProcessusIsEmpty())setButtonGreen();
                 if (ImGui::Button("Choix de processus", ImVec2(-FLT_MIN, fullHeight))) {openChoixProcessusPopup = true;}
+                if (AlgoController::listeProcessusIsEmpty())ImGui::PopStyleColor(3);
 
                 ImGui::TableNextColumn();
                 if (AlgoController::CurrentAlgorithmNeedConfigChoice()) {
+                    setButtonGreen();
                     if (ImGui::Button("Choix d'algorithmes", ImVec2(-FLT_MIN, (fullHeight * 0.5f)-2))) {
                         openChoixAlgoPopup = true;
                     }
+                    if (!dejaClique)ImGui::PopStyleColor(3);
                     if (ImGui::Button("Choix de configuration", ImVec2(-FLT_MIN, (fullHeight * 0.5f)-2))) {
                         openConfigPopup = true;
                     }
+                    if (dejaClique)ImGui::PopStyleColor(3);
                 }
-                else if (ImGui::Button("Choix d'algorithmes", ImVec2(-FLT_MIN, fullHeight))) {openChoixAlgoPopup = true;}
+                else {
+                    dejaClique = false;
+                    if (!AlgoController::getCurrentAlgorithmName().empty())setButtonGreen();
+                    if (ImGui::Button("Choix d'algorithmes", ImVec2(-FLT_MIN, fullHeight))) {openChoixAlgoPopup = true;}
+                    if (!AlgoController::getCurrentAlgorithmName().empty())ImGui::PopStyleColor(3);
+                }
 
                 ImGui::TableNextColumn();
+                if (!AlgoController::canRunAlgorithm()) setButtonRed();
+
                 if (ImGui::Button("Lancer la Simulation", ImVec2(-FLT_MIN, fullHeight)) && AlgoController::canRunAlgorithm()){
                     s.transition_start = glfwGetTime();
                     s.screen = Screen::Transition;
                     AlgoController::runAlgorithm();
                 }
+                if (!AlgoController::canRunAlgorithm())ImGui::PopStyleColor(3);
 
                 ImGui::EndTable();
 
@@ -186,10 +212,16 @@ void DrawGui(AppState& s) {
                 if (ImGui::BeginTable("AlgoTable", columns,ImGuiTableFlags_SizingStretchSame)){
                     for (std::string_view name : AlgoController::ALGO){
                         ImGui::TableNextColumn();
+                        bool found = false;
+                        if (name == AlgoController::getCurrentAlgorithmName()) {
+                            found = true;
+                            setButtonGreen();
+                        }
                         if (ImGui::Button(name.data(), ImVec2(-FLT_MIN, finalH))){
                             AlgoController::selectAlgorithm(name.data());
                             ImGui::CloseCurrentPopup();
                         }
+                        if (found)ImGui::PopStyleColor(3);
                     }
                     ImGui::EndTable();
                 }
@@ -207,6 +239,7 @@ void DrawGui(AppState& s) {
                 if (ImGui::Button("Enregistrer")) {
                     ImGui::CloseCurrentPopup();
                     AlgoController::selectAlgorithm(AlgoController::getCurrentAlgorithmName(),{quantumRR});
+                    dejaClique = true;
                 }
                 ImGui::EndPopup();
             }

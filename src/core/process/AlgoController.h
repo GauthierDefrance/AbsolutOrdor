@@ -83,6 +83,8 @@ public:
 
     static bool canRunAlgorithm();
 
+    static bool listeProcessusIsEmpty();
+
     static bool CurrentAlgorithmNeedConfigChoice();
 
     /** @return Le chemin complet du fichier CSV actuellement chargé. */

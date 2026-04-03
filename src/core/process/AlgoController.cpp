@@ -174,6 +174,13 @@ bool AlgoController::canRunAlgorithm() {
     return true;
 }
 
+bool AlgoController::listeProcessusIsEmpty() {
+    if (listeProcessus == nullptr  || listeProcessus->tete == nullptr) {
+        return false;
+    }
+    return true;
+}
+
 bool AlgoController::CurrentAlgorithmNeedConfigChoice() {
     for (std::size_t i = 0; i < ALGO.size(); ++i) {
         if (ALGO[i] == algorithm_choice) {
