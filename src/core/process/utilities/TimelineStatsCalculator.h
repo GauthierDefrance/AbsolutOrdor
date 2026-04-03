@@ -60,7 +60,46 @@ double tempRepMoyProcessus(ExecutionTimeline *timeline);
  */
 double tauxOccupationCPU(ExecutionTimeline *timeline);
 
+/**
+ * @brief Calcule le temps maximal (borne supérieure) de la timeline.
+ *
+ * Parcourt tous les processus de la timeline, et pour chacun calcule son temps
+ * de fin théorique : timeArrival + somme(nbQuantum de tous ses quanta). Le
+ * résultat renvoyé est le maximum de ces temps de fin parmi tous les processus.
+ *
+ * @param timeline Pointeur vers la timeline d'exécution (doit contenir une liste de processus).
+ * @return Le plus grand instant de fin trouvé (>= 0), ou 0 si timeline/processus est NULL.
+ */
 int getTimelineMax(const ExecutionTimeline *timeline);
+
+/**
+ * @brief Renvoie le premier instant (début) de la timeline.
+ *
+ * Recherche le plus petit timeArrival parmi tous les processus de la timeline.
+ *
+ * @param timeline Pointeur vers la timeline d'exécution.
+ * @return Le plus petit timeArrival, ou 0 si timeline/processus est NULL ou si la liste est vide.
+ */
 int getTimelineDebut(const ExecutionTimeline *timeline);
+
+/**
+ * @brief Compte le nombre de processus présents dans la timeline.
+ *
+ * Incrémente un compteur en parcourant la liste timeline->processus.
+ *
+ * @param timeline Pointeur vers la timeline d'exécution.
+ * @return Le nombre total de processus, ou 0 si timeline/processus est NULL.
+ */
 int getTimelineNbProcessus(const ExecutionTimeline *timeline);
+
+/**
+ * @brief Calcule le nombre total de ticks (unités de temps) pour un type d'opération donné.
+ *
+ * Parcourt tous les processus puis tous leurs quanta ; si q->type correspond au type demandé,
+ * ajoute q->nbQuantum au total.
+ *
+ * @param timeline Pointeur vers la timeline d'exécution.
+ * @param type Type d'opération à cumuler (ex: UC, ES, W).
+ * @return Somme des nbQuantum pour le type indiqué, ou 0 si timeline/processus est NULL.
+ */
 int getTimelineTicksType(const ExecutionTimeline *timeline, enum OperationProcessus type);
