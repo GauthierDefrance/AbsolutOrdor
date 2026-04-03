@@ -80,44 +80,41 @@ void AlgoController::runAlgorithm() {
  */
 void AlgoController::setCSV(char *sourcepath) {
 
-    // Libération de l'ancienne liste si elle existe
-    if (AlgoController::listeProcessus != nullptr) {
-        destroyLTQ(AlgoController::listeProcessus, (void (*)(void *)) libMemProcessus);
-        AlgoController::listeProcessus = nullptr;
+    if (listeProcessus != nullptr) {
+        destroyLTQ(listeProcessus, (void (*)(void *)) libMemProcessus);
+        listeProcessus = nullptr;
     }
 
-    if (! isValidCSVFile(sourcepath)) {
+    if (!isValidCSVFile(sourcepath)) {
         std::cerr << "Erreur : fichier CSV invalide.\n";
-        AlgoController::listeProcessus = nullptr;
         currentCSVPath = "";
         currentCSVName = "";
         return;
     }
 
-    // Importation des nouvelles données
-    AlgoController::listeProcessus = createListeProcessusFromCSV(sourcepath);
+    // ✅ Utilise le parseur C++ au lieu de createListeProcessusFromCSV
+    std::ifstream file(sourcepath);
+    if (!file.is_open()) {
+        std::cerr << "[AlgoController] Erreur : impossible d'ouvrir " << sourcepath << "\n";
+        currentCSVPath = "";
+        currentCSVName = "";
+        return;
+    }
+    listeProcessus = createListeProcessusFromStream(file);
 
-    // Validation
-    if (!isListeProcessusValid(AlgoController::listeProcessus)) {
-        std::cerr << "[AlgoController] Erreur : liste de processus invalide." << std::endl;
-        destroyLTQ(AlgoController::listeProcessus, (void (*)(void *)) libMemProcessus);
-        AlgoController::listeProcessus = nullptr;
-
-        // reset aussi les infos fichier
+    if (!isListeProcessusValid(listeProcessus)) {
+        std::cerr << "[AlgoController] Erreur : liste de processus invalide.\n";
+        destroyLTQ(listeProcessus, (void (*)(void *)) libMemProcessus);
+        listeProcessus = nullptr;
         currentCSVPath = "";
         currentCSVName = "";
         return;
     }
 
-    // Stockage et parsing du nom de fichier
     currentCSVPath = sourcepath;
     std::string pathStr(sourcepath);
     size_t pos = pathStr.find_last_of("/\\");
-    if (pos != std::string::npos) {
-        currentCSVName = pathStr.substr(pos + 1);
-    } else {
-        currentCSVName = pathStr;
-    }
+    currentCSVName = (pos != std::string::npos) ? pathStr.substr(pos + 1) : pathStr;
 }
 
 void AlgoController::setContentCSV(const std::string& csvContent) {

@@ -2,6 +2,11 @@
 #include "data/struct/processus.h"
 #include "data/struct/liste_tq.h"
 #include <stdbool.h>
+
+
+// DEPRECATED : On utilise String Parser désormais /!\
+
+
 /**
  * @file csv_reader.h
  * @brief Interface pour le chargement de scénarios d'ordonnancement via fichiers CSV.

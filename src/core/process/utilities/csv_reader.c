@@ -34,64 +34,76 @@ static void skipAllIgnoredLines(FILE *f);
  * @return ListeTQ La liste peuplée de processus, prête pour l'ordonnanceur.
  */
 ListeTQ createListeProcessusFromCSV(char *fileName) {
-    FILE *f = fopen(fileName, "r");
-    if (!f) {
-        fprintf(stderr, "Erreur : impossible d’ouvrir %s\n", fileName);
-        return NULL;
-    }
+        FILE *f = fopen(fileName, "r");
+        if (!f) {
+            fprintf(stderr, "Erreur : impossible d’ouvrir %s\n", fileName);
+            return NULL;
+        }
 
-    ListeTQ liste = allocMemLTQ();
-    initLTQ(liste);
+        ListeTQ liste = allocMemLTQ();
+        initLTQ(liste);
 
-    int size = 0;
-    skipAllIgnoredLines(f);
-    fscanf(f, "%d", &size);
-
-    char processName[NBMAXCHAR];
-    int spawnDate;
-    int quantum;
-    int i = 0;
-    bool flag = true;
-    while (i < size && flag) {
-        i++;
+        int size = 0;
         skipAllIgnoredLines(f);
 
-        Processus *p = allocMemProcessus();
-        initProcessus(p);
-
-        // Lecture nom + date
-        if (fscanf(f, "%[^;];%d;", processName, &spawnDate) != 2) {
-            fprintf(stderr, "Erreur CSV ligne %d\n", i);
-            free(p);
-            flag = false;
+        // Lecture du nombre de processus
+        if (fscanf(f, "%d", &size) != 1 || size <= 0) {
+            fprintf(stderr, "Erreur : nombre de processus invalide\n");
+            fclose(f);
+            return liste;
         }
 
-        strncpy(p->name, processName, NBMAXCHAR - 1);
-        p->timeArrival = spawnDate;
+        int ch;
+        while ((ch = fgetc(f)) != EOF && ch != '\n');
 
-        // Lecture UC/ES
-        int index = 0;
-        bool flag2 = true;
-        while (fscanf(f, "%d", &quantum) == 1 && flag2) {
-            Quantum *q = malloc(sizeof(Quantum));
-            q->nbQuantum = quantum;
-            q->type = (index % 2 == 0 ? UC : ES);
+        char processName[NBMAXCHAR];
+        int spawnDate;
+        int quantum;
 
-            inserQueueLTQ(p->listeTQ, q);
+        for (int i = 0; i < size; i++) {
 
-            index++;
+            skipAllIgnoredLines(f);
 
-            int c = fgetc(f);
-            if (c == '\n' || c == EOF)
-                flag2 = false;
+            Processus *p = allocMemProcessus();
+            initProcessus(p);
+
+            // Lecture nom + date
+            if (fscanf(f, "%[^;];%d;", processName, &spawnDate) != 2) {
+                fprintf(stderr, "Erreur CSV ligne %d\n", i + 1);
+                libMemProcessus(p);
+                break;
+            }
+
+            strncpy(p->name, processName, NBMAXCHAR - 1);
+            p->name[NBMAXCHAR - 1] = '\0';
+            p->timeArrival = spawnDate;
+
+            // Lecture UC/ES alternés
+            int index = 0;
+            while (fscanf(f, "%d", &quantum) == 1) {
+
+                Quantum *q = malloc(sizeof(Quantum));
+                q->nbQuantum = quantum;
+                q->type = (index % 2 == 0 ? UC : ES);
+
+                inserQueueLTQ(p->listeTQ, q);
+                index++;
+
+                int c = fgetc(f);
+                if (c == '\n' || c == EOF)
+                    break;
+            }
+
+            inserQueueLTQ(liste, p);
         }
 
-        inserQueueLTQ(liste, p);
-    }
+        int c;
+        while ((c = fgetc(f)) != EOF) {}
 
-    fclose(f);
-    return liste;
+        fclose(f);
+        return liste;
 }
+
 
 
 /**
