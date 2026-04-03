@@ -128,7 +128,7 @@ bool isValidInlineCSV(const std::string& input) {
     if (nbProcessus <= 0) return false;
 
     int found = 0;
-    while (readNextLine()) {
+    while (readNextLine() && found < nbProcessus) {
         std::istringstream iss(line);
         std::string token;
 
@@ -152,7 +152,7 @@ bool isValidInlineCSV(const std::string& input) {
         ++found;
     }
 
-    return found == nbProcessus;
+    return found >= nbProcessus;
 }
 
 
