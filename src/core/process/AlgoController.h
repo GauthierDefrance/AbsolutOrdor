@@ -67,6 +67,15 @@ public:
      * @param sourcepath Chemin complet vers le fichier CSV.
      */
     void setCSV(char *sourcepath);
+
+    /**
+     * @brief Charge Le contenu d'un fichier CSV et initialise la liste des processus.
+     *
+     * Si une liste était déjà chargée, elle est automatiquement libérée avant
+     * d'importer les nouvelles données.
+     *
+     * @param sourcepath Chemin complet vers le fichier CSV.
+     */
     void setContentCSV(const std::string& csvContent);
 
     /**
@@ -85,10 +94,13 @@ public:
      */
     static void runAlgorithm();
 
+    /** @return Vérifiez si tous les paramètres nécessaires ont été donnés et sont valides. */
     static bool canRunAlgorithm();
 
+    /** @return Vérifier si la liste de processus est vide. */
     static bool listeProcessusIsEmpty();
 
+    /** @return Si oui ou non l'algorithme a besoin de paramètres supplémentaires */
     static bool CurrentAlgorithmNeedConfigChoice();
 
     /** @return Le chemin complet du fichier CSV actuellement chargé. */
@@ -97,10 +109,12 @@ public:
     /** @return Le nom seul du fichier (sans le dossier) pour l'affichage. */
     static std::string getCurrentCSVName();
 
+    /** @return Le nom de l'algorithme actuellement choisi */
     static std::string getCurrentAlgorithmName();
 
+    /** @return La configuration actuelle pour l'algorithme */
     static AlgoConfig getCurrentAlgorithmConfig();
-
+    /** @return Récupérer le résultat de l'exécution de l'algorithme  */
     static ExecutionTimeline *getExecutionTimeline();
 
 private:

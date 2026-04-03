@@ -495,7 +495,7 @@ void DrawGui(AppState& s) {
 
             ImGui::SameLine();
 
-            if (ImGui::Button("Sauvegardez")) {
+            if (ImGui::Button("Sauvegarder")) {
                 IGFD::FileDialogConfig config;
                 config.path = ".";
                 config.fileName = "resultats.csv";
