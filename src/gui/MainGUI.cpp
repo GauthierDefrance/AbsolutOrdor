@@ -1,5 +1,7 @@
 #include "MainGUI.h"
 
+#include "ExecutionTimelineSequencer.h"
+
 bool dejaClique = false;
 double transition_duration = 10.0;
 char bufferCSVManuel[1024] = "";
@@ -32,6 +34,25 @@ std::string statsTimeline(const ExecutionTimeline *tl) {
 
     return ss.str();
 }
+
+
+static void DrawTimelineLegend(){
+    auto legendItem = [](ImU32 col, const char* label){
+        ImGui::ColorButton(label, ImGui::ColorConvertU32ToFloat4(col),ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoDragDrop,ImVec2(14, 14));
+        ImGui::SameLine();
+        ImGui::TextUnformatted(label);
+        ImGui::SameLine(0.0f, 14.0f);
+    };
+
+    ImGui::TextUnformatted("Legende :");
+    ImGui::SameLine();
+
+    // Couleurs identiques à celles utilisées pour les segments :
+    legendItem(IM_COL32( 80, 200, 120, 255), "UC"); // vert
+    legendItem(IM_COL32( 80, 140, 240, 255), "ES"); // bleu
+    legendItem(IM_COL32(220, 170,  70, 255), "W");  // orange
+}
+
 
 void DisplayWindowSize(float size) {
     ImVec2 display = ImGui::GetIO().DisplaySize;
@@ -283,11 +304,44 @@ void DrawGui(AppState& s) {
             }
             break;
 
-        case Screen::Results:
-            ImGui::Text("Results");
-            if (AlgoController::CurrentAlgorithmNeedConfigChoice())ImGui::Text("%s%d",AlgoController::getCurrentAlgorithmName().c_str(),AlgoController::getCurrentAlgorithmConfig().quantumRR);
-            else ImGui::Text("%s",AlgoController::getCurrentAlgorithmName().c_str());
-            ImGui::Text("%s", statsTimeline(AlgoController::getExecutionTimeline()).c_str());
+        case Screen::Results:{
+            const ExecutionTimeline* tl = AlgoController::getExecutionTimeline();
+
+            ImGui::SeparatorText("Execution Timeline");
+            DrawTimelineLegend();
+            static ExecutionTimelineSequencer sequencer;
+            ImGui::NewLine();
+
+            static const ExecutionTimeline* lastTL = nullptr;
+
+            // (Re)charger la timeline si elle a changé
+            if (tl && tl != lastTL) {
+                sequencer.SetTimeline(tl);
+                sequencer.SetCurrentFrame(sequencer.GetFrameMin()); // optionnel : reset au début
+                lastTL = tl;
+            }
+
+            float customHeightsSum = 0.0f;
+
+            float idealHeight = sequencer.GetItemCount() * 20.0f + 70.0f + customHeightsSum ;
+
+            float maxHeight = ImGui::GetIO().DisplaySize.y * 0.70f;
+            float availY = ImGui::GetContentRegionAvail().y;
+
+            float timelineHeight = idealHeight;
+            if (timelineHeight > maxHeight) timelineHeight = maxHeight;
+            if (timelineHeight > availY)   timelineHeight = availY;
+
+            ImGui::BeginChild("TimelineChild", ImVec2(0, timelineHeight), true, ImGuiWindowFlags_HorizontalScrollbar);
+            sequencer.Draw(ImSequencer::SEQUENCER_CHANGE_FRAME);
+            ImGui::EndChild();
+
+
+            if (AlgoController::CurrentAlgorithmNeedConfigChoice())ImGui::Text("Results : %s%d", AlgoController::getCurrentAlgorithmName().c_str(),AlgoController::getCurrentAlgorithmConfig().quantumRR);
+            else ImGui::Text("Results : %s", AlgoController::getCurrentAlgorithmName().c_str());
+            ImGui::Separator();
+
+            ImGui::Text("%s", statsTimeline(tl).c_str());
 
             if (ImGui::Button("Sauvegardez")) {
                 IGFD::FileDialogConfig config;
@@ -310,6 +364,7 @@ void DrawGui(AppState& s) {
                 }
                 ImGuiFileDialog::Instance()->Close();
             }
+        }
             break;
     default: ;
     }

@@ -43,7 +43,6 @@ set(UTILS_SOURCES
         core/process/utilities/csv_writer.cpp
         core/process/utilities/csv_writer.h
         core/process/utilities/TimelineStatsCalculator.c
-        core/process/utilities/TimelineStatsCalculator.c
 )
 
 # Fichiers de tests
@@ -71,6 +70,8 @@ target_compile_options(CLI PRIVATE -Wall -Wextra -Werror) # <--- ICI
 add_executable(GUI ${CORE_SOURCES} ${UTILS_SOURCES} gui/main.cpp
         gui/MainGUI.cpp
         gui/MainGUI.h
+        gui/ExecutionTimelineSequencer.cpp
+        gui/ExecutionTimelineSequencer.h
 )
 target_link_libraries(GUI imgui glfw OpenGL::GL)
 target_compile_options(GUI PRIVATE -Wall -Wextra -Werror) # <--- ICI
