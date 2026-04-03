@@ -49,6 +49,25 @@ void DisplayPopupSize(float size){
     ImGui::SetNextWindowPos(ImVec2((display.x - win.x) * 0.5f,(display.y - win.y) * 0.5f));
 }
 
+void globalTheme () {
+
+    {
+        ImGuiStyle& style = ImGui::GetStyle();
+
+        style.WindowRounding = 8.0f;
+        style.FrameRounding  = 6.0f;
+        style.PopupRounding  = 6.0f;
+
+        //style.WindowPadding  = ImVec2(12, 12);
+        //style.ItemSpacing    = ImVec2(10, 8);
+
+        ImVec4* colors = style.Colors;
+        colors[ImGuiCol_WindowBg]  = ImVec4(0.12f,0.12f,0.12f,1.00f);
+        colors[ImGuiCol_PopupBg]   = ImVec4(0.10f,0.10f,0.10f,1.00f);
+    }
+
+}
+
 void setButtonRed(){
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 0.35f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.0f, 0.0f, 0.45f));
@@ -314,6 +333,7 @@ int MainGUI::run() {
     ImGui::CreateContext();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
+    globalTheme();
 
     AppState myApp;
 
